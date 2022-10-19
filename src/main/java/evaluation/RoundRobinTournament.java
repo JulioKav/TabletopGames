@@ -133,7 +133,7 @@ public class RoundRobinTournament extends AbstractTournament {
              params . maxTreeDepth = 5; // Maximum length the tree can grow .
 
              // Create the player with the given parameters .
-             BasicMCTSPlayer player = new BasicMCTSPlayer ( params ) ;
+             MCTSPlayer player = new MCTSPlayer ( params ) ;
 
              // The heuristic to evaluate states :
              player . setStateHeuristic (new SushiGoHeuristic() ) ;
@@ -141,12 +141,15 @@ public class RoundRobinTournament extends AbstractTournament {
 
 
             /* 2. Set up players */
+            agents.add(player);
             agents.add(new MCTSPlayer());
-            agents.add(new RHEAPlayer());
+            agents.add(new MCTSPlayer());
+            agents.add(new MCTSPlayer());
+            //agents.add(new RHEAPlayer());
             //agents.add(new BasicMCTSPlayer());
-            agents.add(new RandomPlayer());
+            //agents.add(new RandomPlayer());
             //agents.add(new RMHCPlayer());
-            agents.add(new OSLAPlayer());
+            //agents.add(new OSLAPlayer());
         }
 
         AbstractParameters params = ParameterFactory.createFromFile(gameToPlay, gameParams);

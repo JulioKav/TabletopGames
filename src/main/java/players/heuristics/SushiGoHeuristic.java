@@ -24,16 +24,17 @@ import static games.sushigo.cards.SGCard.SGCardType.*;
 public class SushiGoHeuristic extends TunableParameters implements IStateHeuristic {
 
     double eggNigiriValue = -1;
-    double salmonNigiriValue = 1;
-    double squidNigiriValue = -0.01;
-    double dumplingValue = -0.3;  // Play it
+    double salmonNigiriValue = 0.7;
+    double squidNigiriValue = 0.8;
+    double dumplingValue = 0;  // Play it
     double sashimiValue = -0.5;  // Play it
     double tempuraValue = -0.4;  // Play it
-    double wasabiValue = 0.2;
-    double puddingValue = -0.1;
-    double maki1Value = -0.2;
-    double maki2Value = -0.2;
-    double maki3Value = -0.2;
+    double wasabiValue = 0.9;
+    double puddingValue = 0.1;
+    double maki1Value = -0.7;
+    double maki2Value = -0.4;
+    double maki3Value = 0.7;
+    double chopsticksValue = 1;
 
 
 
@@ -43,16 +44,17 @@ public class SushiGoHeuristic extends TunableParameters implements IStateHeurist
 
     public SushiGoHeuristic() {
         addTunableParameter("eggNigiriValue", -1.0);
-        addTunableParameter("salmonNigiriValue", 1.0);
-        addTunableParameter("squidNigiriValue", -0.01);
-        addTunableParameter("dumplingValue", -0.3);
-        addTunableParameter("sashimiValue", -0.5);
-        addTunableParameter("tempuraValue", -0.4);
-        addTunableParameter("wasabiValue", 0.2);
-        addTunableParameter("puddingValue", -0.1);
-        addTunableParameter("maki1Value", -0.1);
-        addTunableParameter("maki2Value", -0.1);
-        addTunableParameter("maki3Value", -0.1);
+        addTunableParameter("salmonNigiriValue", 0.7);
+        addTunableParameter("squidNigiriValue", 0.8);
+        addTunableParameter("dumplingValue", 0.0);
+        addTunableParameter("sashimiValue", -0.8);
+        addTunableParameter("tempuraValue", -0.1);
+        addTunableParameter("wasabiValue", 0.9);
+        addTunableParameter("puddingValue", 0.1);
+        addTunableParameter("maki1Value", -0.7);
+        addTunableParameter("maki2Value", -0.4);
+        addTunableParameter("maki3Value", 0.7);
+        addTunableParameter("chopsticksValue", 1.0);
     }
 
 
@@ -98,6 +100,8 @@ public class SushiGoHeuristic extends TunableParameters implements IStateHeurist
                 return maki2Value;
             case "Maki_3":
                 return maki3Value;
+            case "Chopsticks":
+                return chopsticksValue;
         }
         return 0;
     }
@@ -129,6 +133,7 @@ public class SushiGoHeuristic extends TunableParameters implements IStateHeurist
         tempuraValue = (double) getParameterValue("tempuraValue");
         wasabiValue = (double) getParameterValue("wasabiValue");
         puddingValue = (double) getParameterValue("puddingValue");
+        chopsticksValue = (double) getParameterValue("puddingValue");
 
 
     }

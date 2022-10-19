@@ -101,10 +101,10 @@ public class RoundRobinTournament extends AbstractTournament {
         }
         /* 1. Settings for the tournament */
         GameType gameToPlay = GameType.valueOf(getArg(args, "game", "SushiGo"));
-        int nPlayersPerGame = getArg(args, "nPlayers", 4);
+        int nPlayersPerGame = getArg(args, "nPlayers", 2);
         boolean selfPlay = getArg(args, "selfPlay", false);
         String mode = getArg(args, "mode", "exhaustive");
-        int matchups = getArg(args, "matchups", 4);
+        int matchups = getArg(args, "matchups", 50);
         String playerDirectory = getArg(args, "players", "");
         String gameParams = getArg(args, "gameParams", "");
         String statsLogPrefix = getArg(args, "statsLog", "");
@@ -128,9 +128,9 @@ public class RoundRobinTournament extends AbstractTournament {
         } else {
 
             MCTSParams params = new MCTSParams () ;
-             params . K = Math . sqrt (2) ; // UCB1 Exploration constant
-             params . rolloutLength = 10; // Maximum length for the rollouts
-             params . maxTreeDepth = 5; // Maximum length the tree can grow .
+             //params . K = Math . sqrt (2) ; // UCB1 Exploration constant
+             //params . rolloutLength = 10; // Maximum length for the rollouts
+             //params . maxTreeDepth = 5; // Maximum length the tree can grow .
 
              // Create the player with the given parameters .
              MCTSPlayer player = new MCTSPlayer ( params ) ;
@@ -143,8 +143,9 @@ public class RoundRobinTournament extends AbstractTournament {
             /* 2. Set up players */
             agents.add(player);
             agents.add(new MCTSPlayer());
-            agents.add(new MCTSPlayer());
-            agents.add(new MCTSPlayer());
+
+            //agents.add(new MCTSPlayer());
+            //agents.add(new MCTSPlayer());
             //agents.add(new RHEAPlayer());
             //agents.add(new BasicMCTSPlayer());
             //agents.add(new RandomPlayer());

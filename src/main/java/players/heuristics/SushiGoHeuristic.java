@@ -23,18 +23,18 @@ import static games.sushigo.cards.SGCard.SGCardType.*;
 
 public class SushiGoHeuristic extends TunableParameters implements IStateHeuristic {
 
-    double eggNigiriValue = -1;
-    double salmonNigiriValue = 0.7;
-    double squidNigiriValue = 0.8;
-    double dumplingValue = 0;  // Play it
-    double sashimiValue = -0.5;  // Play it
-    double tempuraValue = -0.4;  // Play it
-    double wasabiValue = 0.9;
-    double puddingValue = 0.1;
-    double maki1Value = -0.7;
-    double maki2Value = -0.4;
-    double maki3Value = 0.7;
-    double chopsticksValue = 1;
+    double eggNigiriValue = 1;
+    double salmonNigiriValue = 2;
+    double squidNigiriValue = 3;
+    double dumplingValue = 1;  // Play it
+    double sashimiValue = 0;  // Play it
+    double tempuraValue = 0;  // Play it
+    double wasabiValue = 4.5;
+    double puddingValue = 1;
+    double maki1Value = 0;
+    double maki2Value = 0.5;
+    double maki3Value = 1;
+    double chopsticksValue = 5;
 
 
 
@@ -43,31 +43,41 @@ public class SushiGoHeuristic extends TunableParameters implements IStateHeurist
 
 
     public SushiGoHeuristic() {
-        addTunableParameter("eggNigiriValue", -1.0);
-        addTunableParameter("salmonNigiriValue", 0.7);
-        addTunableParameter("squidNigiriValue", 0.8);
-        addTunableParameter("dumplingValue", 0.0);
-        addTunableParameter("sashimiValue", -0.8);
-        addTunableParameter("tempuraValue", -0.1);
-        addTunableParameter("wasabiValue", 0.9);
-        addTunableParameter("puddingValue", 0.1);
-        addTunableParameter("maki1Value", -0.7);
-        addTunableParameter("maki2Value", -0.4);
-        addTunableParameter("maki3Value", 0.7);
-        addTunableParameter("chopsticksValue", 1.0);
+        addTunableParameter("eggNigiriValue", 1.0);
+        addTunableParameter("salmonNigiriValue", 2);
+        addTunableParameter("squidNigiriValue", 3);
+        addTunableParameter("dumplingValue", 1.0);
+        addTunableParameter("sashimiValue", 0.0);
+        addTunableParameter("tempuraValue", 0.0);
+        addTunableParameter("wasabiValue", 4.5);
+        addTunableParameter("puddingValue", 1);
+        addTunableParameter("maki1Value", 0.5);
+        addTunableParameter("maki2Value", 0.7);
+        addTunableParameter("maki3Value", 1.0);
+        addTunableParameter("chopsticksValue", 5.0);
     }
 
 
     public double evaluateState(AbstractGameState gs, int playerId) {
         SGGameState sggs = (SGGameState) gs;
 
-        double cardValues = 0.0;
-        for ( SGCard card : sggs.getPlayerDeck(playerId).getComponents())
-        {
-            cardValues += getCardValue(sggs, card);
-        }
+        if (sggs.isNotTerminal())
+            
+            return (sggs.getPlayerScore()[playerId] + sggs.getPlayerScoreToAdd(playerId))/ 50.0;
+        return sggs.getPlayerResults()[playerId].value;
 
-        return cardValues;
+       // double cardValues = 0.0;
+       // if (sggs.isNotTerminal()) {
+         //   for (SGCard card : sggs.getPlayerDeck(playerId).getComponents()) {
+           //     cardValues += getCardValue(sggs, card, playerId);
+            //}
+            //return cardValues;
+        //}
+
+
+
+
+
 
 
 
@@ -76,19 +86,91 @@ public class SushiGoHeuristic extends TunableParameters implements IStateHeurist
     }
 
 
-    double getCardValue(SGGameState sggs, SGCard card) {
+    double getCardValue(SGGameState sggs, SGCard card, int playerID) {
         switch(card.getComponentName())  {
             case "EggNigiri":
+                if (sggs.getPlayerWasabiAvailable(playerID) >= 1)
+            {
+                return eggNigiriValue * 3;
+            }
                 return eggNigiriValue;
             case "SalmonNigiri":
+                if (sggs.getPlayerWasabiAvailable(playerID) >= 1)
+                {
+                    return salmonNigiriValue * 3;
+                }
                 return salmonNigiriValue;
             case "SquidNigiri":
+                if (sggs.getPlayerWasabiAvailable(playerID) >= 1)
+                {
+                    return squidNigiriValue * 3;
+                }
                 return squidNigiriValue;
             case "Dumpling":
+                if (sggs.getPlayerDumplingAmount(playerID) == 2)
+                {
+                    return dumplingValue * 2;
+                }
+                if (sggs.getPlayerDumplingAmount(playerID) == 2)
+                {
+                    return dumplingValue * 3;
+                }
+                if (sggs.getPlayerDumplingAmount(playerID) == 3)
+                {
+                    return dumplingValue * 4;
+                }
+                if (sggs.getPlayerDumplingAmount(playerID) == 4)
+                {
+                    return dumplingValue * 5;
+                }
+                if (sggs.getPlayerDumplingAmount(playerID) > 5)
+                {
+                    return dumplingValue * 0;
+                }
                 return dumplingValue;
             case "Sashimi":
+                if (sggs.getPlayerSashimiAmount(playerID) == 3)
+                {
+                    return sashimiValue + 10;
+                }
+                if (sggs.getPlayerSashimiAmount(playerID) == 6)
+                {
+                    return sashimiValue + 10;
+                }
+                if (sggs.getPlayerSashimiAmount(playerID) == 9)
+                {
+                    return sashimiValue + 10;
+                }
+                if (sggs.getPlayerSashimiAmount(playerID) == 12)
+                {
+                    return sashimiValue + 10;
+                }
                 return sashimiValue;
             case "Tempura":
+                if (sggs.getPlayerTempuraAmount(playerID) == 2)
+                {
+                    return tempuraValue + 5;
+                }
+                if (sggs.getPlayerTempuraAmount(playerID) == 4)
+                {
+                    return tempuraValue + 5;
+                }
+                if (sggs.getPlayerTempuraAmount(playerID) == 6)
+                {
+                    return tempuraValue + 5;
+                }
+                if (sggs.getPlayerTempuraAmount(playerID) == 8)
+                {
+                    return tempuraValue + 5;
+                }
+                if (sggs.getPlayerTempuraAmount(playerID) == 10)
+                {
+                    return tempuraValue + 5;
+                }
+                if (sggs.getPlayerTempuraAmount(playerID) == 12)
+                {
+                    return tempuraValue + 5;
+                }
                 return tempuraValue;
             case "Wasabi":
                 return wasabiValue;

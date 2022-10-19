@@ -4,6 +4,8 @@ import core.components.Card;
 
 public class SGCard extends Card {
 
+
+
     public enum SGCardType {
         Maki_1,
         Maki_2,

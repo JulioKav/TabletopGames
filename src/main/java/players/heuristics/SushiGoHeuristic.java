@@ -60,20 +60,26 @@ public class SushiGoHeuristic extends TunableParameters implements IStateHeurist
 
     public double evaluateState(AbstractGameState gs, int playerId) {
         SGGameState sggs = (SGGameState) gs;
+        //if (sggs.isNotTerminal())
+        //    return (sggs.getPlayerScore()[playerId] + sggs.getPlayerScoreToAdd(playerId))/ 50.0;
+       // return sggs.getPlayerResults()[playerId].value;
 
-        if (sggs.isNotTerminal())
-            
-            return (sggs.getPlayerScore()[playerId] + sggs.getPlayerScoreToAdd(playerId))/ 50.0;
+        double cardValues = 0.0;
+        if (sggs.isNotTerminal()) {
+            for (SGCard card : sggs.getPlayerDeck(playerId).getComponents()) {
+                cardValues += getCardValue(sggs, card, playerId);
+            }
+
+            return (sggs.getPlayerScore()[playerId]
+                    + sggs.getPlayerField(playerId).getSize()
+                   // - sggs.getPlayerFields().get(0).getSize()
+                    //- sggs.getPlayerFields().get(1).getSize()
+                    //- sggs.getPlayerFields().get(2).getSize()
+                    //- sggs.getPlayerFields().get(3).getSize()
+
+            )/ 50.0;
+        }
         return sggs.getPlayerResults()[playerId].value;
-
-       // double cardValues = 0.0;
-       // if (sggs.isNotTerminal()) {
-         //   for (SGCard card : sggs.getPlayerDeck(playerId).getComponents()) {
-           //     cardValues += getCardValue(sggs, card, playerId);
-            //}
-            //return cardValues;
-        //}
-
 
 
 
@@ -173,6 +179,8 @@ public class SushiGoHeuristic extends TunableParameters implements IStateHeurist
                 }
                 return tempuraValue;
             case "Wasabi":
+                //if (sggs.getPlayerDeck(playerID).getSize() <= 5)
+                 //   return wasabiValue 0;
                 return wasabiValue;
             case "Pudding":
                 return puddingValue;

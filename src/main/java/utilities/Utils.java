@@ -5,7 +5,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
+import org.javatuples.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -209,6 +209,56 @@ public abstract class Utils {
             return new Pair<>(newCount, newValue);
         }
         return pair;
+    }
+
+    public static Quartet<Pair<Integer, Double>,Pair<Integer, Double>,Pair<Integer, Double>,Pair<Integer, Double>> Qdecay(Quartet<Pair<Integer, Double>,Pair<Integer, Double>,Pair<Integer, Double>,Pair<Integer, Double>> quart, double gamma) {
+        if (gamma < 1.0 && gamma >= 0.0) {
+            Pair<Integer,Double> p0 = quart.getValue0();
+            Pair<Integer,Double> p1 = quart.getValue1();
+            Pair<Integer,Double> p2 = quart.getValue2();
+            Pair<Integer,Double> p3 = quart.getValue3();
+            if (p0.a == 0) {
+                p0 = new Pair<Integer,Double>(0, 0.0);
+            }else{
+                double oldCount = p0.a;
+                int newCount = (int) (oldCount * gamma);
+                double newValue = p0.b * newCount / oldCount;
+                p0 = new Pair<>(newCount, newValue);
+            }
+            quart =  quart.setAt0(p0);
+
+            if (p1.a == 0) {
+                p1 = new Pair<Integer,Double>(0, 0.0);
+            }else{
+                double oldCount = p1.a;
+                int newCount = (int) (oldCount * gamma);
+                double newValue = p1.b * newCount / oldCount;
+                p1 = new Pair<>(newCount, newValue);
+            }
+            quart =  quart.setAt1(p1);
+
+            if (p2.a == 0) {
+                p2 = new Pair<Integer,Double>(0, 0.0);
+            }else{
+                double oldCount = p2.a;
+                int newCount = (int) (oldCount * gamma);
+                double newValue = p2.b * newCount / oldCount;
+                p2 = new Pair<>(newCount, newValue);
+            }
+            quart =  quart.setAt2(p2);
+
+            if (p3.a == 0) {
+                p3 = new Pair<Integer,Double>(0, 0.0);
+            }else{
+                double oldCount = p3.a;
+                int newCount = (int) (oldCount * gamma);
+                double newValue = p3.b * newCount / oldCount;
+                p3 = new Pair<>(newCount, newValue);
+            }
+            quart =  quart.setAt3(p3);
+
+        }
+        return quart;
     }
 
     public static <T> Map<T, Pair<Integer, Double>> decay(Map<T, Pair<Integer, Double>> map, double gamma) {

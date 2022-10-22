@@ -12,6 +12,7 @@ import players.heuristics.SushiGoHeuristic;
 import players.mcts.BasicMCTSPlayer;
 import players.mcts.MCTSParams;
 import players.mcts.MCTSPlayer;
+import players.rhea.RHEAParams;
 import players.rhea.RHEAPlayer;
 import players.rmhc.RMHCPlayer;
 import players.simple.OSLAPlayer;
@@ -104,7 +105,7 @@ public class RoundRobinTournament extends AbstractTournament {
         int nPlayersPerGame = getArg(args, "nPlayers", 4);
         boolean selfPlay = getArg(args, "selfPlay", false);
         String mode = getArg(args, "mode", "exhaustive");
-        int matchups = getArg(args, "matchups", 208);
+        int matchups = getArg(args, "matchups", 4);
         String playerDirectory = getArg(args, "players", "");
         String gameParams = getArg(args, "gameParams", "");
         String statsLogPrefix = getArg(args, "statsLog", "");
@@ -131,22 +132,27 @@ public class RoundRobinTournament extends AbstractTournament {
              //params . K = Math . sqrt (2) ; // UCB1 Exploration constant
              //params . rolloutLength = 10; // Maximum length for the rollouts
              //params . maxTreeDepth = 5; // Maximum length the tree can grow .
-
+            RHEAParams params1 = new RHEAParams() ;
+            params1 .heuristic = new SushiGoHeuristic();
              // Create the player with the given parameters .
              MCTSPlayer player = new MCTSPlayer ( params ) ;
-
+             RHEAPlayer player1 = new RHEAPlayer ( params1 ) ;
              // The heuristic to evaluate states :
              player . setStateHeuristic (new SushiGoHeuristic() ) ;
 
 
 
+
             /* 2. Set up players */
             agents.add(player);
-            agents.add(new MCTSPlayer());
+            //agents.add(player1);
+            //agents.add(new MCTSPlayer());
 
-            agents.add(new MCTSPlayer());
-            agents.add(new MCTSPlayer());
-            //agents.add(new RHEAPlayer());
+            //agents.add(new MCTSPlayer());
+           // agents.add(new MCTSPlayer());
+            agents.add(new RHEAPlayer());
+            agents.add(new RHEAPlayer());
+            agents.add(new RHEAPlayer());
             //agents.add(new BasicMCTSPlayer());
             //agents.add(new RandomPlayer());
             //agents.add(new RMHCPlayer());

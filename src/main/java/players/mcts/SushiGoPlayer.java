@@ -8,13 +8,11 @@ import core.actions.AbstractAction;
 import core.interfaces.IActionHeuristic;
 import core.interfaces.IGameListener;
 import core.interfaces.IStateHeuristic;
-import games.dicemonastery.DiceMonasteryStateAttributes;
+import players.heuristics.SushiGoHeuristic;
 import utilities.Pair;
-import org.javatuples.*;;
 import utilities.Utils;
 
 import java.util.*;
-import java.util.function.ToDoubleBiFunction;
 import java.util.stream.Collectors;
 
 import static players.mcts.MCTSEnums.OpponentTreePolicy.*;
@@ -32,30 +30,26 @@ public class SushiGoPlayer extends MCTSPlayer {
     protected AbstractPlayer rolloutStrategy;
     protected boolean debug = false;
     protected SingleTreeNode root;
-    List<Map<AbstractAction, Quartet<Pair<Integer, Double>,Pair<Integer, Double>,Pair<Integer, Double>,Pair<Integer, Double>>>> MASTStats;
+    List<Map<AbstractAction, Pair<Integer, Double>>> MASTStats;
     private AbstractPlayer opponentModel;
     private IActionHeuristic advantageFunction;
 
     public SushiGoPlayer() {
-        this(System.currentTimeMillis());
-    }
-
-    public SushiGoPlayer(long seed) {
-        this(new MCTSParams(seed), "SushiGoPlayer");
-    }
-
-    public SushiGoPlayer(MCTSParams params) {
-        this(params, "SushiGoPlayer");
+        this(new MCTSParams(System.currentTimeMillis()), "SushiGoPlayer");
     }
 
     public SushiGoPlayer(MCTSParams params, String name) {
         this.params = params;
+        this.params.opponentTreePolicy = MultiTree;
+        this.params.maxTreeDepth = 8;
+        this.params.rolloutLength = 30;
+        this.params.heuristic = new SushiGoHeuristic();
         rnd = new Random(this.params.getRandomSeed());
-        rolloutStrategy = params.getRolloutStrategy();
-        opponentModel = params.getOpponentModel();
-        heuristic = params.getHeuristic();
-        opponentHeuristic = params.getOpponentHeuristic();
-        advantageFunction = params.advantageFunction;
+        rolloutStrategy = this.params.getRolloutStrategy();
+        opponentModel = this.params.getOpponentModel();
+        heuristic = this.params.getHeuristic();
+        opponentHeuristic = this.params.getOpponentHeuristic();
+        advantageFunction = this.params.advantageFunction;
         setName(name);
     }
 
@@ -78,7 +72,7 @@ public class SushiGoPlayer extends MCTSPlayer {
 
         if (MASTStats != null)
             root.MASTStatistics = MASTStats.stream()
-                    .map(m -> Utils.Qdecay(m, params.MASTGamma))
+                    .map(m -> Utils.decay(m, params.MASTGamma))
                     .collect(Collectors.toList());
 
         if (rolloutStrategy instanceof MASTPlayer) {
@@ -109,7 +103,11 @@ public class SushiGoPlayer extends MCTSPlayer {
         // Return best action
         if (root.children.size() > 2 * actions.size())
             throw new AssertionError(String.format("Unexpectedly large number of children: %d with action size of %d", root.children.size(), actions.size()) );
+
+
+
         return root.bestAction();
+
     }
 
 
@@ -131,8 +129,8 @@ public class SushiGoPlayer extends MCTSPlayer {
     }
 
     @Override
-    public SushiGoPlayer copy() {
-        return new SushiGoPlayer((MCTSParams) params.copy());
+    public MCTSPlayer copy() {
+        return new MCTSPlayer((MCTSParams) params.copy());
     }
 
     @Override

@@ -14,7 +14,7 @@ import utilities.Utils;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+import static players.mcts.MCTSEnums.TreePolicy.AlphaGo;
 import static players.mcts.MCTSEnums.OpponentTreePolicy.*;
 import static players.mcts.MCTSEnums.OpponentTreePolicy.MultiTree;
 
@@ -33,6 +33,7 @@ public class SushiGoPlayer extends MCTSPlayer {
     List<Map<AbstractAction, Pair<Integer, Double>>> MASTStats;
     private AbstractPlayer opponentModel;
     private IActionHeuristic advantageFunction;
+    
 
     public SushiGoPlayer() {
         this(new MCTSParams(System.currentTimeMillis()), "SushiGoPlayer");
@@ -65,7 +66,7 @@ public class SushiGoPlayer extends MCTSPlayer {
     @Override
     public AbstractAction getAction(AbstractGameState gameState, List<AbstractAction> actions) {
         // Search for best action from the root
-        if (params.opponentTreePolicy == MultiTree || params.opponentTreePolicy == MultiTreeParanoid)
+        if (this.params.opponentTreePolicy == MultiTree || this.params.opponentTreePolicy == MultiTreeParanoid)
             root = new MultiTreeNode(this, gameState, rnd);
         else
             root = SingleTreeNode.createRootNode(this, gameState, rnd);

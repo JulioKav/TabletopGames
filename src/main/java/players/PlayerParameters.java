@@ -8,8 +8,8 @@ import java.util.*;
 public abstract class PlayerParameters extends TunableParameters {
 
     // Budget settings
-    public PlayerConstants budgetType = PlayerConstants.BUDGET_FM_CALLS;
-    public int budget = 4000;
+    public PlayerConstants budgetType = PlayerConstants.BUDGET_TIME;
+    public int budget = 1000;
     public int breakMS = 10;
 
     // Heuristic
@@ -17,8 +17,8 @@ public abstract class PlayerParameters extends TunableParameters {
 
     public PlayerParameters(long seed) {
         super(seed);
-        addTunableParameter("budgetType", PlayerConstants.BUDGET_FM_CALLS, Arrays.asList(PlayerConstants.values()));
-        addTunableParameter("budget", 4000, Arrays.asList(100, 300, 1000, 3000, 10000, 30000, 100000));
+        addTunableParameter("budgetType", PlayerConstants.BUDGET_TIME, Arrays.asList(PlayerConstants.values()));
+        addTunableParameter("budget", 1000, Arrays.asList(100, 300, 1000, 3000, 10000, 30000, 100000));
         addTunableParameter("breakMS", 10);
     }
 

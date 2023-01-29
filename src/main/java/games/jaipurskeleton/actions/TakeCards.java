@@ -41,9 +41,17 @@ public class TakeCards extends AbstractAction {
 
         if (howManyPerTypeTakeFromMarket.size() == 1) {
             JaipurCard.GoodType goodType = howManyPerTypeTakeFromMarket.keySet().iterator().next();
+
             int howMany = howManyPerTypeTakeFromMarket.get(goodType);
             if (goodType == JaipurCard.GoodType.Camel) {
                 // Option C: Take ALL the camels.
+                jgs.getPlayerHerds().get(playerID).increment();
+                jgs.getMarket().remove(goodType);
+                if (jgs.getDrawDeck().getSize() == 0)
+                {
+                    triggerRoundEnd = true;
+                }
+                jgs.getDrawDeck().draw();
 
                 // TODO 1: Increment player herds by the number of camels in the market
                 // TODO 1: Remove all camels from the market
@@ -54,7 +62,14 @@ public class TakeCards extends AbstractAction {
 
             } else if (howMany == 1) {
                 // Option B: Take 1 single good
-
+                jgs.getPlayerHands().get(playerID).get(goodType).increment();
+                jgs.getMarket().get(goodType).decrement();
+                if (jgs.getDrawDeck().getSize() == 0)
+                {
+                    triggerRoundEnd = true;
+                }
+                JaipurCard drawnCard = jgs.getDrawDeck().draw();
+                jgs.getMarket().get(drawnCard.goodType).increment();
                 // TODO 2: Increment the number of cards the player has of this type (`goodType`) by 1
                 // TODO 2: Reduce the number of cards in the market of this type by 1
                 // TODO 2: Draw a new card from the draw deck (jgs.getDrawDeck().draw()) and increment the corresponding type in the market by 1

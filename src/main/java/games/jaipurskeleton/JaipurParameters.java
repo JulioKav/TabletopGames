@@ -28,6 +28,17 @@ public class JaipurParameters extends AbstractParameters {
         put(JaipurCard.GoodType.Spice, 1);
         put(JaipurCard.GoodType.Leather, 1);
     }};
+
+    Map < JaipurCard . GoodType , Integer [] > goodTokensProgression = new HashMap <JaipurCard . GoodType , Integer [] >() {{
+         put ( JaipurCard . GoodType . Diamonds , new Integer []{5 ,5 ,5 ,7 ,7}) ;
+         put ( JaipurCard . GoodType . Gold , new Integer []{5 ,5 ,5 ,6 ,6}) ;
+         put ( JaipurCard . GoodType . Silver , new Integer []{5 ,5 ,5 ,5 ,5}) ;
+         put ( JaipurCard . GoodType . Cloth , new Integer []{1 ,1 ,2 ,2 ,3 ,3 ,5}) ;
+         put ( JaipurCard . GoodType . Spice , new Integer []{1 ,1 ,2 ,2 ,3 ,3 ,5}) ;
+         put ( JaipurCard . GoodType . Leather , new Integer []{1 ,1 ,1 ,1 ,1 ,1 ,2 ,3 ,4}) ;
+         }};
+
+
     Map<Integer, Integer[]> bonusTokensAvailable = new HashMap<Integer, Integer[]>() {{
         put(3, new Integer[]{1,1,2,2,2,3,3});
         put(4, new Integer[]{4,4,5,5,6,6});
@@ -37,6 +48,12 @@ public class JaipurParameters extends AbstractParameters {
     int nPointsMostCamels = 5;
     int nGoodTokensEmptyRoundEnd = 3;
 
+    int nRoundsWinForGameWin = 2;
+
+    int marketSize = 5;
+    int handLimit = 7;
+
+    int startingHandSize = 5;
     public JaipurParameters(long seed) {
         super(seed);
     }
@@ -46,8 +63,14 @@ public class JaipurParameters extends AbstractParameters {
         super(seed);
         this.goodNCardsMinimumSell = new HashMap<>(jaipurParameters.getGoodNCardsMinimumSell());
         this.bonusTokensAvailable = new HashMap<>();
+        this . nRoundsWinForGameWin = jaipurParameters .getNRoundsWinForGameWin() ;
+        this . handLimit = jaipurParameters .getHandLimit() ;
+        this . startingHandSize = jaipurParameters .getStartingHandSize() ;
+        this . marketSize = jaipurParameters .getMarketSize() ;
+
         for (int n: jaipurParameters.getBonusTokensAvailable().keySet()) {
             this.bonusTokensAvailable.put(n, jaipurParameters.getBonusTokensAvailable().get(n).clone());
+
         }
         this.nPointsMostCamels = jaipurParameters.getNPointsMostCamels();
         this.nGoodTokensEmptyRoundEnd = jaipurParameters.getNGoodTokensEmptyGameEnd();
@@ -57,12 +80,30 @@ public class JaipurParameters extends AbstractParameters {
         return goodNCardsMinimumSell;
     }
 
+    public Map<JaipurCard.GoodType, Integer[]> getGoodTokensProgression() {
+        return goodTokensProgression;
+    }
+
     public Map<Integer, Integer[]> getBonusTokensAvailable() {
         return bonusTokensAvailable;
     }
 
     public int getNPointsMostCamels() {
         return nPointsMostCamels;
+    }
+
+    public int getMarketSize() {
+        return marketSize;
+    }
+
+    public int getStartingHandSize() {return startingHandSize;}
+
+    public int getHandLimit() {
+        return handLimit;
+    }
+
+    public int getNRoundsWinForGameWin() {
+        return nRoundsWinForGameWin;
     }
 
     public int getNGoodTokensEmptyGameEnd() {
@@ -80,11 +121,11 @@ public class JaipurParameters extends AbstractParameters {
         if (!(o instanceof JaipurParameters)) return false;
         if (!super.equals(o)) return false;
         JaipurParameters that = (JaipurParameters) o;
-        return nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && Objects.equals(goodNCardsMinimumSell, that.goodNCardsMinimumSell) && Objects.equals(bonusTokensAvailable, that.bonusTokensAvailable);
+        return  startingHandSize == that.startingHandSize && handLimit == that.handLimit && nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && nRoundsWinForGameWin == that.nRoundsWinForGameWin  && marketSize == that.marketSize && Objects.equals(goodNCardsMinimumSell, that.goodNCardsMinimumSell) && Objects.equals(bonusTokensAvailable, that.bonusTokensAvailable) && Objects.equals(goodTokensProgression, that.goodTokensProgression);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable, nPointsMostCamels, nGoodTokensEmptyRoundEnd);
+        return Objects.hash(super.hashCode(), goodNCardsMinimumSell, bonusTokensAvailable, nPointsMostCamels, nGoodTokensEmptyRoundEnd,nRoundsWinForGameWin,goodTokensProgression, marketSize, handLimit,startingHandSize);
     }
 }

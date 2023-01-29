@@ -26,8 +26,15 @@ public class JaipurGameState extends AbstractGameState {
     Deck<JaipurCard> drawDeck;
     Map<JaipurCard.GoodType, Counter> market;
 
+    List<Counter> marketSize;
+    List<Counter> handLimit;
+
+    List<Counter> startingHandSize;
+    Map<JaipurCard.GoodType, Deck<JaipurToken>> goodTokensProgression;
     Map<JaipurCard.GoodType, Deck<JaipurToken>> goodTokens;
     Counter nGoodTokensSold;
+
+    Counter nGoodTokensEmptyGameEnd;
     Map<Integer, Deck<JaipurToken>> bonusTokens;
 
     List<Counter> playerScores;
@@ -97,12 +104,21 @@ public class JaipurGameState extends AbstractGameState {
         for (JaipurCard.GoodType gt: goodTokens.keySet()) {
             copy.goodTokens.put(gt, goodTokens.get(gt).copy());
         }
+        copy.goodTokensProgression = new HashMap<>();
+        for (JaipurCard.GoodType gt: goodTokensProgression.keySet()) {
+            copy.goodTokensProgression.put(gt, goodTokensProgression.get(gt).copy());
+        }
         copy.nGoodTokensSold = nGoodTokensSold.copy();
+        copy.nGoodTokensEmptyGameEnd = nGoodTokensEmptyGameEnd.copy();
         copy.playerScores = new ArrayList<>();
         copy.playerNRoundsWon = new ArrayList<>();
         copy.playerNBonusTokens = new ArrayList<>();
         copy.playerNGoodTokens = new ArrayList<>();
         copy.playerHerds = new ArrayList<>();
+        copy.marketSize = new ArrayList<>();
+        copy.handLimit = new ArrayList<>();
+        copy.startingHandSize = new ArrayList<>();
+
         for (int i = 0; i < getNPlayers(); i++) {
             copy.playerScores.add(playerScores.get(i).copy());
             copy.playerNRoundsWon.add(playerNRoundsWon.get(i).copy());
@@ -237,7 +253,7 @@ public class JaipurGameState extends AbstractGameState {
         if (!(o instanceof JaipurGameState)) return false;
         if (!super.equals(o)) return false;
         JaipurGameState that = (JaipurGameState) o;
-        return Objects.equals(playerHands, that.playerHands) && Objects.equals(playerHerds, that.playerHerds) && Objects.equals(drawDeck, that.drawDeck) && Objects.equals(market, that.market) && Objects.equals(goodTokens, that.goodTokens) && Objects.equals(nGoodTokensSold, that.nGoodTokensSold) && Objects.equals(bonusTokens, that.bonusTokens) && Objects.equals(playerScores, that.playerScores) && Objects.equals(playerNRoundsWon, that.playerNRoundsWon) && Objects.equals(playerNBonusTokens, that.playerNBonusTokens) && Objects.equals(playerNGoodTokens, that.playerNGoodTokens);
+        return Objects.equals(playerHands, that.playerHands) && Objects.equals(playerHerds, that.playerHerds) && Objects.equals(drawDeck, that.drawDeck) && Objects.equals(market, that.market) && Objects.equals(goodTokens, that.goodTokens) && Objects.equals(nGoodTokensSold, that.nGoodTokensSold) && Objects.equals(bonusTokens, that.bonusTokens) && Objects.equals(playerScores, that.playerScores) && Objects.equals(playerNRoundsWon, that.playerNRoundsWon) && Objects.equals(playerNBonusTokens, that.playerNBonusTokens) && Objects.equals(playerNGoodTokens, that.playerNGoodTokens) && Objects.equals(playerNGoodTokens, that.playerNGoodTokens) ;
     }
 
     @Override

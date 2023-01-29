@@ -28,6 +28,8 @@ public class JaipurGameState extends AbstractGameState {
 
     List<Counter> marketSize;
     List<Counter> handLimit;
+    List<Counter>startingCamels;
+    List<Counter>camelsInDeck;
 
     List<Counter> startingHandSize;
     Map<JaipurCard.GoodType, Deck<JaipurToken>> goodTokensProgression;
@@ -118,6 +120,8 @@ public class JaipurGameState extends AbstractGameState {
         copy.marketSize = new ArrayList<>();
         copy.handLimit = new ArrayList<>();
         copy.startingHandSize = new ArrayList<>();
+        copy.startingCamels = new ArrayList<>();
+        copy.camelsInDeck = new ArrayList<>();
 
         for (int i = 0; i < getNPlayers(); i++) {
             copy.playerScores.add(playerScores.get(i).copy());
@@ -246,6 +250,7 @@ public class JaipurGameState extends AbstractGameState {
     public List<Counter> getPlayerNGoodTokens() {
         return playerNGoodTokens;
     }
+
 
     @Override
     public boolean _equals(Object o) {

@@ -12,11 +12,13 @@ import games.jaipurskeleton.components.JaipurCard;
 import games.jaipurskeleton.components.JaipurToken;
 //import org.sparkproject.guava.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap;
+import utilities.Utils;
 
 import java.util.*;
 
 import static core.CoreConstants.GameResult.*;
 import static games.jaipurskeleton.components.JaipurCard.GoodType.*;
+import static scala.Console.print;
 
 /**
  * Jaipur rules: <a href="https://www.fgbradleys.com/rules/rules2/Jaipur-rules.pdf">pdf here</a>
@@ -227,7 +229,7 @@ public class JaipurForwardModel extends StandardForwardModel {
         // Option C: Take all camels, they don't count towards hand limit
         // TODO 1: Check how many camel cards are in the market. If more than 0, construct one TakeCards action object and add it to the `actions` ArrayList. (The `howManyPerTypeGiveFromHand` argument should be null)
 
-        if (jgs.getMarket().get(Camel).getValue() != 0)
+        if (jgs.getMarket().get(Camel) != null && jgs.getMarket().get(Camel).getValue() != 0)
         {
             Map<JaipurCard.GoodType, Integer> camelsTakenMap = new HashMap<JaipurCard.GoodType, Integer>() {{
                 put(Camel, jgs.getMarket().get(Camel).getValue());
@@ -254,7 +256,8 @@ public class JaipurForwardModel extends StandardForwardModel {
             for (int i = 0; i < JaipurCard.GoodType.values().length; i++)
             {
                 JaipurCard.GoodType currentCard = JaipurCard.GoodType.values()[i];
-                if (jgs.getMarket().get(JaipurCard.GoodType.values()[i]).getValue() != 0 && JaipurCard.GoodType.values()[i] != Camel)
+
+                if (jgs.getMarket().get(JaipurCard.GoodType.values()[i]) != null && jgs.getMarket().get(JaipurCard.GoodType.values()[i]).getValue()  >= 1 && JaipurCard.GoodType.values()[i] != Camel)
                 {
                     Map<JaipurCard.GoodType, Integer> cardTakenMap = new HashMap<JaipurCard.GoodType, Integer>() {{
                         put(currentCard, 1);
@@ -271,8 +274,205 @@ public class JaipurForwardModel extends StandardForwardModel {
             }
             // Option A: Take several (non-camel) cards and replenish with cards of different types from hand
             // TODO (Advanced, bonus, optional): Calculate legal option A variations
+            ///
+            int numberDrawn = ((JaipurParameters) gameState.getGameParameters()).handLimit;
+            List<Integer> SeveralCardsTaken = new ArrayList<>();
+            List<Integer> SeveralCardsGiven = new ArrayList<>();
+            //setup take cards and give cards arrays
+
+                if (jgs.getMarket().get(Diamonds) != null && jgs.getMarket().get(Diamonds).getValue()!= 0) {
+                    for (int i = 0; i < jgs.getMarket().get(Diamonds).getValue(); i++) {
+                        SeveralCardsTaken.add(0);
+                    }
+                }
+                if (jgs.getMarket().get(Gold) != null && jgs.getMarket().get(Gold).getValue() != 0) {
+                    for (int i = 0; i < jgs.getMarket().get(Gold).getValue(); i++) {
+                        SeveralCardsTaken.add(1);
+                    }
+                }
+                if (jgs.getMarket().get(Silver) != null && jgs.getMarket().get(Silver).getValue() != 0) {
+                    for (int i = 0; i < jgs.getMarket().get(Silver).getValue(); i++) {
+                        SeveralCardsTaken.add(2);
+                    }
+                }
+                if (jgs.getMarket().get(Cloth) != null && jgs.getMarket().get(Cloth).getValue() != 0) {
+                    for (int i = 0; i < jgs.getMarket().get(Cloth).getValue(); i++) {
+                        SeveralCardsTaken.add(3);
+                    }
+                }
+                if (jgs.getMarket().get(Spice) != null && jgs.getMarket().get(Spice).getValue() != 0) {
+                    for (int i = 0; i < jgs.getMarket().get(Spice).getValue(); i++) {
+                        SeveralCardsTaken.add(4);
+                    }
+                }
+                if (jgs.getMarket().get(Leather) != null && jgs.getMarket().get(Leather).getValue() != 0) {
+                    for (int i = 0; i < jgs.getMarket().get(Leather).getValue(); i++) {
+                        SeveralCardsTaken.add(5);
+                    }
+                }
 
 
+
+            int[] SeveralCardsTakenArray = SeveralCardsTaken.stream().mapToInt(i->i).toArray();
+
+
+                if (jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Diamonds) != null && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Diamonds).getValue() > 0) {
+                    for (int i = 0; i < jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Diamonds).getValue(); i++) {
+                        SeveralCardsGiven.add(0);
+                    }
+                }
+                if (jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Gold) != null && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Gold).getValue() > 0) {
+                    for (int i = 0; i < jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Gold).getValue(); i++) {
+                        SeveralCardsGiven.add(1);
+                    }
+                }
+                if (jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Silver) != null && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Silver).getValue() > 0) {
+                    for (int i = 0; i < jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Silver).getValue(); i++) {
+                        SeveralCardsGiven.add(2);
+                    }
+                }
+                if (jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Cloth) != null && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Cloth).getValue() > 0) {
+                    for (int i = 0; i < jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Cloth).getValue(); i++) {
+                        SeveralCardsGiven.add(3);
+                    }
+                }
+                if (jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Spice) != null && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Spice).getValue() > 0) {
+                    for (int i = 0; i < jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Spice).getValue(); i++) {
+                        SeveralCardsGiven.add(4);
+                    }
+                }
+                if (jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Leather) != null && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Leather).getValue() > 0) {
+                    for (int i = 0; i < jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Leather).getValue(); i++) {
+                        SeveralCardsGiven.add(5);
+                    }
+                }
+
+
+            int[] SeveralCardsGivenArray = SeveralCardsGiven.stream().mapToInt(i->i).toArray();
+
+            //select number drawn
+
+
+
+            for (int j = 1; j < numberDrawn; j++) {
+                //create combinations for drawn
+                ArrayList<int[]> chosenMarket = Utils.generateCombinations(SeveralCardsTakenArray, j);
+
+                for (int n = 0; n < chosenMarket.size(); n++) {
+                    int diamondCounter = 0;
+                    int goldCounter = 0;
+                    int silverCounter = 0;
+                    int clothCounter = 0;
+                    int spiceCounter = 0;
+                    int leatherCounter = 0;
+                    Map<JaipurCard.GoodType, Integer> severalTakenMap = new HashMap<JaipurCard.GoodType, Integer>() {{}};
+                    for (int m = 0; m < chosenMarket.get(n).length; m++) {
+
+
+                        if (chosenMarket.get(n)[m] == 0) {
+                            ++diamondCounter;
+                        }
+                        if (chosenMarket.get(n)[m] == 1) {
+                            ++goldCounter;
+                        }
+                        if (chosenMarket.get(n)[m] == 2) {
+                            ++silverCounter;
+                        }
+                        if (chosenMarket.get(n)[m] == 3) {
+                            ++clothCounter;
+                        }
+                        if (chosenMarket.get(n)[m] == 4) {
+                            ++spiceCounter;
+                        }
+                        if (chosenMarket.get(n)[m] == 5) {
+                            ++leatherCounter;
+                        }
+
+
+
+
+
+                    }
+                    if(diamondCounter != 0) {
+                        severalTakenMap.put(Diamonds, diamondCounter);
+                    }if(goldCounter != 0) {
+                        severalTakenMap.put(Gold, goldCounter);
+                    }if(silverCounter != 0) {
+                        severalTakenMap.put(Silver, silverCounter);
+                    }if(clothCounter != 0) {
+                        severalTakenMap.put(Cloth, clothCounter);
+                    }if(spiceCounter != 0) {
+                        severalTakenMap.put(Spice, spiceCounter);
+                    }if(leatherCounter != 0) {
+                        severalTakenMap.put(Leather, leatherCounter);
+                    }
+
+                    ImmutableMap<JaipurCard.GoodType, Integer> severalTakenMapImm =
+                            ImmutableMap.<JaipurCard.GoodType, Integer>builder()
+                                    .putAll(severalTakenMap)
+                                    .build();
+
+
+                    ArrayList<int[]> givenMarket = Utils.generateCombinations(SeveralCardsGivenArray, j);
+                    //create combinations for given for each drawn combination
+                    for (int k = 0; k < givenMarket.size(); k++) {
+                        int diamondCounterGiven = 0;
+                        int goldCounterGiven = 0;
+                        int silverCounterGiven = 0;
+                        int clothCounterGiven = 0;
+                        int spiceCounterGiven = 0;
+                        int leatherCounterGiven = 0;
+                        Map<JaipurCard.GoodType, Integer> severalGivenMap = new HashMap<JaipurCard.GoodType, Integer>() {{}};
+                        for (int m = 0; m < givenMarket.get(k).length; m++) {
+                            if (givenMarket.get(k)[m] == 0) {
+                                ++diamondCounterGiven;
+                            }
+                            if (givenMarket.get(k)[m] == 1) {
+                                ++goldCounterGiven;
+                            }
+                            if (givenMarket.get(k)[m] == 2) {
+                                ++silverCounterGiven;
+                            }
+                            if (givenMarket.get(k)[m] == 3) {
+                                ++clothCounterGiven;
+                            }
+                            if (givenMarket.get(k)[m] == 4) {
+                                ++spiceCounterGiven;
+                            }
+                            if (givenMarket.get(k)[m] == 5) {
+                                ++leatherCounterGiven;
+                            }
+                        }
+                        if(diamondCounterGiven != 0) {
+                            severalGivenMap.put(Diamonds, diamondCounterGiven);
+                        }if(goldCounterGiven != 0) {
+                            severalGivenMap.put(Gold, goldCounterGiven);
+                        }if(silverCounterGiven != 0) {
+                            severalGivenMap.put(Silver, silverCounterGiven);
+                        }if(clothCounterGiven != 0) {
+                            severalGivenMap.put(Cloth, clothCounterGiven);
+                        }if(spiceCounterGiven != 0) {
+                            severalGivenMap.put(Spice, spiceCounterGiven);
+                        }if(leatherCounterGiven != 0) {
+                            severalGivenMap.put(Leather, leatherCounterGiven);
+                        }
+
+
+
+
+                        ImmutableMap<JaipurCard.GoodType, Integer> severalGivenMapImm =
+                                ImmutableMap.<JaipurCard.GoodType, Integer>builder()
+                                        .putAll(severalGivenMap)
+                                        .build();
+
+                        actions.add(new TakeCards(severalTakenMapImm, severalGivenMapImm, currentPlayer));
+
+                    }
+
+                }
+
+
+            }
         }
 
         return actions;

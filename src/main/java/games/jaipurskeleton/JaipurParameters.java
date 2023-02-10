@@ -29,7 +29,7 @@ public class JaipurParameters extends AbstractParameters {
         put(JaipurCard.GoodType.Leather, 1);
     }};
 
-    Map < JaipurCard . GoodType , Integer [] > goodTokensProgression = new HashMap <JaipurCard . GoodType , Integer [] >() {{
+      Map < JaipurCard . GoodType , Integer [] > goodTokensProgression = new HashMap <JaipurCard . GoodType , Integer [] >() {{
          put ( JaipurCard . GoodType . Diamonds , new Integer []{5 ,5 ,5 ,7 ,7}) ;
          put ( JaipurCard . GoodType . Gold , new Integer []{5 ,5 ,5 ,6 ,6}) ;
          put ( JaipurCard . GoodType . Silver , new Integer []{5 ,5 ,5 ,5 ,5}) ;
@@ -69,6 +69,12 @@ public class JaipurParameters extends AbstractParameters {
         this . startingHandSize = jaipurParameters .getStartingHandSize() ;
         this . marketSize = jaipurParameters .getMarketSize() ;
         this . startingCamels = jaipurParameters .getStartingCamels() ;
+        this . goodTokensProgression = new HashMap < >() ;
+        for ( JaipurCard . GoodType gt : jaipurParameters.getGoodTokensProgression().keySet () )
+        {
+            this . goodTokensProgression . put ( gt , jaipurParameters .
+                    getGoodTokensProgression () . get ( gt ) . clone () ) ;
+        }
 
         for (int n: jaipurParameters.getBonusTokensAvailable().keySet()) {
             this.bonusTokensAvailable.put(n, jaipurParameters.getBonusTokensAvailable().get(n).clone());

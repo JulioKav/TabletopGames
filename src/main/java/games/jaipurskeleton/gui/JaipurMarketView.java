@@ -32,15 +32,17 @@ public class JaipurMarketView extends JComponent {
         int yGap = fontSize*2 + offset;
         int y = 0;
         for (JaipurCard.GoodType gt: JaipurCard.GoodType.values()) {
-            int inMarket = gs.getMarket().get(gt).getValue();
-            for (int i = 0; i < inMarket; i++) {
-                g.setColor(JaipurGUIManager.goodColorMapping.get(gt));
-                g.fillRect(0, yGap+y * offset, defaultItemSize, defaultItemSize);
-                g.setColor(Color.black);
-                g.drawRect(0, yGap+y * offset, defaultItemSize, defaultItemSize);
-                g.setColor(Color.white);
-                g.drawString(gt.name(), 2, yGap+y * offset + offset);
-                y++;
+            if(gs.getMarket().get(gt) != null) {
+                int inMarket = gs.getMarket().get(gt).getValue();
+                for (int i = 0; i < inMarket; i++) {
+                    g.setColor(JaipurGUIManager.goodColorMapping.get(gt));
+                    g.fillRect(0, yGap + y * offset, defaultItemSize, defaultItemSize);
+                    g.setColor(Color.black);
+                    g.drawRect(0, yGap + y * offset, defaultItemSize, defaultItemSize);
+                    g.setColor(Color.white);
+                    g.drawString(gt.name(), 2, yGap + y * offset + offset);
+                    y++;
+                }
             }
         }
 

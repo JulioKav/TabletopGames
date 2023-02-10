@@ -150,7 +150,7 @@ public class JaipurGUIManager extends AbstractGUIManager {
      */
     @Override
     public int getMaxActionSpace() {
-        return 10;
+        return 100;
     }
 
     /**

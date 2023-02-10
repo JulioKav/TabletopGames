@@ -122,7 +122,7 @@ public class JaipurForwardModel extends StandardForwardModel {
             JaipurCard card = new JaipurCard(JaipurCard.GoodType.Leather);
             gs.drawDeck.add(card);
         }
-        for (int i = 0; i < (( JaipurParameters ) gs . getGameParameters () ) . camelsInDeck; i++) {  // 11 Camel cards, - 3 already in the market
+        for (int i = 0; i < (( JaipurParameters ) gs . getGameParameters () ) . getCamelsInDeck(); i++) {  // 11 Camel cards, - 3 already in the market
             JaipurCard card = new JaipurCard(JaipurCard.GoodType.Camel);
             gs.drawDeck.add(card);
         }
@@ -155,7 +155,7 @@ public class JaipurForwardModel extends StandardForwardModel {
         }
 
         // Take first 2 cards from the deck and place them face up in the market.
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < ((JaipurParameters) gs.getGameParameters()).marketSize - ((JaipurParameters) gs.getGameParameters()).startingCamels; i++) {
             JaipurCard card = gs.drawDeck.draw();
             gs.market.get(card.goodType).increment();
         }
@@ -196,7 +196,7 @@ public class JaipurForwardModel extends StandardForwardModel {
         }
 
         // First player
-        gs.setFirstPlayer(0);
+        gs.setFirstPlayer(1);
     }
 
     /**

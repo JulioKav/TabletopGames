@@ -41,7 +41,7 @@ public class TakeCards extends AbstractAction {
     @Override
     public boolean execute(AbstractGameState gs) {
         JaipurGameState jgs = (JaipurGameState) gs;
-
+        JaipurParameters jp = (JaipurParameters) jgs.getGameParameters();
         if (howManyPerTypeTakeFromMarket.size() == 1) {
             JaipurCard.GoodType goodType = howManyPerTypeTakeFromMarket.keySet().iterator().next();
 
@@ -56,14 +56,10 @@ public class TakeCards extends AbstractAction {
                         if (jgs.getMarket().get(JaipurCard.GoodType.Camel).getValue() != 0) {
                             jgs.getMarket().get(JaipurCard.GoodType.Camel).decrement();
                         }
-                        int currentMarketSize = jgs.getMarket().size();
-                        jgs.getMarket().get(jgs.getDrawDeck().draw().goodType).increment();
-                        if (currentMarketSize != jgs.getMarket().size())
-                        {jgs.getMarket().get(jgs.getDrawDeck().draw().goodType).increment();}
-
-                        
-
-
+                        if (jgs.getMarket().size() != jp.getMarketSize())
+                        {
+                            jgs.getMarket().get(jgs.getDrawDeck().draw().goodType).increment();
+                        }
                         if (jgs.getDrawDeck().getSize() == 0) {
                             triggerRoundEnd = true;
                         }
@@ -84,8 +80,10 @@ public class TakeCards extends AbstractAction {
                 if (jgs.getMarket().get(goodType).getValue() != 0) {
                     jgs.getMarket().get(goodType).decrement();
                 }
-                JaipurCard drawnCard = jgs.getDrawDeck().draw();
-                jgs.getMarket().get(drawnCard.goodType).increment();
+                if (jgs.getMarket().size() != jp.getMarketSize())
+                {
+                    jgs.getMarket().get(jgs.getDrawDeck().draw().goodType).increment();
+                }
                 if (jgs.getDrawDeck().getSize() == 0)
                 {
                     triggerRoundEnd = true;

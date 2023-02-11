@@ -45,7 +45,7 @@ public class JaipurForwardModel extends StandardForwardModel {
         gs.market = new HashMap<>();
         for (JaipurCard.GoodType gt: JaipurCard.GoodType.values()) {
             // 5 cards in the market
-            gs.market.put(gt, new Counter(0, 0, (( JaipurParameters ) gs . getGameParameters () ) . nRoundsWinForGameWin, "Market: " + gt));
+            gs.market.put(gt, new Counter(0, 0, jp.getMarketSize(), "Market: " + gt));
         }
 
         gs.drawDeck = new Deck<>("Draw deck", CoreConstants.VisibilityMode.HIDDEN_TO_ALL);
@@ -67,13 +67,13 @@ public class JaipurForwardModel extends StandardForwardModel {
             gs.playerNBonusTokens.add(new Counter(0, 0, Integer.MAX_VALUE, "Player " + i + " n bonus tokens"));
 
             // Create herds, maximum 11 camels in the game
-            gs.playerHerds.add(new Counter(0, 0, 11, "Player " + i + " herd"));
+            gs.playerHerds.add(new Counter(0, 0, jp.getCamelsInDeck() + jp.getStartingCamels(), "Player " + i + " herd"));
 
             Map<JaipurCard.GoodType, Counter> playerHand = new HashMap<>();
             for (JaipurCard.GoodType gt: JaipurCard.GoodType.values()) {
                 if (gt != JaipurCard.GoodType.Camel) {
                     // Hand limit of 7
-                    playerHand.put(gt, new Counter(0, 0,  (( JaipurParameters ) gs . getGameParameters () ) . nRoundsWinForGameWin, "Player " + i + " hand: " + gt));
+                    playerHand.put(gt, new Counter(0, 0,  jp.getHandLimit(), "Player " + i + " hand: " + gt));
                 }
             }
             gs.playerHands.add(playerHand);

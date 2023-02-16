@@ -14,7 +14,7 @@ import java.util.Objects;
 
 public class TakeCards extends AbstractAction {
 
-    final ImmutableMap<JaipurCard.GoodType, Integer> howManyPerTypeTakeFromMarket;
+    public final ImmutableMap<JaipurCard.GoodType, Integer> howManyPerTypeTakeFromMarket;
     final ImmutableMap<JaipurCard.GoodType, Integer> howManyPerTypeGiveFromHand;
     final int playerID;
 
@@ -104,7 +104,9 @@ public class TakeCards extends AbstractAction {
             jgs.getMarket().get(gt).decrement(howManyPerTypeTakeFromMarket.get(gt));
         }
         for(JaipurCard.GoodType gt: howManyPerTypeGiveFromHand.keySet()) {
-            jgs.getPlayerHands().get(playerID).get(gt).decrement(howManyPerTypeGiveFromHand.get(gt));
+            if (gt != JaipurCard.GoodType.Camel){
+            jgs.getPlayerHands().get(playerID).get(gt).decrement(howManyPerTypeGiveFromHand.get(gt));}
+            if (gt == JaipurCard.GoodType.Camel){jgs.getPlayerHerds().get(playerID).decrement(howManyPerTypeGiveFromHand.get(gt));}
             jgs.getMarket().get(gt).increment(howManyPerTypeGiveFromHand.get(gt));
         }
 

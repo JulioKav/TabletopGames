@@ -8,7 +8,6 @@ import evaluation.listeners.GameListener;
 import games.GameType;
 import players.PlayerFactory;
 import utilities.Pair;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -26,6 +25,7 @@ public class GameReport {
      *
      * @param args
      */
+
     public static void main(String[] args) {
         long timeStart = System.currentTimeMillis();
         List<String> argsList = Arrays.asList(args);
@@ -67,20 +67,20 @@ public class GameReport {
         }
 
         // Get Player to be used
-        String playerDescriptor = getArg(args, "player", "");
+        String playerDescriptor = getArg(args, "player", "random");
         String opponentDescriptor = getArg(args, "opponent", "random");
         String gameParams = getArg(args, "gameParam", "");
         String loggerClass = getArg(args, "logger", "evaluation.loggers.SummaryLogger");  // TODO: why is this separate, read all from json!
         String statsLog = getArg(args, "statsLog", "SummaryLogger.txt");
         List<String> listenerClasses = new ArrayList<>(Arrays.asList(getArg(args, "listener", "evaluation.listeners.GameListener").split("\\|")));
-        List<String> metricsClasses = new ArrayList<>(Arrays.asList(getArg(args, "metrics", "evaluation.metrics.GameMetrics").split("\\|")));
+        List<String> metricsClasses = new ArrayList<>(Arrays.asList(getArg(args, "metrics", "games.jaipurskeleton . stats .JaipurMetrics\n").split("\\|")));
         List<String> logFiles = new ArrayList<>(Arrays.asList(getArg(args, "logFile", "GameReport.txt").split("\\|")));
 
         if (listenerClasses.size() > 1 && logFiles.size() > 1 && listenerClasses.size() != logFiles.size())
             throw new IllegalArgumentException("Lists of log files and listeners must be the same length");
 
-        int nGames = getArg(args, "nGames", 1000);
-        List<String> tempGames = new ArrayList<>(Arrays.asList(getArg(args, "games", "all").split("\\|")));
+        int nGames = getArg(args, "nGames", 10);
+        List<String> tempGames = new ArrayList<>(Arrays.asList(getArg(args, "games", "jaipur").split("\\|")));
         List<String> games = tempGames;
         if (tempGames.get(0).equals("all")) {
             games = Arrays.stream(GameType.values()).map(Enum::name).filter(name -> !tempGames.contains("-" + name)).collect(toList());
@@ -90,7 +90,7 @@ public class GameReport {
             throw new IllegalArgumentException("Cannot yet provide a gameParams argument if running multiple games");
 
         // This creates a <MinPlayer, MaxPlayer> Pair for each game#
-        List<Pair<Integer, Integer>> nPlayers = Arrays.stream(getArg(args, "nPlayers", "all").split("\\|"))
+        List<Pair<Integer, Integer>> nPlayers = Arrays.stream(getArg(args, "nPlayers", "2").split("\\|"))
                 .map(str -> {
                     if (str.contains("-")) {
                         int hyphenIndex = str.indexOf("-");

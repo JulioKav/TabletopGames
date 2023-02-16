@@ -346,6 +346,11 @@ public class JaipurForwardModel extends StandardForwardModel {
                         SeveralCardsGiven.add(5);
                     }
                 }
+                if (jgs.getPlayerHerds().get(jgs.getCurrentPlayer()) != null && jgs.getPlayerHerds().get(jgs.getCurrentPlayer()).getValue() > 0) {
+                    for (int i = 0; i < jgs.getPlayerHerds().get(jgs.getCurrentPlayer()).getValue(); i++) {
+                        SeveralCardsGiven.add(6);
+                    }
+                }
 
 
             int[] SeveralCardsGivenArray = SeveralCardsGiven.stream().mapToInt(i->i).toArray();
@@ -354,7 +359,7 @@ public class JaipurForwardModel extends StandardForwardModel {
 
 
 
-            for (int j = 1; j < numberDrawn; j++) {
+            for (int j = 1; j < numberDrawn+1; j++) {
                 //create combinations for drawn
                 ArrayList<int[]> chosenMarket = Utils.generateCombinations(SeveralCardsTakenArray, j);
 
@@ -422,6 +427,7 @@ public class JaipurForwardModel extends StandardForwardModel {
                         int clothCounterGiven = 0;
                         int spiceCounterGiven = 0;
                         int leatherCounterGiven = 0;
+                        int camelCounterGiven = 0;
                         Map<JaipurCard.GoodType, Integer> severalGivenMap = new HashMap<JaipurCard.GoodType, Integer>() {{}};
                         for (int m = 0; m < givenMarket.get(k).length; m++) {
                             if (givenMarket.get(k)[m] == 0) {
@@ -442,6 +448,9 @@ public class JaipurForwardModel extends StandardForwardModel {
                             if (givenMarket.get(k)[m] == 5) {
                                 ++leatherCounterGiven;
                             }
+                            if (givenMarket.get(k)[m] == 6) {
+                                ++camelCounterGiven;
+                            }
                         }
                         if(diamondCounterGiven != 0) {
                             severalGivenMap.put(Diamonds, diamondCounterGiven);
@@ -455,6 +464,8 @@ public class JaipurForwardModel extends StandardForwardModel {
                             severalGivenMap.put(Spice, spiceCounterGiven);
                         }if(leatherCounterGiven != 0) {
                             severalGivenMap.put(Leather, leatherCounterGiven);
+                        }if(camelCounterGiven != 0) {
+                            severalGivenMap.put(Camel, camelCounterGiven);
                         }
 
 

@@ -170,11 +170,12 @@ public class JaipurGameState extends AbstractGameState {
                 if (i != playerId) {
 
                     for (JaipurCard.GoodType n : playerHands.get(i).keySet()) {
-                        copy.playerHands.get(i).put(n, new Counter(0, 0, 0, "zero"));
-
                         for (int p = 0; p < playerHands.get(i).get(n).getValue(); p++) {
                             copy.drawDeck.add(new JaipurCard(n));
                         }
+                        copy.playerHands.get(i).get(n).setValue(0);
+
+
 
 
                     }
@@ -197,6 +198,7 @@ public class JaipurGameState extends AbstractGameState {
 
                 for (JaipurCard.GoodType gt : playerHands.get(i).keySet()) {
                     playerHandCopy.put(gt, playerHands.get(i).get(gt).copy());
+                    playerHandCopy.get(gt).setValue(playerHands.get(i).get(gt).getValue());
                 }
                 copy.playerHands.add(playerHandCopy);
             } else {

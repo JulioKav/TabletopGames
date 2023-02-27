@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static scala.Console.print;
 import static utilities.Utils.componentToImage;
 
 public class Game {
@@ -890,6 +892,7 @@ public class Game {
              * So, they need to be flushed as well. As with the decoders, the convention is to pass in a null
              * input until the output is not complete.
              */
+
             do {
                 encoder.encode(packet, null);
                 if (packet.isComplete())
@@ -922,8 +925,8 @@ public class Game {
 
         // 1. Set up the players for the game.
         ArrayList<AbstractPlayer> players = new ArrayList<>();
-//        players.add(new RandomPlayer());
         players.add(new RandomPlayer());
+      //  players.add(new RandomPlayer());
 //        players.add(new MCTSPlayer());
 //        MCTSParams params1 = new MCTSParams();
 //        players.add(new MCTSPlayer(params1));
@@ -934,10 +937,11 @@ public class Game {
 //        players.add(new FirstActionPlayer());
 
         // 2. Game parameter configuration. Set to null to ignore and use default parameters
+
         String gameParams = null;
 
         // 3. Run!
-        runOne(GameType.valueOf(gameType), gameParams, players, seed, false, null, useGUI ? ac : null, turnPause);
+        runOne(GameType.valueOf(gameType), gameParams, players, seed, true, null, useGUI ? ac : null, turnPause);
 
         // 4. Run several games
 //        ArrayList<GameType> games = new ArrayList<>(Arrays.asList(GameType.values()));

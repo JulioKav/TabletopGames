@@ -44,6 +44,7 @@ public class JaipurGUIManager extends AbstractGUIManager {
         put(Spice, (new Color(106, 203, 69)));
         put(Leather, (new Color(133, 70, 22)));
         put(Camel, new Color(132, 171, 224));
+        put(Emerald, new Color(0, 250, 100));
     }};
     public static HashMap<JaipurCard.GoodType, Color> soldGoodColorMapping = new HashMap<JaipurCard.GoodType, Color>() {{
         put(Diamonds, (new Color(246, 198, 198)));
@@ -53,6 +54,7 @@ public class JaipurGUIManager extends AbstractGUIManager {
         put(Spice, (new Color(224, 246, 216)));
         put(Leather, (new Color(248, 228, 213)));
         put(Camel, new Color(223, 233, 246));
+        put(Emerald, new Color(223, 250, 220));
     }};
     public static int viewWidth, viewHeight;
     public static int border = 30;
@@ -150,7 +152,7 @@ public class JaipurGUIManager extends AbstractGUIManager {
      */
     @Override
     public int getMaxActionSpace() {
-        return 100000;
+        return 1000;
     }
 
     /**
@@ -167,12 +169,12 @@ public class JaipurGUIManager extends AbstractGUIManager {
         String rules = "<html><center><h1>Jaipur</h1></center><br/><hr><br/>";
         rules += "<p>Players sell good cards from their hands for good tokens, or take cards from the market, alternating turns.</p><br/>";
         rules += "<p>Selling several cards at the same time can earn the players bonus tokens.</p><br/>";
-        rules += "<p>Players have a hand limit of " + 7 + " cards. Camel cards go in a separate pile and don't count towards this limit.</p><br/>";
+        rules += "<p>Players have a hand limit of " + params.handLimit + " cards. Camel cards go in a separate pile and don't count towards this limit.</p><br/>";
         rules += "<p>If taking Camels from the market, all camels must be taken. If exchanging cards in the market, camel cards from the player's herd can be used.</p><br/>";
         rules += "<p>A round ends when " + params.nGoodTokensEmptyRoundEnd + " stacks of good tokens are empty, or no more cards are left in the draw pile when needing to replenish the market.</p><br/>";
         rules += "<p>At the end of the round, the player with the most camel cards wins the camel token and " + params.nPointsMostCamels + " bonus points.</p><br/>";
         rules += "<p>ROUND WIN: The player with the most points (from good tokens, bonus tokens and camel token) wins the round.</p><br/>";
-        rules += "<p>WIN: The player who wins majority of rounds played (" + 2 + ") wins.</p>";
+        rules += "<p>WIN: The player who wins majority of rounds played (" + params.nRoundsWinForGameWin + ") wins.</p>";
         rules += "<hr><p><b>INTERFACE: </b> Click action buttons.</p>";
         rules += "</html>";
         return rules;

@@ -87,7 +87,7 @@ public class GameReport {
         }
 
         if (!gameParams.equals("") && games.size() > 1)
-            throw new IllegalArgumentException("Cannot yet provide a gameParams argument if running multiple games");
+            throw new IllegalArgumentException("Cannot yet provide a gameParams argument if fning multiple games");
 
         // This creates a <MinPlayer, MaxPlayer> Pair for each game#
         List<Pair<Integer, Integer>> nPlayers = Arrays.stream(getArg(args, "nPlayers", "2").split("\\|"))

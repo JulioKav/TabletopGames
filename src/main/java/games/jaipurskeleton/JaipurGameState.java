@@ -206,11 +206,13 @@ public class JaipurGameState extends AbstractGameState {
                     JaipurCard card = copy.drawDeck.draw();
 
                     // If camel, it goes into the herd instead
-                    if (card.goodType == JaipurCard.GoodType.Camel) {
+                    if (card != null && card.goodType == JaipurCard.GoodType.Camel) {
                         copy.drawDeck.add(card, copy.drawDeck.getSize());
                     } else {
                         // Otherwise, into the player's hand
-                        copy.playerHands.get(i).get(card.goodType).increment();
+                        if(card != null) {
+                            copy.playerHands.get(i).get(card.goodType).increment();
+                        }
                     }
                 }
 

@@ -2,12 +2,18 @@ package games.jaipurskeleton;
 
 import core.AbstractGameState;
 import core.AbstractParameters;
+import core.Game;
 import evaluation.TunableParameters;
+import games.GameType;
 import games.jaipurskeleton.components.JaipurCard;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+
+import static scala.Console.print;
+import static scala.Console.println;
 
 /**
  * <p>This class should hold a series of variables representing game parameters (e.g. number of cards dealt to players,
@@ -19,14 +25,20 @@ import java.util.Objects;
  * <p>The class can optionally extend from {@link TunableParameters} instead, which allows to use
  * automatic game parameter optimisation tools in the framework.</p>
  */
-public  class JaipurParameters extends AbstractParameters {
+public  class JaipurParameters extends TunableParameters {
+
+
     Map<JaipurCard.GoodType, Integer> goodNCardsMinimumSell = new HashMap<JaipurCard.GoodType, Integer>() {{
+
         put(JaipurCard.GoodType.Diamonds, 2);
         put(JaipurCard.GoodType.Gold, 2);
         put(JaipurCard.GoodType.Silver, 2);
         put(JaipurCard.GoodType.Cloth, 1);
         put(JaipurCard.GoodType.Spice, 1);
         put(JaipurCard.GoodType.Leather, 1);
+        put(JaipurCard.GoodType.Emerald, 3);
+
+
     }};
 
       Map < JaipurCard . GoodType , Integer [] > goodTokensProgression = new HashMap <JaipurCard . GoodType , Integer [] >() {{
@@ -36,6 +48,8 @@ public  class JaipurParameters extends AbstractParameters {
          put ( JaipurCard . GoodType . Cloth , new Integer []{1 ,1 ,2 ,2 ,3 ,3 ,5}) ;
          put ( JaipurCard . GoodType . Spice , new Integer []{1 ,1 ,2 ,2 ,3 ,3 ,5}) ;
          put ( JaipurCard . GoodType . Leather , new Integer []{1 ,1 ,1 ,1 ,1 ,1 ,2 ,3 ,4}) ;
+         put(JaipurCard.GoodType.Emerald, new Integer[]{6, 6, 7, 7, 8, 8});
+
          }};
 
 
@@ -55,8 +69,51 @@ public  class JaipurParameters extends AbstractParameters {
     int camelsInDeck = 8;
 
     int startingHandSize = 5;
+
+    boolean emeraldToggle = false;
     public JaipurParameters(long seed) {
         super(seed);
+        addTunableParameter ( " nPointsMostCamels " , 5 , Arrays. asList (0 , 2 , 5 , 7 , 10) ) ;
+        addTunableParameter ( " nRoundsWinForGameWin " , 2 , Arrays. asList (1 , 2 , 5 , 7 , 10) ) ;
+        addTunableParameter ( " handLimit " , 7 , Arrays. asList ( 5 , 7 , 9, 12) ) ;
+        addTunableParameter ( " startingHandSize " , 5 , Arrays. asList (0 , 2 ,3,4, 5 ) ) ;
+        addTunableParameter ( " marketSize " , 5 , Arrays. asList (  2 , 5 , 7 , 10,12) ) ;
+        addTunableParameter ( " startingCamels " , 3 , Arrays. asList (0 , 2 , 3 , 4, 5) ) ;
+        addTunableParameter ( " camelsInDeck " , 8 , Arrays. asList (4 , 6 , 8 , 10, 12) ) ;
+        addTunableParameter ( " emeraldToggle " , false , Arrays. asList (false , true) ) ;
+        for ( JaipurCard . GoodType gt : goodNCardsMinimumSell . keySet () ) {
+            addTunableParameter ( gt . name () + " minSell " , goodNCardsMinimumSell . get (
+                    gt ) , Arrays . asList (1 ,2 ,3 ,4 ,5) ) ;
+        }
+
+
+    }
+
+    @Override
+    public void _reset() {
+
+
+        nPointsMostCamels = ( int) getParameterValue ( " nPointsMostCamels " ) ;
+        nRoundsWinForGameWin = ( int) getParameterValue ( " nRoundsWinForGameWin " ) ;
+        handLimit = ( int) getParameterValue ( " handLimit " ) ;
+        startingHandSize = ( int) getParameterValue ( " startingHandSize " ) ;
+        marketSize = ( int) getParameterValue ( " marketSize " ) ;
+        startingCamels = ( int) getParameterValue ( " startingCamels " ) ;
+        camelsInDeck = ( int) getParameterValue ( " camelsInDeck " ) ;
+        emeraldToggle = ( boolean) getParameterValue ( " emeraldToggle " ) ;
+        goodNCardsMinimumSell . replaceAll (( gt , v ) -> ( Integer ) getParameterValue ( gt .
+                name () + " minSell " ) ) ;
+
+        println("nPointsMostCamels  " + nPointsMostCamels);
+        println("nRoundsWinForGameWin   " + nRoundsWinForGameWin);
+        println("handLimit  " + handLimit);
+        println("emeraldToggle  " + emeraldToggle);
+        println("goodNCardsMinimumSell  " + goodNCardsMinimumSell);
+        println("startingCamels  " + startingCamels);
+        println("startingHandSize  " + startingHandSize);
+        println("camelsInDeck  " + camelsInDeck);
+        println("marketSize  " + marketSize);
+
     }
 
     // Copy constructor
@@ -69,6 +126,7 @@ public  class JaipurParameters extends AbstractParameters {
         this . startingHandSize = jaipurParameters .getStartingHandSize() ;
         this . marketSize = jaipurParameters .getMarketSize() ;
         this . startingCamels = jaipurParameters .getStartingCamels() ;
+        this . emeraldToggle = jaipurParameters.getEmeraldToggle();
         this . goodTokensProgression = new HashMap < >() ;
         for ( JaipurCard . GoodType gt : jaipurParameters.getGoodTokensProgression().keySet () )
         {
@@ -82,6 +140,8 @@ public  class JaipurParameters extends AbstractParameters {
         }
         this.nPointsMostCamels = jaipurParameters.getNPointsMostCamels();
         this.nGoodTokensEmptyRoundEnd = jaipurParameters.getNGoodTokensEmptyGameEnd();
+
+
     }
 
     public Map<JaipurCard.GoodType, Integer> getGoodNCardsMinimumSell() {
@@ -109,6 +169,7 @@ public  class JaipurParameters extends AbstractParameters {
     public int getCamelsInDeck() {
         return camelsInDeck;
     }
+    public boolean getEmeraldToggle(){return emeraldToggle;}
 
 
     public int getStartingHandSize() {return startingHandSize;}
@@ -136,11 +197,37 @@ public  class JaipurParameters extends AbstractParameters {
         if (!(o instanceof JaipurParameters)) return false;
         if (!super.equals(o)) return false;
         JaipurParameters that = (JaipurParameters) o;
-        return   camelsInDeck == that.camelsInDeck && startingCamels == that.startingCamels && startingHandSize == that.startingHandSize && handLimit == that.handLimit && nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && nRoundsWinForGameWin == that.nRoundsWinForGameWin  && marketSize == that.marketSize && Objects.equals(goodNCardsMinimumSell, that.goodNCardsMinimumSell) && Objects.equals(bonusTokensAvailable, that.bonusTokensAvailable) && Objects.equals(goodTokensProgression, that.goodTokensProgression);
+        return   emeraldToggle == that.emeraldToggle && camelsInDeck == that.camelsInDeck && startingCamels == that.startingCamels && startingHandSize == that.startingHandSize && handLimit == that.handLimit && nPointsMostCamels == that.nPointsMostCamels && nGoodTokensEmptyRoundEnd == that.nGoodTokensEmptyRoundEnd && nRoundsWinForGameWin == that.nRoundsWinForGameWin  && marketSize == that.marketSize && Objects.equals(goodNCardsMinimumSell, that.goodNCardsMinimumSell) && Objects.equals(bonusTokensAvailable, that.bonusTokensAvailable) && Objects.equals(goodTokensProgression, that.goodTokensProgression);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(),camelsInDeck,startingCamels, goodNCardsMinimumSell, bonusTokensAvailable, nPointsMostCamels, nGoodTokensEmptyRoundEnd,nRoundsWinForGameWin,goodTokensProgression, marketSize, handLimit,startingHandSize);
+        return Objects.hash(super.hashCode(),emeraldToggle,camelsInDeck,startingCamels, goodNCardsMinimumSell, bonusTokensAvailable, nPointsMostCamels, nGoodTokensEmptyRoundEnd,nRoundsWinForGameWin,goodTokensProgression, marketSize, handLimit,startingHandSize);
     }
+
+    @Override
+    public Object instantiate() {
+        return new Game( GameType. Jaipur , new JaipurForwardModel () , new
+                JaipurGameState (this , GameType . Jaipur . getMinPlayers () ) ) ;
+    }
+
+
+    @Override
+    public String toString() {
+        return "JaipurParameters{" +
+                "goodNCardsMinimumSell=" + goodNCardsMinimumSell +
+                ", goodTokensProgression=" + goodTokensProgression +
+                ", bonusTokensAvailable=" + bonusTokensAvailable +
+                ", nPointsMostCamels=" + nPointsMostCamels +
+                ", nGoodTokensEmptyRoundEnd=" + nGoodTokensEmptyRoundEnd +
+                ", nRoundsWinForGameWin=" + nRoundsWinForGameWin +
+                ", startingCamels=" + startingCamels +
+                ", marketSize=" + marketSize +
+                ", handLimit=" + handLimit +
+                ", camelsInDeck=" + camelsInDeck +
+                ", startingHandSize=" + startingHandSize +
+                ", emeraldToggle=" + emeraldToggle +
+                "} " ;
+    }
+
 }

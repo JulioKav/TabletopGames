@@ -51,17 +51,19 @@ public class TakeCards extends AbstractAction {
                 int numberCamels = jgs.getMarket().get(JaipurCard.GoodType.Camel).getValue();
                 if(jgs.getMarket().get(JaipurCard.GoodType.Camel) != null) {
                     for (int i = 0; i < numberCamels; i++) {
-                        jgs.getPlayerHerds().get(playerID).increment();
-
-                        if (jgs.getMarket().get(JaipurCard.GoodType.Camel).getValue() != 0) {
-                            jgs.getMarket().get(JaipurCard.GoodType.Camel).decrement();
-                        }
-                        if (jgs.getMarket().size() != jp.getMarketSize())
-                        {
-                            jgs.getMarket().get(jgs.getDrawDeck().draw().goodType).increment();
-                        }
-                        if (jgs.getDrawDeck().getSize() == 0) {
+                        if (jgs.getDrawDeck().draw() == null) {
                             triggerRoundEnd = true;
+
+                        }
+                        else {
+                            jgs.getPlayerHerds().get(playerID).increment();
+
+                            if (jgs.getMarket().get(JaipurCard.GoodType.Camel).getValue() != 0) {
+                                jgs.getMarket().get(JaipurCard.GoodType.Camel).decrement();
+                            }
+                            if (jgs.getMarket().size() != jp.getMarketSize() && jgs.getDrawDeck().getSize() != 0) {
+                                jgs.getMarket().get(jgs.getDrawDeck().draw().goodType).increment();
+                            }
                         }
 
                     }
@@ -76,17 +78,17 @@ public class TakeCards extends AbstractAction {
             }
             else if (howMany == 1) {
                 // Option B: Take 1 single good
-                jgs.getPlayerHands().get(playerID).get(goodType).increment();
-                if (jgs.getMarket().get(goodType).getValue() != 0) {
-                    jgs.getMarket().get(goodType).decrement();
-                }
-                if (jgs.getMarket().size() != jp.getMarketSize())
-                {
-                    jgs.getMarket().get(jgs.getDrawDeck().draw().goodType).increment();
-                }
-                if (jgs.getDrawDeck().getSize() == 0)
-                {
+                if (jgs.getDrawDeck().draw() == null) {
                     triggerRoundEnd = true;
+                }
+                else {
+                    jgs.getPlayerHands().get(playerID).get(goodType).increment();
+                    if (jgs.getMarket().get(goodType).getValue() != 0) {
+                        jgs.getMarket().get(goodType).decrement();
+                    }
+                    if (jgs.getMarket().size() != jp.getMarketSize() && jgs.getDrawDeck().getSize() != 0) {
+                        jgs.getMarket().get(jgs.getDrawDeck().draw().goodType).increment();
+                    }
                 }
 
                 // TODO 2: Increment the number of cards the player has of this type (`goodType`) by 1

@@ -32,19 +32,31 @@ public class JaipurGoodTokenView extends JComponent {
     @Override
     protected void paintComponent(Graphics gg) {
         Graphics2D g = (Graphics2D) gg;
-
+        JaipurParameters jp = (JaipurParameters) gs.getGameParameters();
         // Display each stack of good tokens, showing the numbers left on each
         int y = 0;
 
         for (JaipurCard.GoodType gt: JaipurCard.GoodType.values()) {
-            Deck<JaipurToken> deck = gs.getGoodTokens().get(gt);
-            if (deck == null) {
-                continue;
+            if(jp.getEmeraldToggle() == true) {
+                Deck<JaipurToken> deck = gs.getGoodTokens().get(gt);
+                if (deck == null) {
+                    continue;
+                }
+                Integer[] progression = ((JaipurParameters) gs.getGameParameters()).getGoodTokensProgression().get(gt);
+                drawTokens(g, progression, deck, y, JaipurGUIManager.soldGoodColorMapping.get(gt), outColor, fColor, true);
+                drawTokens(g, progression, deck, y, JaipurGUIManager.goodColorMapping.get(gt), Color.black, Color.white, false);
+                y += defaultItemSize;
             }
-           Integer[] progression = ((JaipurParameters)gs.getGameParameters()).getGoodTokensProgression().get(gt);
-            drawTokens(g, progression, deck,y, JaipurGUIManager.soldGoodColorMapping.get(gt), outColor, fColor, true);
-            drawTokens(g, progression, deck, y, JaipurGUIManager.goodColorMapping.get(gt), Color.black, Color.white, false);
-            y += defaultItemSize;
+            else{
+                if(gt != JaipurCard.GoodType.Emerald){Deck<JaipurToken> deck = gs.getGoodTokens().get(gt);
+                    if (deck == null) {
+                        continue;
+                    }
+                    Integer[] progression = ((JaipurParameters) gs.getGameParameters()).getGoodTokensProgression().get(gt);
+                    drawTokens(g, progression, deck, y, JaipurGUIManager.soldGoodColorMapping.get(gt), outColor, fColor, true);
+                    drawTokens(g, progression, deck, y, JaipurGUIManager.goodColorMapping.get(gt), Color.black, Color.white, false);
+                    y += defaultItemSize;}
+            }
         }
     }
 

@@ -126,6 +126,12 @@ public class JaipurForwardModel extends StandardForwardModel {
             JaipurCard card = new JaipurCard(JaipurCard.GoodType.Camel);
             gs.drawDeck.add(card);
         }
+        if (jp.getEmeraldToggle() == true) {
+            for (int i = 0; i < 10; i++) {  // 6 Emerald cards
+                JaipurCard card = new JaipurCard(Emerald);
+                gs.drawDeck.add(card);
+            }
+        }
         gs.drawDeck.shuffle(r);
 
         // Deal N cards to each player
@@ -196,7 +202,7 @@ public class JaipurForwardModel extends StandardForwardModel {
         }
 
         // First player
-        gs.setFirstPlayer(1);
+        gs.setFirstPlayer(0);
     }
 
     /**
@@ -214,16 +220,27 @@ public class JaipurForwardModel extends StandardForwardModel {
         // Can sell cards from hand
         // TODO: Follow lab 1 instructions (Section 3.1) to fill in this method here.
         for ( JaipurCard . GoodType gt : playerHand . keySet () ) {
-             if ( playerHand . get ( gt ) . getValue () >= jp . goodNCardsMinimumSell . get ( gt ) )
-            {
-                 // Can sell this good type ! We can choose any number of cards to
-                //sell of this type between minimum and how many we have
-                 for (int n = jp . goodNCardsMinimumSell . get ( gt ) ; n <= playerHand . get (
-                    gt ) . getValue () ; n ++) {
-                 actions . add (new SellCards( gt , n ) ) ;
-                 }
-                 }
-             }
+            if (jp.getEmeraldToggle() == true) {
+                if (playerHand.get(gt).getValue() >= jp.goodNCardsMinimumSell.get(gt)) {
+                    // Can sell this good type ! We can choose any number of cards to
+                    //sell of this type between minimum and how many we have
+                    for (int n = jp.goodNCardsMinimumSell.get(gt); n <= playerHand.get(
+                            gt).getValue(); n++) {
+                        actions.add(new SellCards(gt, n));
+                    }
+                }
+            }
+            else{
+                if (gt != Emerald && playerHand.get(gt).getValue() >= jp.goodNCardsMinimumSell.get(gt)) {
+                    // Can sell this good type ! We can choose any number of cards to
+                    //sell of this type between minimum and how many we have
+                    for (int n = jp.goodNCardsMinimumSell.get(gt); n <= playerHand.get(
+                            gt).getValue(); n++) {
+                        actions.add(new SellCards(gt, n));
+                    }
+                }
+            }
+        }
 
         // Can take cards from the market, respecting hand limit
         // Option C: Take all camels, they don't count towards hand limit
@@ -310,6 +327,13 @@ public class JaipurForwardModel extends StandardForwardModel {
                         SeveralCardsTaken.add(5);
                     }
                 }
+                if(jp.getEmeraldToggle()== true) {
+                    if (jgs.getMarket().get(Emerald) != null && jgs.getMarket().get(Emerald).getValue() != 0) {
+                        for (int i = 0; i < jgs.getMarket().get(Emerald).getValue(); i++) {
+                            SeveralCardsTaken.add(7);
+                        }
+                    }
+                }
 
 
 
@@ -352,6 +376,15 @@ public class JaipurForwardModel extends StandardForwardModel {
                     }
                 }
 
+                if (jp.getEmeraldToggle() == true) {
+                    if (jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Emerald) != null && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Emerald).getValue() > 0) {
+                        for (int i = 0; i < jgs.getPlayerHands().get(jgs.getCurrentPlayer()).get(Emerald).getValue(); i++) {
+                            SeveralCardsGiven.add(5);
+                        }
+                    }
+                }
+
+
 
             int[] SeveralCardsGivenArray = SeveralCardsGiven.stream().mapToInt(i->i).toArray();
 
@@ -370,6 +403,7 @@ public class JaipurForwardModel extends StandardForwardModel {
                     int clothCounter = 0;
                     int spiceCounter = 0;
                     int leatherCounter = 0;
+                    int emeraldCounter = 0;
                     Map<JaipurCard.GoodType, Integer> severalTakenMap = new HashMap<JaipurCard.GoodType, Integer>() {{}};
                     for (int m = 0; m < chosenMarket.get(n).length; m++) {
 
@@ -392,6 +426,9 @@ public class JaipurForwardModel extends StandardForwardModel {
                         if (chosenMarket.get(n)[m] == 5) {
                             ++leatherCounter;
                         }
+                        if (chosenMarket.get(n)[m] == 7) {
+                            ++emeraldCounter;
+                        }
 
 
 
@@ -411,6 +448,9 @@ public class JaipurForwardModel extends StandardForwardModel {
                     }if(leatherCounter != 0) {
                         severalTakenMap.put(Leather, leatherCounter);
                     }
+                    if(emeraldCounter != 0) {
+                        severalTakenMap.put(Emerald, emeraldCounter);
+                    }
 
                     ImmutableMap<JaipurCard.GoodType, Integer> severalTakenMapImm =
                             ImmutableMap.<JaipurCard.GoodType, Integer>builder()
@@ -428,6 +468,7 @@ public class JaipurForwardModel extends StandardForwardModel {
                         int spiceCounterGiven = 0;
                         int leatherCounterGiven = 0;
                         int camelCounterGiven = 0;
+                        int emeraldCounterGiven = 0;
                         Map<JaipurCard.GoodType, Integer> severalGivenMap = new HashMap<JaipurCard.GoodType, Integer>() {{}};
                         for (int m = 0; m < givenMarket.get(k).length; m++) {
                             if (givenMarket.get(k)[m] == 0) {
@@ -448,8 +489,11 @@ public class JaipurForwardModel extends StandardForwardModel {
                             if (givenMarket.get(k)[m] == 5) {
                                 ++leatherCounterGiven;
                             }
-                            if (givenMarket.get(k)[m] == 6) {
+                            if (givenMarket.get(k)[m] == 6 && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).size() != jp.handLimit) {
                                 ++camelCounterGiven;
+                            }
+                            if (givenMarket.get(k)[m] == 7) {
+                                ++emeraldCounterGiven;
                             }
                         }
                         if(diamondCounterGiven != 0) {
@@ -466,6 +510,8 @@ public class JaipurForwardModel extends StandardForwardModel {
                             severalGivenMap.put(Leather, leatherCounterGiven);
                         }if(camelCounterGiven != 0) {
                             severalGivenMap.put(Camel, camelCounterGiven);
+                        }if(emeraldCounterGiven != 0) {
+                            severalGivenMap.put(Emerald, emeraldCounterGiven);
                         }
 
 

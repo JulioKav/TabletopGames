@@ -15,8 +15,84 @@ import utilities.Group;
 
 import java.util.*;
 
+import static scala.Console.print;
+
 public  class JaipurMetrics implements IMetricsCollection {
 
+    public static class CamelTokenWinner extends AbstractMetric {
+
+
+        @Override
+        public Object run(GameListener listener, Event e) {
+            JaipurGameState gs = (JaipurGameState) e.state;
+            double winner = 0;
+            double CamelWinner = 0;
+            int playerScore = 0;
+            int playerScoreChallenger = 0;
+            int playerCamels = 0;
+            int playerCamelsChallenger = 0;
+            int camelTokenIsWinner = 0;
+            for (int i = 0; i < gs.getNPlayers(); i++) {
+                playerScoreChallenger = gs.getPlayerScores().get(i).getValue();
+                playerCamelsChallenger = gs.getPlayerHerds().get(i).getValue();
+                if (playerScore < playerScoreChallenger) {
+                    winner = i;
+                    playerScore = playerScoreChallenger;
+                }
+
+                if (playerCamels < playerCamelsChallenger) {
+                    CamelWinner = i;
+                    playerCamels = playerCamelsChallenger;
+                }
+
+                //check if camel token
+                if (CamelWinner == winner) {
+                    camelTokenIsWinner = 1;
+                } else {
+                    camelTokenIsWinner = 0;
+                }
+
+
+            }
+            return camelTokenIsWinner;
+        }
+
+        @Override
+        public Set<Event.GameEvent> getEventTypes() {
+            return Collections.singleton(Event.GameEvent.ROUND_OVER);
+        }
+    }
+
+
+
+    public static class WinnerGoesFirst extends AbstractMetric {
+        @Override
+        public Object run(GameListener listener, Event e) {
+            JaipurGameState gs = (JaipurGameState) e . state ;
+            double winner = 0;
+            int playerScore = 0;
+            int playerScoreChallenger = 0;
+            for (int i = 0; i < gs . getNPlayers () ; i ++) {
+                playerScoreChallenger = gs .getPlayerNRoundsWon().get(i).getValue();
+
+                if(playerScore < playerScoreChallenger)
+                {
+
+                    winner = i;
+                    playerScore = playerScoreChallenger;
+                }
+
+
+
+            }
+            return winner;
+        }
+
+        @Override
+        public Set<Event.GameEvent> getEventTypes() {
+            return Collections. singleton ( Event . GameEvent . GAME_OVER ) ;
+        }
+    }
 
     public static class RoundScoreDifference extends AbstractMetric {
 

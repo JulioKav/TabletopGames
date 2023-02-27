@@ -1,7 +1,10 @@
 package games.jaipurskeleton.components;
 
+import core.AbstractParameters;
 import core.CoreConstants;
 import core.components.Component;
+import games.jaipurskeleton.JaipurGameState;
+import games.jaipurskeleton.JaipurParameters;
 
 import java.util.Objects;
 
@@ -14,6 +17,7 @@ import java.util.Objects;
  * <p>They <b>may</b> keep references to other components or actions (but these should be deep-copied in the copy() method, watch out for infinite loops!).</p>
  */
 public class JaipurCard extends Component {
+
     public enum GoodType {
         Diamonds,
         Gold,
@@ -21,7 +25,8 @@ public class JaipurCard extends Component {
         Cloth,
         Spice,
         Leather,
-        Camel
+        Camel,
+        Emerald
     }
 
     final public GoodType goodType;

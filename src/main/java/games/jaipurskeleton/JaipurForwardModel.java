@@ -426,8 +426,10 @@ public class JaipurForwardModel extends StandardForwardModel {
                         if (chosenMarket.get(n)[m] == 5) {
                             ++leatherCounter;
                         }
-                        if (chosenMarket.get(n)[m] == 7) {
-                            ++emeraldCounter;
+                        if (jp.getEmeraldToggle() == true) {
+                            if (chosenMarket.get(n)[m] == 7) {
+                                ++emeraldCounter;
+                            }
                         }
 
 
@@ -448,9 +450,10 @@ public class JaipurForwardModel extends StandardForwardModel {
                     }if(leatherCounter != 0) {
                         severalTakenMap.put(Leather, leatherCounter);
                     }
+                    if (jp.getEmeraldToggle() == true) {
                     if(emeraldCounter != 0) {
                         severalTakenMap.put(Emerald, emeraldCounter);
-                    }
+                    }}
 
                     ImmutableMap<JaipurCard.GoodType, Integer> severalTakenMapImm =
                             ImmutableMap.<JaipurCard.GoodType, Integer>builder()
@@ -489,11 +492,13 @@ public class JaipurForwardModel extends StandardForwardModel {
                             if (givenMarket.get(k)[m] == 5) {
                                 ++leatherCounterGiven;
                             }
-                            if (givenMarket.get(k)[m] == 6 && jgs.getPlayerHands().get(jgs.getCurrentPlayer()).size() != jp.handLimit) {
+                            if (givenMarket.get(k)[m] == 6 ) {
                                 ++camelCounterGiven;
                             }
-                            if (givenMarket.get(k)[m] == 7) {
-                                ++emeraldCounterGiven;
+                            if (jp.getEmeraldToggle() == true) {
+                                if (givenMarket.get(k)[m] == 7) {
+                                    ++emeraldCounterGiven;
+                                }
                             }
                         }
                         if(diamondCounterGiven != 0) {
@@ -510,9 +515,12 @@ public class JaipurForwardModel extends StandardForwardModel {
                             severalGivenMap.put(Leather, leatherCounterGiven);
                         }if(camelCounterGiven != 0) {
                             severalGivenMap.put(Camel, camelCounterGiven);
-                        }if(emeraldCounterGiven != 0) {
-                            severalGivenMap.put(Emerald, emeraldCounterGiven);
+                        }if (jp.getEmeraldToggle() == true) {
+                            if (emeraldCounterGiven != 0) {
+                                severalGivenMap.put(Emerald, emeraldCounterGiven);
+                            }
                         }
+
 
 
 
@@ -521,8 +529,8 @@ public class JaipurForwardModel extends StandardForwardModel {
                                 ImmutableMap.<JaipurCard.GoodType, Integer>builder()
                                         .putAll(severalGivenMap)
                                         .build();
-
-                        actions.add(new TakeCards(severalTakenMapImm, severalGivenMapImm, currentPlayer));
+                        if (!(jp.getHandLimit() - j < camelCounterGiven)){
+                        actions.add(new TakeCards(severalTakenMapImm, severalGivenMapImm, currentPlayer));}
 
                     }
 

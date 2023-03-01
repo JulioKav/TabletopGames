@@ -104,15 +104,6 @@ public  class JaipurParameters extends TunableParameters {
         goodNCardsMinimumSell . replaceAll (( gt , v ) -> ( Integer ) getParameterValue ( gt .
                 name () + " minSell " ) ) ;
 
-        println("nPointsMostCamels  " + nPointsMostCamels);
-        println("nRoundsWinForGameWin   " + nRoundsWinForGameWin);
-        println("handLimit  " + handLimit);
-        println("emeraldToggle  " + emeraldToggle);
-        println("goodNCardsMinimumSell  " + goodNCardsMinimumSell);
-        println("startingCamels  " + startingCamels);
-        println("startingHandSize  " + startingHandSize);
-        println("camelsInDeck  " + camelsInDeck);
-        println("marketSize  " + marketSize);
 
     }
 

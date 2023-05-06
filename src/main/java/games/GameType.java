@@ -23,6 +23,10 @@ import games.loveletter.*;
 import games.loveletter.gui.LoveLetterGUIManager;
 import games.pandemic.*;
 import games.pandemic.gui.PandemicGUIManager;
+import games.resistance.ResForwardModel;
+import games.resistance.ResGUIManager;
+import games.resistance.ResGameState;
+import games.resistance.ResParameters;
 import games.terraformingmars.*;
 import games.terraformingmars.gui.TMGUI;
 import games.poker.*;
@@ -161,10 +165,17 @@ public enum GameType {
             Arrays.asList(Strategy, Bluffing, Deduction, Abstract),
             Arrays.asList(Memory, GridMovement),
             StrategoGameState.class, StrategoForwardModel.class, StrategoParams.class, StrategoGUIManager.class),
+    Resistance(5, 10,
+            Arrays.asList(Strategy, Bluffing, Deduction, Abstract),
+            Arrays.asList(Memory, GridMovement),
+            ResGameState.class, ResForwardModel.class, ResParameters.class, ResGUIManager.class),
+
     CantStop(2, 4,
             Arrays.asList(Dice, Abstract),
             Collections.singletonList(PushYourLuck),
             CantStopGameState.class, CantStopForwardModel.class, CantStopParameters.class, CantStopGUIManager.class
+
+
     );
 
     // Core classes where the game is defined

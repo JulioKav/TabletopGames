@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import static games.resistance.ResGameState.ResGamePhase.TeamSelection;
+
 /**
  * <p>The forward model contains all the game rules and logic. It is mainly responsible for declaring rules for:</p>
  * <ol>
@@ -41,19 +43,21 @@ public class ResForwardModel extends StandardForwardModel {
         ResGameState resgs = (ResGameState)firstState;
         ResParameters resp = (ResParameters)firstState.getGameParameters();
 
-        resgs.playerHandCards = new ArrayList<>();
+        resgs.playerHandCards = new ArrayList<>(resgs.getNPlayers());
         //could be wrong
-        resgs.gameBoard = Arrays. asList(resp.gameBoard);
+        resgs.gameBoard = resp.getPlayerBoard(resgs.getNPlayers());
+        if(resgs.gameBoard == null)
+        {throw new AssertionError("GameBoard shouldn't be null");};
         resgs.factions = resp.factions;
 
-        List<PartialObservableDeck<ResPlayerCards>> playerHandCards = new ArrayList<>(firstState.getNPlayers());
+        //List<PartialObservableDeck<ResPlayerCards>> playerHandCards = new ArrayList<>(firstState.getNPlayers());
         int spyCounter = 0;
         for (int i = 0; i < firstState.getNPlayers(); i++) {
             boolean[] visible = new boolean[firstState.getNPlayers()];
             visible[i] = true;
             //might see sabotage cards
             PartialObservableDeck<ResPlayerCards> playerCards = new PartialObservableDeck<>("Player Cards", visible);
-            playerHandCards.add(playerCards);
+            resgs.playerHandCards.add(playerCards);
 
             // Add identity cards to hand
             if (rnd.nextInt(2) == 0 && spyCounter != resgs.factions[1]) {
@@ -83,7 +87,11 @@ public class ResForwardModel extends StandardForwardModel {
         ResPlayerCards leader = new ResPlayerCards(ResPlayerCards.CardType.LEADER);
         int randomPlayerLeader = rnd.nextInt(resgs.getNPlayers());
         leader.setOwnerId(randomPlayerLeader);
-        playerHandCards.get(randomPlayerLeader+1).add(leader);
+        resgs.playerHandCards.get(randomPlayerLeader).add(leader);
+        // DOUBLE CHECK LAST PLAYER CAN GET LEADER
+
+        //System.out.println(resgs.playerHandCards.get(0));
+        resgs.setGamePhase(TeamSelection);
     }
 
     /**

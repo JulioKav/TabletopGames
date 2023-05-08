@@ -2,9 +2,8 @@ package games.resistance;
 
 import core.AbstractGameState;
 import core.AbstractParameters;
-import games.explodingkittens.ExplodingKittensParameters;
+import games.resistance.components.ResGameBoard;
 
-import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -23,29 +22,27 @@ public class ResParameters extends AbstractParameters {
     }
 
     private ResGameState gameState;
-    public int[] gameBoard = getPlayerBoard(gameState.getNPlayers());
-    public int[] factions = getFactions(gameState.getNPlayers());
+    // Hard coded bad idea.
+    //public int[] gameBoard = getPlayerBoard(gameState.getNPlayers());
 
-
-
-
+    //public int[] factions = getFactions(gameState.getNPlayers());
+    // Hard coded bad idea
+    public int[] factions = getFactions(5);
 
 
     // might be wrong
-    public int[] getPlayerBoard(int numberPlayers){
-
+    public ResGameBoard getPlayerBoard(int numberPlayers){
         if (numberPlayers == 5)
-        {return new int[]{2, 3, 2, 3, 3};}
+        {return new ResGameBoard(new int[]{2, 3, 2, 3, 3});}
         if (numberPlayers == 6)
-        {return new int[]{2, 3, 4, 3, 4};}
+        {return new ResGameBoard(new int[] {2, 3, 4, 3, 4});}
         if (numberPlayers == 7)
-        {return new int[]{2, 3, 3, 4, 4};}
+        {return new ResGameBoard(new int[]{2, 3, 3, 4, 4});}
         if (numberPlayers == 8 || numberPlayers == 9 || numberPlayers == 10)
-        {return new int[]{3, 4, 4, 5, 5};}
-
-        return null;
-
+        {return new ResGameBoard(new int[]{3, 4, 4, 5, 5});}
+        throw new AssertionError("shouldn't be null, incorrect players:" + numberPlayers);
     }
+
 
     public int[] getFactions(int numberPlayers){
 
@@ -71,7 +68,7 @@ public class ResParameters extends AbstractParameters {
         ResParameters resp = new ResParameters(System.currentTimeMillis());
 
 
-        resp.gameBoard = gameBoard;
+
         resp.factions = factions;
         return resp;
 
@@ -84,7 +81,7 @@ public class ResParameters extends AbstractParameters {
         if (!(o instanceof ResParameters)) return false;
         if (!super.equals(o)) return false;
         ResParameters that = (ResParameters) o;
-        return  Objects.equals(gameBoard, that.gameBoard) &&
+        return
                 Objects.equals(factions, that.factions);
         
     }
@@ -92,6 +89,6 @@ public class ResParameters extends AbstractParameters {
     @Override
     public int hashCode() {
         // TODO: include the hashcode of all variables.
-        return Objects.hash(super.hashCode(),gameBoard,factions);
+        return Objects.hash(super.hashCode(),factions);
     }
 }

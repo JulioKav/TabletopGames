@@ -1,79 +1,60 @@
 package games.resistance.components;
 
-import core.CoreConstants;
 import core.components.Component;
+import games.terraformingmars.TMGameState;
+import games.terraformingmars.TMTypes;
+import games.terraformingmars.actions.ModifyGlobalParameter;
+import utilities.Utils;
 
-/**
- * <p>Components represent a game piece, or encompass some unit of game information (e.g. cards, tokens, score counters, boards, dice etc.)</p>
- * <p>Components in the game can (and should, if applicable) extend one of the other components, in package {@link core.components}.
- * Or, the game may simply reuse one of the existing core components.</p>
- * <p>They need to extend at a minimum the {@link Component} super class and implement the {@link Component#copy()} method.</p>
- * <p>They also need to include {@link Object#equals(Object)} and {@link Object#hashCode()} methods.</p>
- * <p>They <b>may</b> keep references to other components or actions (but these should be deep-copied in the copy() method, watch out for infinite loops!).</p>
- */
+import java.util.Arrays;
+import java.util.Objects;
+
+import static core.CoreConstants.ComponentType.BOARD;
+import static core.CoreConstants.ComponentType.BOARD_NODE;
+
 public class ResGameBoard extends Component {
-    public ResGameBoard(CoreConstants.ComponentType type, String name) {
-        super(type, name);
+
+    int[] missionSuccessValues = new int[5];
+    ResGameBoard type;
+
+    public ResGameBoard(int[] missionSuccessValues) {
+        super(BOARD, "Board");
+        this.missionSuccessValues = missionSuccessValues;
     }
 
-    protected ResGameBoard(CoreConstants.ComponentType type, String name, int componentID) {
-        super(type, name, componentID);
+    protected ResGameBoard(int[] missionSuccessValues, int componentID) {
+        super(BOARD, "Board", componentID);
+        this.missionSuccessValues = missionSuccessValues;
     }
 
-    public enum CardType {
-        gameBoard
-
+    public void setType(ResGameBoard type) {
+        this.type = type;
     }
-
-    /**
-     * @return Make sure to return an exact <b>deep</b> copy of the object, including all of its variables.
-     * Make sure the return type is this class (e.g. GTComponent) and NOT the super class Component.
-     * <p>
-     * <b>IMPORTANT</b>: This should have the same componentID
-     * (using the protected constructor on the Component super class which takes this as an argument).
-     * </p>
-     * <p>The function should also call the {@link Component#copyComponentTo(Component)} method, passing in as an
-     * argument the new copy you've made.</p>
-     * <p>If all variables in this class are final or effectively final, then you can just return <code>`this`</code>.</p>
-     */
-
-    public ResGameBoard.CardType cardType;
-
-    public ResGameBoard(ResGameBoard.CardType cardType) {
-
-        // MAYBE WRONG (DONT USE VALUEOF)
-        super(CoreConstants.ComponentType.valueOf(cardType.toString()));
-        this.cardType = cardType;
-    }
-
-    public ResGameBoard(ResGameBoard.CardType cardType, int ID) {
-        // MAYBE WRONG (DONT USE VALUEOF)
-        super(CoreConstants.ComponentType.valueOf(cardType.toString()), ID);
-        this.cardType = cardType;
+    public int[] getMissionSuccessValues() {
+        return missionSuccessValues;
     }
 
     @Override
     public ResGameBoard copy() {
-        ResGameBoard copy = new ResGameBoard(type, componentName, componentID);
-        // TODO: copy here all non-fi
-        //  nal class variables.
+        ResGameBoard copy = new ResGameBoard(missionSuccessValues, componentID);
         copyComponentTo(copy);
+        copy.type = type;
         return copy;
     }
 
     @Override
     public boolean equals(Object o) {
-        // TODO: compare all class variables (if any).
-        return (o instanceof ResGameBoard) && super.equals(o);
+        if (this == o) return true;
+        if (!(o instanceof ResGameBoard)) return false;
+        if (!super.equals(o)) return false;
+        ResGameBoard tmMapTile = (ResGameBoard) o;
+        return Arrays.equals(missionSuccessValues,this.missionSuccessValues) && type == this.type;
     }
 
     @Override
     public int hashCode() {
-        // TODO: include all class variables (if any).
-        return super.hashCode();
-    }
-
-    public String toString() {
-        return cardType.name();
+        // Potentially get rid of ownerID. Sets the owner of the gameboard as the game.
+        int result = Objects.hash(super.hashCode(), ownerId, type, missionSuccessValues);
+        return result;
     }
 }

@@ -1,6 +1,7 @@
 package games.resistance.components;
 
 import core.CoreConstants;
+import core.components.Card;
 import core.components.Component;
 import games.explodingkittens.cards.ExplodingKittensCard;
 
@@ -12,14 +13,16 @@ import games.explodingkittens.cards.ExplodingKittensCard;
  * <p>They also need to include {@link Object#equals(Object)} and {@link Object#hashCode()} methods.</p>
  * <p>They <b>may</b> keep references to other components or actions (but these should be deep-copied in the copy() method, watch out for infinite loops!).</p>
  */
-public class ResPlayerCards extends Component {
-    public ResPlayerCards(CoreConstants.ComponentType type, String name) {
-        super(type, name);
-    }
+public class ResPlayerCards extends Card {
+    //public ResPlayerCards(CoreConstants.ComponentType type, String name) {
+    //    super(type, name);
+    //}
 
-    protected ResPlayerCards(CoreConstants.ComponentType type, String name, int componentID) {
-        super(type, name, componentID);
-    }
+//    protected ResPlayerCards(CoreConstants.ComponentType type, String name, int componentID) {
+//        super(type, name, componentID);
+//    }
+
+
 
     public enum CardType {
         SPY,
@@ -42,24 +45,23 @@ public class ResPlayerCards extends Component {
      * <p>If all variables in this class are final or effectively final, then you can just return <code>`this`</code>.</p>
      */
 
-    public ResPlayerCards.CardType cardType;
+    public CardType cardType;
 
-    public ResPlayerCards(ResPlayerCards.CardType cardType) {
-
-        // MAYBE WRONG (DONT USE VALUEOF)
-        super(CoreConstants.ComponentType.valueOf(cardType.toString()));
+    public ResPlayerCards(CardType cardType){
+        super(cardType.toString());
         this.cardType = cardType;
     }
 
-    public ResPlayerCards(ResPlayerCards.CardType cardType, int ID) {
-        // MAYBE WRONG (DONT USE VALUEOF)
-        super(CoreConstants.ComponentType.valueOf(cardType.toString()), ID);
+    protected ResPlayerCards(CardType cardType, int ID){
+        super(cardType.toString(), ID);
         this.cardType = cardType;
     }
+
+// might be wrong initialisation cards
 
     @Override
     public ResPlayerCards copy() {
-        ResPlayerCards copy = new ResPlayerCards(type, componentName, componentID);
+        ResPlayerCards copy = new ResPlayerCards(cardType, componentID);
         // TODO: copy here all non-fi
         //  nal class variables.
         copyComponentTo(copy);

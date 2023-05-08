@@ -3,17 +3,15 @@ package games.resistance;
 import core.AbstractGameState;
 import core.AbstractParameters;
 import core.components.Component;
-import core.components.Deck;
 import core.components.PartialObservableDeck;
+import core.interfaces.IGamePhase;
+import core.interfaces.IPrintable;
 import games.GameType;
-import games.explodingkittens.cards.ExplodingKittensCard;
 import games.resistance.components.ResGameBoard;
 import games.resistance.components.ResPlayerCards;
-import games.resistance.ResParameters;
 //import games.resistance.components.ResGameBoard;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -28,16 +26,24 @@ public class ResGameState extends AbstractGameState {
     // int[] gameBoard;
 
     public int[] factions;
+
+    public enum ResGamePhase implements IGamePhase {
+        MissionVote, TeamSelection,
+    }
+
+
     /**
      * @param gameParameters - game parameters.
      * @param nPlayers       - number of players in the game
      */
 
-    List<PartialObservableDeck<ResPlayerCards>> playerHandCards;
+    List<PartialObservableDeck<ResPlayerCards>> playerHandCards = new ArrayList<>(10);
     //might not work as intended since casting component and also list and int[] usage/swapping
-    List<int[]> gameBoard;
+    public ResGameBoard gameBoard = new ResGameBoard(new int[5]);
+
     public ResGameState(AbstractParameters gameParameters, int nPlayers) {
         super(gameParameters, nPlayers);
+
     }
 
     /**
@@ -58,12 +64,26 @@ public class ResGameState extends AbstractGameState {
     @Override
     protected List<Component> _getAllComponents() {
         // TODO: add all components to the list
+        if(gameBoard == null)
+        {throw new AssertionError("GameBoard shouldn't be null");};
+
+        //ACTIVATE THIS LATER
+//        if(playerHandCards.get(0) == null)
+//        {throw new AssertionError("playerhands shouldn't be null");};
+
         return new ArrayList<Component>() {{
 
-            add((Component) gameBoard);
+            add(gameBoard);
             addAll(playerHandCards);
+
+//            for(int x : gameBoard.getMissionSuccessValues())
+//            {
+//                System.out.println(x);
+//            }
+            //System.out.println(playerHandCards.get(4));
         }};
     }
+
 
 
     /**
@@ -81,6 +101,7 @@ public class ResGameState extends AbstractGameState {
     @Override
     protected ResGameState _copy(int playerId) {
         ResGameState copy = new ResGameState(gameParameters, getNPlayers());
+        copy.playerHandCards = new ArrayList<>();
         // TODO: deep copy all variables to the new game state.
         return copy;
     }

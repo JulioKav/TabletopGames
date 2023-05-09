@@ -7,6 +7,7 @@ import core.components.PartialObservableDeck;
 import core.interfaces.IGamePhase;
 import core.interfaces.IPrintable;
 import games.GameType;
+import games.resistance.actions.ResVoting;
 import games.resistance.components.ResGameBoard;
 import games.resistance.components.ResPlayerCards;
 //import games.resistance.components.ResGameBoard;
@@ -26,6 +27,7 @@ public class ResGameState extends AbstractGameState {
     // int[] gameBoard;
 
     public int[] factions;
+    List<List<ResVoting>> votingChoice;
 
     public enum ResGamePhase implements IGamePhase {
         MissionVote, TeamSelection,
@@ -103,7 +105,46 @@ public class ResGameState extends AbstractGameState {
         ResGameState copy = new ResGameState(gameParameters, getNPlayers());
         copy.playerHandCards = new ArrayList<>();
         // TODO: deep copy all variables to the new game state.
+
+        copy.votingChoice = new ArrayList<>();
+
+        if (playerId == -1) {
+            for (int i = 0; i < getNPlayers(); i++) {
+                copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
+            }
+        } else {
+            // Now we need to redeterminise
+            // We don't know what other players have chosen for this round, hide card choices
+            for (int i = 0; i < getNPlayers(); i++) {
+                if (i == playerId) {
+                    copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
+                } else {
+                    // Replace others with hidden choices
+                    ArrayList<ResVoting> hiddenChoice = new ArrayList<>();
+                    for (ResVoting c : votingChoice.get(i)) {
+                        hiddenChoice.add(c.getHiddenChoice());
+                    }
+                    copy.votingChoice.add(hiddenChoice);
+                }
+            }
+        }
         return copy;
+    }
+
+    public void clearCardChoices() {
+        for (int i = 0; i < getNPlayers(); i++) votingChoice.get(i).clear();
+    }
+
+    public void clearvotingChoice() {
+        for (int i = 0; i < getNPlayers(); i++) votingChoice.get(i).clear();
+    }
+
+    public void addCardChoice(ResVoting ResVoting, int playerId) {
+        votingChoice.get(playerId).add(ResVoting);
+    }
+
+    public List<List<ResVoting>> getvotingChoice() {
+        return votingChoice;
     }
 
     /**
@@ -130,6 +171,10 @@ public class ResGameState extends AbstractGameState {
     public double getGameScore(int playerId) {
         // TODO: What is this player's score (if any)?
         return 0;
+    }
+
+    public List<PartialObservableDeck<ResPlayerCards>> getPlayerHandCards(){
+        return playerHandCards;
     }
 
     @Override

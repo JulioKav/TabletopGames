@@ -47,7 +47,7 @@ public class ResGameBoard extends Component {
         if (this == o) return true;
         if (!(o instanceof ResGameBoard)) return false;
         if (!super.equals(o)) return false;
-        ResGameBoard tmMapTile = (ResGameBoard) o;
+
         return Arrays.equals(missionSuccessValues,this.missionSuccessValues) && type == this.type;
     }
 

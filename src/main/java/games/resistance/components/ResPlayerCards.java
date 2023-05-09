@@ -4,6 +4,10 @@ import core.CoreConstants;
 import core.components.Card;
 import core.components.Component;
 import games.explodingkittens.cards.ExplodingKittensCard;
+import games.resistance.ResGameState;
+import games.sushigo.SGGameState;
+
+import java.util.function.Consumer;
 
 /**
  * <p>Components represent a game piece, or encompass some unit of game information (e.g. cards, tokens, score counters, boards, dice etc.)</p>
@@ -30,7 +34,13 @@ public class ResPlayerCards extends Card {
         LEADER,
         Yes,
         No,
+        ;
 
+        private Consumer<ResGameState> onRoundEnd, onGameEnd;
+
+        public void onRoundEnd(ResGameState gs) {
+            if (onRoundEnd != null) onRoundEnd.accept(gs);
+        }
     }
 
     /**
@@ -46,6 +56,8 @@ public class ResPlayerCards extends Card {
      */
 
     public CardType cardType;
+
+
 
     public ResPlayerCards(CardType cardType){
         super(cardType.toString());
@@ -79,6 +91,8 @@ public class ResPlayerCards extends Card {
         // TODO: include all class variables (if any).
         return super.hashCode();
     }
+
+
 
     public String toString() {
         return cardType.name();

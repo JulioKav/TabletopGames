@@ -29,7 +29,7 @@ public class ResParameters extends AbstractParameters {
     // Hard coded bad idea
     public int[] factions = getFactions(5);
 
-
+    public int getMaxRounds(){return 5;}
     // might be wrong
     public ResGameBoard getPlayerBoard(int numberPlayers){
         if (numberPlayers == 5)

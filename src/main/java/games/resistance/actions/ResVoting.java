@@ -32,7 +32,7 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
 
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
-        // Chopsticks allowing to pick second card, different from that already selected
+
         ResGameState resgs = (ResGameState) state;
         int idxSelected = resgs.getvotingChoice().get(playerId).get(0).cardIdx;
         List<AbstractAction> actions = new ArrayList<>();

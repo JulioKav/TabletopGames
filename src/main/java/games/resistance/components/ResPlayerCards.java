@@ -5,7 +5,8 @@ import core.components.Card;
 import core.components.Component;
 import games.explodingkittens.cards.ExplodingKittensCard;
 import games.resistance.ResGameState;
-import games.sushigo.SGGameState;
+import games.sushigo.cards.SGCard;
+
 
 import java.util.function.Consumer;
 
@@ -40,6 +41,9 @@ public class ResPlayerCards extends Card {
 
         public void onRoundEnd(ResGameState gs) {
             if (onRoundEnd != null) onRoundEnd.accept(gs);
+        }
+
+        public void onGameEnd(ResGameState resgs) {
         }
     }
 
@@ -83,7 +87,11 @@ public class ResPlayerCards extends Card {
     @Override
     public boolean equals(Object o) {
         // TODO: compare all class variables (if any).
-        return (o instanceof ResPlayerCards) && super.equals(o);
+        if (this == o) return true;
+        if (!(o instanceof SGCard)) return false;
+        if (!super.equals(o)) return false;
+        SGCard sgCard = (SGCard) o;
+        return  cardType == this.cardType ;
     }
 
     @Override

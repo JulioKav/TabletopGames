@@ -3,6 +3,7 @@ package games.resistance;
 import core.AbstractGameState;
 import core.AbstractParameters;
 import core.components.Component;
+import core.components.Deck;
 import core.components.PartialObservableDeck;
 import core.interfaces.IGamePhase;
 import core.interfaces.IPrintable;
@@ -27,11 +28,14 @@ public class ResGameState extends AbstractGameState {
     // int[] gameBoard;
 
     public int[] factions;
+
     List<List<ResVoting>> votingChoice;
 
     public enum ResGamePhase implements IGamePhase {
-        MissionVote, TeamSelection,
+        MissionVote, TeamSelectionVote, LeaderSelectsTeam
     }
+
+
 
 
     /**
@@ -102,12 +106,15 @@ public class ResGameState extends AbstractGameState {
      */
     @Override
     protected ResGameState _copy(int playerId) {
+        //System.out.println(gameBoard.getMissionSuccessValues()[1]);
         ResGameState copy = new ResGameState(gameParameters, getNPlayers());
-        copy.playerHandCards = new ArrayList<>();
+        copy.playerHandCards = playerHandCards;
+        copy.gameBoard = gameBoard;
+        //System.out.println(getRoundCounter());
         // TODO: deep copy all variables to the new game state.
 
         copy.votingChoice = new ArrayList<>();
-
+        //System.out.println(votingChoice);
         if (playerId == -1) {
             for (int i = 0; i < getNPlayers(); i++) {
                 copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
@@ -118,17 +125,24 @@ public class ResGameState extends AbstractGameState {
             for (int i = 0; i < getNPlayers(); i++) {
                 if (i == playerId) {
                     copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
-                } else {
-                    // Replace others with hidden choices
-                    ArrayList<ResVoting> hiddenChoice = new ArrayList<>();
-                    for (ResVoting c : votingChoice.get(i)) {
-                        hiddenChoice.add(c.getHiddenChoice());
-                    }
-                    copy.votingChoice.add(hiddenChoice);
+                    //System.out.println(votingChoice.get(i));
+
                 }
+//                else {
+//                    // Replace others with hidden choices
+//                    ArrayList<ResVoting> hiddenChoice = new ArrayList<>();
+//                    for (ResVoting c : votingChoice.get(i)) {
+//                        hiddenChoice.add(c.getHiddenChoice());
+//                    }
+//                    copy.votingChoice.add(hiddenChoice);
+//
+//
+//                }
             }
         }
+
         return copy;
+
     }
 
     public void clearCardChoices() {

@@ -19,7 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import static games.resistance.ResGameState.ResGamePhase.TeamSelection;
+import static core.CoreConstants.ComponentType.CARD;
+import static games.resistance.ResGameState.ResGamePhase.*;
 import static games.sushigo.cards.SGCard.SGCardType.values;
 
 /**
@@ -104,7 +105,7 @@ public class ResForwardModel extends StandardForwardModel {
         // DOUBLE CHECK LAST PLAYER CAN GET LEADER
 
         //System.out.println(resgs.playerHandCards.get(0));
-        resgs.setGamePhase(TeamSelection);
+        resgs.setGamePhase(LeaderSelectsTeam);
     }
 
     /**
@@ -113,15 +114,27 @@ public class ResForwardModel extends StandardForwardModel {
      */
     @Override
     protected List<AbstractAction> _computeAvailableActions(AbstractGameState gameState) {
+
         ResGameState resgs = (ResGameState) gameState;
+
         List<AbstractAction> actions = new ArrayList<>();
 
+
+        //System.out.println(resgs.getPlayerHandCards());
         int currentPlayer = resgs.getCurrentPlayer();
         Deck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(currentPlayer);
-        for (int i = 0; i < currentPlayerHand.getSize(); i++) {
-            // All players can do is choose a card in hand to play.
-            actions.add(new ResVoting(currentPlayer, i));
+
+        //LEADER TEAM SELECTION
+        //System.out.println(currentPlayerHand.getComponents().get(0).cardType);
+
+        if (currentPlayerHand.getComponents().get(0).cardType == ResPlayerCards.CardType.LEADER)
+        {
+            for (int i = 0; i < resgs.gameBoard.getMissionSuccessValues()[resgs.getRoundCounter()]; i++) { System.out.println("AA");}
         }
+            // All players can do is choose a yes or no card in hand to play.
+        actions.add(new ResVoting(currentPlayer, currentPlayerHand.getSize() - 3));
+        actions.add(new ResVoting(currentPlayer, currentPlayerHand.getSize() - 2));
+        //System.out.println(currentPlayerHand.get(currentPlayerHand.getSize() - 3));
         return actions;
     }
 
@@ -131,6 +144,9 @@ public class ResForwardModel extends StandardForwardModel {
             return; // we only want to trigger this processing if an extended action sequence (i.e. Chopsticks) has been terminated
         ResGameState resgs = (ResGameState) currentState;
 
+        //NEED TO CHOOSE TEAM
+
+        if (resgs.getGamePhase() == LeaderSelectsTeam){
         // Check if all players made their choice
         int turn = resgs.getTurnCounter();
         if ((turn + 1) % resgs.getNPlayers() == 0) {
@@ -147,11 +163,11 @@ public class ResForwardModel extends StandardForwardModel {
                 resgs.clearCardChoices();
 
                 // Check if the game is over
-                if (resgs.getRoundCounter() >= ((ResParameters)resgs.getGameParameters()).) {
+                if (resgs.getRoundCounter() >= ((ResParameters)resgs.getGameParameters()).getMaxRounds()) {
                     // It is! Process end of game rules.nRounds
-                    for (ResPlayerCards.CardType type: values()) {
-                        type.onGameEnd(resgs);
-                    }
+//                    for (ResPlayerCards.CardType type: values()) {
+//                        type.onGameEnd(resgs);
+//                    }
                     // Decide winner
                     endGame(resgs);
                     return;
@@ -160,59 +176,71 @@ public class ResForwardModel extends StandardForwardModel {
                 _startRound(resgs);
                 return;
             } else {
-                // Round is not over, keep going. Rotate hands for next player turns.
-                rotatePlayerHands(resgs);
-
                 // Clear card choices from this turn, ready for the next simultaneous choice.
                 resgs.clearCardChoices();
+                // Round is not over, keep going. Rotate hands for next player turns.
+                //rotatePlayerHands(resgs);
+
+
             }
         }
 
         // End player turn
         if (resgs.getGameStatus() == CoreConstants.GameResult.GAME_ONGOING) {
             endPlayerTurn(resgs);
-        }
+        }}
     }
 
-    void revealCards(ResGameState gs) {
-        for (int i = 0; i < gs.getNPlayers(); i++) {
-            Deck<SGCard> hand = gs.getPlayerHands().get(i);
-            for (ChooseCard cc: gs.cardChoices.get(i)) {
-                SGCard cardToReveal = hand.get(cc.cardIdx);
+    void revealCards(ResGameState resgs) {
+        ArrayList<ResPlayerCards> allVotes = new ArrayList<>();
+        for (int i = 0; i < resgs.getNPlayers(); i++) {
+            PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
+            for (ResVoting cc: resgs.votingChoice.get(i)) {
+                ResPlayerCards cardToReveal = hand.get(cc.cardIdx);
+                allVotes.add(cardToReveal);
 
-                hand.remove(cardToReveal);
-                gs.playedCards.get(i).add(cardToReveal);
-                gs.playedCardTypes[i].get(cardToReveal.type).increment(cardToReveal.count);
-                gs.playedCardTypesAllGame[i].get(cardToReveal.type).increment(cardToReveal.count);
+                //dont need to remove cards?
 
-                //Add points to player
-                cardToReveal.type.onReveal(gs, i);
+                //hand.remove(cardToReveal);
+
+                // MIGHT NEED FOR HEURISTIC/INFO
+                //resgs.playedCards.get(i).add(cardToReveal);
+
+
+
+//                resgs.playedCardTypes[i].get(cardToReveal.type).increment(cardToReveal.count);
+//                resgs.playedCardTypesAllGame[i].get(cardToReveal.type).increment(cardToReveal.count);
+//
+//                //Add points to player
+//                cardToReveal.type.onReveal(resgs, i);
             }
         }
+        //System.out.println(allVotes);
     }
 
     public void _startRound(ResGameState resgs) {
-        //Draw new hands for players
-        for (int i = 0; i < resgs.getNPlayers(); i++){
-            for (int j = 0; j < resgs.nCardsInHand; j++)
-            {
-                if (resgs.drawPile.getSize() == 0) {
-                    // Reshuffle discard into draw pile
-                    resgs.drawPile.add(resgs.discardPile);
-                    resgs.discardPile.clear();
-                    resgs.drawPile.shuffle(new Random(resgs.getGameParameters().getRandomSeed()));
-                }
-                resgs.playerHands.get(i).add(resgs.drawPile.draw());
-            }
-            resgs.deckRotations = 0;
-        }
+//        //Draw new hands for players
+//        ResPlayerCards.CardType leader = ResPlayerCards.CardType.LEADER;
+//        for (int i = 0; i < resgs.getNPlayers(); i++){
+//            if (resgs.playerHandCards.contains(ResPlayerCards.CardType.LEADER))
+//            {
+//                if (i + 1 == resgs.getNPlayers())
+//                {
+//
+//                }
+//            }
+//
+//                resgs.playerHandCards.get(i).add(leader,0);
+//
+//
+//        }
     }
 
     boolean isRoundOver(ResGameState resgs) {
         //
-        for (int i = 0; i < resgs.getPlayerHands().size(); i++) {
-            if (resgs.getPlayerHands().get(i).getSize() > 0) return false;
-        }
+//        for (int i = 0; i < resgs.getPlayerHands().size(); i++) {
+//            if (resgs.getPlayerHands().get(i).getSize() > 0) return false;
+//        }
         return true;
     }
     public void _endRound(ResGameState resgs) {
@@ -221,20 +249,6 @@ public class ResForwardModel extends StandardForwardModel {
             type.onRoundEnd(resgs);
         }
 
-        // Clear played hands if they get discarded between rounds, they go in the discard pile
-        for (int i = 0; i < resgs.getNPlayers(); i++) {
-            Deck<SGCard> cardsToKeep = resgs.playedCards.get(i).copy();
-            cardsToKeep.clear();
-            for (SGCard card : resgs.playedCards.get(i).getComponents()) {
-                if (card.type.isDiscardedBetweenRounds()) {
-                    resgs.discardPile.add(card);
-                    resgs.playedCardTypes[i].get(card.type).setValue(0);
-                } else {
-                    cardsToKeep.add(card);
-                }
-            }
-            resgs.playedCards.get(i).clear();
-            resgs.playedCards.get(i).add(cardsToKeep);
-        }
+
     }
 }

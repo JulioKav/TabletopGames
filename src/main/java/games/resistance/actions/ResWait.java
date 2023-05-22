@@ -2,31 +2,30 @@ package games.resistance.actions;
 
 import core.AbstractGameState;
 import core.actions.AbstractAction;
-import core.components.PartialObservableDeck;
 import core.interfaces.IExtendedSequence;
 import games.resistance.ResGameState;
-import games.resistance.components.ResPlayerCards;
+import utilities.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ResVoting extends AbstractAction implements IExtendedSequence {
+public class ResWait extends AbstractAction implements IExtendedSequence {
     public final int playerId;
-    public final int cardIdx;
 
-    public ResVoting(int playerId, int cardIdx) {
+
+    public ResWait(int playerId ) {
         this.playerId = playerId;
-        this.cardIdx = cardIdx;
+
     }
 
-    public ResVoting getHiddenChoice() {
-        return new ResVoting(playerId, -1);
-    }
+//    public ResTeamBuilding getHiddenChoice() {
+//        return new ResTeamBuilding(playerId, -1);
+//    }
 
     @Override
     public boolean execute(AbstractGameState gs) {
-        ((ResGameState)gs).addCardChoice(this, gs.getCurrentPlayer());
+
         return true;
     }
 
@@ -34,15 +33,11 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
         ResGameState resgs = (ResGameState) state;
-        int idxSelected = resgs.getvotingChoice().get(playerId).get(0).cardIdx;
+
         List<AbstractAction> actions = new ArrayList<>();
 
-        PartialObservableDeck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(playerId);
-        for (int i = 0; i < currentPlayerHand.getSize(); i++) {
-            if (idxSelected != i) {
-                actions.add(new ResVoting(playerId, i));
-            }
-        }
+
+        actions.add(new ResWait(playerId));
 
         return actions;
     }
@@ -63,25 +58,27 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
     }
 
     @Override
-    public ResVoting copy() {
+    public ResWait copy() {
         return this; // immutable
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ResVoting)) return false;
-        ResVoting that = (ResVoting) o;
-        return playerId == that.playerId && cardIdx == that.cardIdx;
+        if (!(o instanceof ResWait)) return false;
+        ResWait that = (ResWait) o;
+        return playerId == that.playerId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(playerId, cardIdx);
+        return Objects.hash(playerId);
     }
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return "Choose card " + cardIdx;
+        return "Waiting " ;
     }
+
+
 }

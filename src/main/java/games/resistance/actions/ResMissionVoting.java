@@ -11,22 +11,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ResVoting extends AbstractAction implements IExtendedSequence {
+public class ResMissionVoting extends AbstractAction implements IExtendedSequence {
     public final int playerId;
     public final int cardIdx;
 
-    public ResVoting(int playerId, int cardIdx) {
+    public ResMissionVoting(int playerId, int cardIdx) {
         this.playerId = playerId;
         this.cardIdx = cardIdx;
     }
 
-    public ResVoting getHiddenChoice() {
-        return new ResVoting(playerId, -1);
+    public ResMissionVoting getHiddenChoice() {
+        return new ResMissionVoting(playerId, -1);
     }
 
     @Override
     public boolean execute(AbstractGameState gs) {
-        ((ResGameState)gs).addCardChoice(this, gs.getCurrentPlayer());
+        ((ResGameState)gs).addMissionChoice(this, gs.getCurrentPlayer());
         return true;
     }
 
@@ -40,7 +40,7 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
         PartialObservableDeck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(playerId);
         for (int i = 0; i < currentPlayerHand.getSize(); i++) {
             if (idxSelected != i) {
-                actions.add(new ResVoting(playerId, i));
+                actions.add(new ResMissionVoting(playerId, i));
             }
         }
 
@@ -63,15 +63,15 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
     }
 
     @Override
-    public ResVoting copy() {
+    public ResMissionVoting copy() {
         return this; // immutable
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ResVoting)) return false;
-        ResVoting that = (ResVoting) o;
+        if (!(o instanceof ResMissionVoting)) return false;
+        ResMissionVoting that = (ResMissionVoting) o;
         return playerId == that.playerId && cardIdx == that.cardIdx;
     }
 

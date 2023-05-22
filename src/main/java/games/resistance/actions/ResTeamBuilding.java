@@ -2,31 +2,30 @@ package games.resistance.actions;
 
 import core.AbstractGameState;
 import core.actions.AbstractAction;
-import core.components.PartialObservableDeck;
 import core.interfaces.IExtendedSequence;
 import games.resistance.ResGameState;
-import games.resistance.components.ResPlayerCards;
+import utilities.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ResVoting extends AbstractAction implements IExtendedSequence {
+public class ResTeamBuilding extends AbstractAction implements IExtendedSequence {
     public final int playerId;
-    public final int cardIdx;
+    public final int[] team;
 
-    public ResVoting(int playerId, int cardIdx) {
+    public ResTeamBuilding(int playerId, int[] team) {
         this.playerId = playerId;
-        this.cardIdx = cardIdx;
+        this.team = team;
     }
 
-    public ResVoting getHiddenChoice() {
-        return new ResVoting(playerId, -1);
-    }
+//    public ResTeamBuilding getHiddenChoice() {
+//        return new ResTeamBuilding(playerId, -1);
+//    }
 
     @Override
     public boolean execute(AbstractGameState gs) {
-        ((ResGameState)gs).addCardChoice(this, gs.getCurrentPlayer());
+        ((ResGameState)gs).addTeamChoice(this, gs.getCurrentPlayer());;
         return true;
     }
 
@@ -34,16 +33,19 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
         ResGameState resgs = (ResGameState) state;
-        int idxSelected = resgs.getvotingChoice().get(playerId).get(0).cardIdx;
+
         List<AbstractAction> actions = new ArrayList<>();
 
-        PartialObservableDeck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(playerId);
-        for (int i = 0; i < currentPlayerHand.getSize(); i++) {
-            if (idxSelected != i) {
-                actions.add(new ResVoting(playerId, i));
-            }
+        int[] players = new int[resgs.getNPlayers()];
+        for (int i = 0; i < resgs.getNPlayers(); i++) {
+            players[i] = i;
         }
 
+          ArrayList<int[]> chosenMarket = Utils.generateCombinations(players, resgs.gameBoard.getMissionSuccessValues()[resgs.getRoundCounter()]);
+            for(int[] teams : chosenMarket) {
+                actions.add(new ResTeamBuilding(playerId, teams));
+            }
+        //System.out.println(actions);
         return actions;
     }
 
@@ -63,25 +65,27 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
     }
 
     @Override
-    public ResVoting copy() {
+    public ResTeamBuilding copy() {
         return this; // immutable
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ResVoting)) return false;
-        ResVoting that = (ResVoting) o;
-        return playerId == that.playerId && cardIdx == that.cardIdx;
+        if (!(o instanceof ResTeamBuilding)) return false;
+        ResTeamBuilding that = (ResTeamBuilding) o;
+        return playerId == that.playerId && team == that.team;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(playerId, cardIdx);
+        return Objects.hash(playerId, team);
     }
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return "Choose card " + cardIdx;
+        return "Choose team " + team;
     }
+
+
 }

@@ -2,7 +2,9 @@ package games.resistance;
 
 import core.AbstractGameState;
 import core.AbstractParameters;
+import core.Game;
 import games.resistance.components.ResGameBoard;
+import gametemplate.GTParameters;
 
 import java.util.Objects;
 
@@ -22,12 +24,13 @@ public class ResParameters extends AbstractParameters {
     }
 
     private ResGameState gameState;
+
     // Hard coded bad idea.
     //public int[] gameBoard = getPlayerBoard(gameState.getNPlayers());
 
     //public int[] factions = getFactions(gameState.getNPlayers());
     // Hard coded bad idea
-    public int[] factions = getFactions(5);
+    //public int[] factions = getFactions();
 
     public int getMaxRounds(){return 5;}
     // might be wrong
@@ -69,7 +72,7 @@ public class ResParameters extends AbstractParameters {
 
 
 
-        resp.factions = factions;
+        //resp.factions = factions;
         return resp;
 
     }
@@ -82,13 +85,13 @@ public class ResParameters extends AbstractParameters {
         if (!super.equals(o)) return false;
         ResParameters that = (ResParameters) o;
         return
-                Objects.equals(factions, that.factions);
+                o instanceof ResParameters;
         
     }
 
     @Override
     public int hashCode() {
         // TODO: include the hashcode of all variables.
-        return Objects.hash(super.hashCode(),factions);
+        return Objects.hash(super.hashCode());
     }
 }

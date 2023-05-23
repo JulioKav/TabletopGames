@@ -163,25 +163,32 @@ public class ResForwardModel extends StandardForwardModel {
             if(resgs.getGamePhase()== TeamSelectionVote) {
                 // All players can do is choose a yes or no card in hand to play.
                 //System.out.println(currentPlayer + "currentplayer");
-
+                //System.out.println( "consdsdsdd not met");
                 actions.add(new ResVoting(currentPlayer, currentPlayerHand.getSize() - 3));
                 actions.add(new ResVoting(currentPlayer, currentPlayerHand.getSize() - 2));
                 //System.out.println(actions.size());
             }
 
         if(resgs.getGamePhase()== MissionVote) {
+
             //System.out.println("in here");
             // All players can do is choose a yes or no card in hand to play.
+
             ArrayList<Integer> teamList = new ArrayList<>();
             for (int value : resgs.finalTeamChoice) {
                 teamList.add(value);
+
+                System.out.println(value + "value");
+                System.out.println(teamList );
             }
 
             if(teamList.contains(currentPlayer)){
+                System.out.println(teamList + "cond met");
                 actions.add(new ResVoting(currentPlayer, currentPlayerHand.getSize() - 3));
                 actions.add(new ResVoting(currentPlayer, currentPlayerHand.getSize() - 2));
             }
             else {
+                System.out.println(teamList + "cond not met");
                 actions.add(new ResWait(currentPlayer));
             }
 
@@ -257,7 +264,7 @@ public class ResForwardModel extends StandardForwardModel {
             // Check if all players made their choice
             int turn = resgs.getTurnCounter();
 
-            if ((turn + 1) % resgs.getNPlayers() == 0) {
+            if ((turn + 1) % resgs.getNPlayers() == 0 && resgs.getTurnCounter() != (2*resgs.getNPlayers())-1) {
                 // They did! Reveal all cards at once. Process card reveal rules.
 
                 revealCards(resgs);
@@ -395,13 +402,13 @@ public class ResForwardModel extends StandardForwardModel {
             for (int i : resgs.finalTeamChoice) {
                 PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
                 counter += 1;
-                System.out.println("whatever this is: " + i);
+
                 for (ResMissionVoting cc: resgs.missionVotingChoice.get(i)) {
                     ResPlayerCards cardToReveal = hand.get(cc.cardIdx);
 
                     allVotes.add(cardToReveal);
                     System.out.println(cardToReveal + "mission");
-                    System.out.println(counter);
+
                     //if(allVotes.size() == 5){System.out.println(allVotes);}
 
                     //dont need to remove cards?

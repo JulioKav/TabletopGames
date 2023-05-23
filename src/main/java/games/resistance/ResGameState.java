@@ -117,6 +117,7 @@ public class ResGameState extends AbstractGameState {
         ResGameState copy = new ResGameState(gameParameters, getNPlayers());
         copy.playerHandCards = playerHandCards;
         copy.gameBoard = gameBoard;
+        copy.finalTeamChoice = finalTeamChoice;
         //System.out.println(getRoundCounter());
         // TODO: deep copy all variables to the new game state.
 
@@ -130,7 +131,7 @@ public class ResGameState extends AbstractGameState {
 
         }
         else {
-            System.out.println("Voting choice size: "+ votingChoice.size());
+            //System.out.println("Voting choice size: "+ votingChoice.size());
             // Now we need to redeterminise
             // We don't know what other players have chosen for this round, hide card choices
             for (int i = 0; i < getNPlayers(); i++) {
@@ -162,7 +163,7 @@ public class ResGameState extends AbstractGameState {
 
         }
         else {
-            System.out.println("Mission voting size: "+ missionVotingChoice.size());
+            //System.out.println("Mission voting size: "+ missionVotingChoice.size());
             // Now we need to redeterminise
             // We don't know what other players have chosen for this round, hide card choices
             for (int i = 0; i < getNPlayers(); i++) {

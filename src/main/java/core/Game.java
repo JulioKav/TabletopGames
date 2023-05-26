@@ -17,6 +17,7 @@ import io.humble.video.awt.MediaPictureConverterFactory;
 import players.human.ActionController;
 import players.human.HumanConsolePlayer;
 import players.human.HumanGUIPlayer;
+import players.mcts.MCTSPlayer;
 import players.simple.RandomPlayer;
 import utilities.Pair;
 import utilities.Utils;
@@ -927,17 +928,22 @@ public class Game {
         /* Set up players for the game */
         ArrayList<AbstractPlayer> players = new ArrayList<>(playerCount);
 
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
-//        players.add(new MCTSPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+
 //        MCTSParams params1 = new MCTSParams();
 //        players.add(new MCTSPlayer(params1));
 //        players.add(new OSLAPlayer());

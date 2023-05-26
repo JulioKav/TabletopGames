@@ -8,6 +8,7 @@ import games.resistance.ResGameState;
 import games.sushigo.cards.SGCard;
 
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -88,16 +89,16 @@ public class ResPlayerCards extends Card {
     public boolean equals(Object o) {
         // TODO: compare all class variables (if any).
         if (this == o) return true;
-        if (!(o instanceof SGCard)) return false;
+        if (!(o instanceof ResPlayerCards)) return false;
         if (!super.equals(o)) return false;
-        SGCard sgCard = (SGCard) o;
+        ResPlayerCards resCard = (ResPlayerCards) o;
         return  cardType == this.cardType ;
     }
 
     @Override
     public int hashCode() {
         // TODO: include all class variables (if any).
-        return super.hashCode();
+        return Objects.hash(super.hashCode(), type);
     }
 
 

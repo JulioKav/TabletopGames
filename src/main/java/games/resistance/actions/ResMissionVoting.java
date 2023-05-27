@@ -20,8 +20,10 @@ public class ResMissionVoting extends AbstractAction implements IExtendedSequenc
         this.cardIdx = cardIdx;
     }
 
-    public ResMissionVoting getHiddenChoice() {
-        return new ResMissionVoting(playerId, -1);
+    public ResMissionVoting getHiddenChoice(ResGameState resgs) {
+        if (resgs.getPlayerHandCards().get(playerId).getSize() > 3)
+        {return new ResMissionVoting(playerId, 1);}
+        else{return new ResMissionVoting(playerId, 0);}
     }
 
     @Override

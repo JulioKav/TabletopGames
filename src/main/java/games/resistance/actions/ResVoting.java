@@ -20,8 +20,14 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
         this.cardIdx = cardIdx;
     }
 
-    public ResVoting getHiddenChoice() {
-        return new ResVoting(playerId, -1);
+
+    /////////// MIGHT BE DUMB RANDOMLY CHOOSING WITH HARDCODEd HAND
+    public ResVoting getHiddenChoice(ResGameState resgs) {
+        if (resgs.getPlayerHandCards().get(playerId).getSize() > 3) {
+            return new ResVoting(playerId, 1);
+        } else {
+            return new ResVoting(playerId, 0);
+        }
     }
 
     @Override
@@ -85,3 +91,5 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
         return "Choose card " + cardIdx;
     }
 }
+
+

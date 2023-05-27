@@ -115,8 +115,9 @@ public class ResGameState extends AbstractGameState {
     @Override
     protected ResGameState _copy(int playerId) {
         //System.out.println(gameBoard.getMissionSuccessValues()[1]);
+
         ResGameState copy = new ResGameState(gameParameters, getNPlayers());
-        ////NEEEEEEED TO DETERMINISE PLAYERHAND CARDS
+
 
         copy.gameBoard = gameBoard;
         copy.gameBoardValues = gameBoardValues;
@@ -128,6 +129,8 @@ public class ResGameState extends AbstractGameState {
         copy.missionVotingChoice = new ArrayList<>();
         //copy.teamChoice = new ArrayList<>(1);
         //System.out.println(votingChoice);
+        //System.out.println(playerHandCards.size() + "PLAYERHANDSCARDS");
+
         if (playerId == -1) {
             copy.playerHandCards = playerHandCards;
             for (int i = 0; i < getNPlayers(); i++) {
@@ -137,6 +140,8 @@ public class ResGameState extends AbstractGameState {
 
         }
         else {
+            ArrayList<Integer> teamList = new ArrayList<>();
+            for (int value : finalTeamChoice) {teamList.add(value);}
             //System.out.println("Voting choice size: "+ votingChoice.size());
             // Now we need to redeterminise
             // We don't know what other players have chosen for this round, hide card choices
@@ -145,27 +150,41 @@ public class ResGameState extends AbstractGameState {
                     copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
                     copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
                     copy.playerHandCards.add(playerHandCards.get(i));
+                    copy.votingChoice.add(votingChoice.get(i));
+
+                    //Checking MissionVote Eligibility
+                    if(teamList.contains(i)){copy.missionVotingChoice.add(missionVotingChoice.get(i));}
+
+
+
+
                     //System.out.println(votingChoice.get(i));
 
                 }
                 //Allowing Spies To Know All Card Types
-                if(playerHandCards.get(playerId).get(0).cardType == ResPlayerCards.CardType.SPY || playerHandCards.get(playerId).get(1).cardType == ResPlayerCards.CardType.SPY){
+                if(playerHandCards.get(playerId).get(playerHandCards.get(playerId).getSize()-1).cardType == ResPlayerCards.CardType.SPY && i != playerId){
                     copy.playerHandCards.add(playerHandCards.get(i));
                 }
-                else {
+                else if (i != playerId){
                     copy.playerHandCards.add(createHiddenHands(i));
+
                 }
 
-                ArrayList<ResVoting> hiddenChoiceVote = new ArrayList<>();
-                for (ResVoting c : votingChoice.get(i)) {
-                    hiddenChoiceVote.add(c.getHiddenChoice());
-                }
-                ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
-                for (ResMissionVoting c : missionVotingChoice.get(i)) {
-                    hiddenChoiceMissionVote.add(c.getHiddenChoice());
-                }
-                copy.votingChoice.add(hiddenChoiceVote);
-                copy.missionVotingChoice.add(hiddenChoiceMissionVote);
+                if (i != playerId){
+                    ArrayList<ResVoting> hiddenChoiceVote = new ArrayList<>();
+                    for (ResVoting c : votingChoice.get(i)) {
+                        System.out.println(c.getHiddenChoice(this).cardIdx +"ResVOting CARD");
+                        hiddenChoiceVote.add(c.getHiddenChoice(this));
+                    }
+
+                    ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
+                    if(teamList.contains(i)){
+                    for (ResMissionVoting c : missionVotingChoice.get(i)) {
+                        hiddenChoiceMissionVote.add(c.getHiddenChoice(this));
+                    }}
+
+                    copy.votingChoice.add(hiddenChoiceVote);
+                    copy.missionVotingChoice.add(hiddenChoiceMissionVote);}
             }
         }
 
@@ -187,7 +206,7 @@ public class ResGameState extends AbstractGameState {
 //            }}
         
 
-
+        //System.out.println(copy.votingChoice.size() + "voting choice SIZE");
         return copy;
 
     }

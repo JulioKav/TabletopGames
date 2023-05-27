@@ -919,7 +919,7 @@ public class Game {
     public static void main(String[] args) {
         String gameType = Utils.getArg(args, "game", "Resistance");
         boolean useGUI = Utils.getArg(args, "gui", true);
-        int playerCount = Utils.getArg(args, "nPlayers", 10);
+        int playerCount = Utils.getArg(args, "nPlayers", 5);
         int turnPause = Utils.getArg(args, "turnPause", 0);
         long seed = Utils.getArg(args, "seed", System.currentTimeMillis());
 
@@ -935,14 +935,14 @@ public class Game {
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
-//        players.add(new RandomPlayer());
-//        players.add(new RandomPlayer());
-//        players.add(new RandomPlayer());
+        players.add(new RandomPlayer());
+        players.add(new RandomPlayer());
+        players.add(new RandomPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
 
 //        MCTSParams params1 = new MCTSParams();
 //        players.add(new MCTSPlayer(params1));

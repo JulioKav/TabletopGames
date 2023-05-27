@@ -174,6 +174,7 @@ public class SGForwardModel extends StandardForwardModel {
         for (int i = 0; i < gs.getNPlayers(); i++) {
             Deck<SGCard> hand = gs.getPlayerHands().get(i);
             for (ChooseCard cc: gs.cardChoices.get(i)) {
+
                 SGCard cardToReveal = hand.get(cc.cardIdx);
 
                 hand.remove(cardToReveal);

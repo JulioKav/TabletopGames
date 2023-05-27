@@ -352,6 +352,12 @@ public class ResForwardModel extends StandardForwardModel {
         for (int i = 0; i < resgs.getNPlayers(); i++) {
             PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
             for (ResVoting cc: resgs.votingChoice.get(i)) {
+                System.out.println(hand.get(0) + "hand MCTS");
+                System.out.println(hand.get(1) + "hand MCTS");
+                System.out.println(hand.get(2) + "hand MCTS");
+                System.out.println(cc.cardIdx + "CC");
+
+
                 ResPlayerCards cardToReveal = hand.get(cc.cardIdx);
                 allVotes.add(cardToReveal.cardType);
                 //dont need to remove cards?

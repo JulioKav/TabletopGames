@@ -32,6 +32,7 @@ public class ResGameState extends AbstractGameState {
     List<Boolean> gameBoardValues = new ArrayList<>();
     boolean voteSuccess;
 
+    int failedVoteCounter = 0;
     List<List<ResVoting>> votingChoice;
 
     List<List<ResMissionVoting>> missionVotingChoice;
@@ -86,15 +87,8 @@ public class ResGameState extends AbstractGameState {
 //        {throw new AssertionError("playerhands shouldn't be null");};
 
         return new ArrayList<Component>() {{
-
             add(gameBoard);
             addAll(playerHandCards);
-
-//            for(int x : gameBoard.getMissionSuccessValues())
-//            {
-//                System.out.println(x);
-//            }
-            //System.out.println(playerHandCards.get(4));
         }};
     }
 
@@ -114,28 +108,19 @@ public class ResGameState extends AbstractGameState {
      */
     @Override
     protected ResGameState _copy(int playerId) {
-        //System.out.println(gameBoard.getMissionSuccessValues()[1]);
-
-        ResGameState copy = new ResGameState(gameParameters, getNPlayers());
-
-
+        ResGameState copy = new ResGameState(gameParameters.copy(), getNPlayers());
         copy.gameBoard = gameBoard;
         copy.gameBoardValues = gameBoardValues;
         copy.finalTeamChoice = finalTeamChoice;
-        //System.out.println(getRoundCounter());
-        // TODO: deep copy all variables to the new game state.
-
         copy.votingChoice = new ArrayList<>();
         copy.missionVotingChoice = new ArrayList<>();
-        //copy.teamChoice = new ArrayList<>(1);
-        //System.out.println(votingChoice);
-        //System.out.println(playerHandCards.size() + "PLAYERHANDSCARDS");
-
+        copy.playerHandCards = new ArrayList<>(10);
         if (playerId == -1) {
             copy.playerHandCards = playerHandCards;
             for (int i = 0; i < getNPlayers(); i++) {
                 copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
-                copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
+                if(i < missionVotingChoice.size()){copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));}
+
             }
 
         }
@@ -148,17 +133,11 @@ public class ResGameState extends AbstractGameState {
             for (int i = 0; i < getNPlayers(); i++) {
                 if (i == playerId) {
                     copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
-                    copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
+                    //copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
                     copy.playerHandCards.add(playerHandCards.get(i));
-                    copy.votingChoice.add(votingChoice.get(i));
 
                     //Checking MissionVote Eligibility
-                    if(teamList.contains(i)){copy.missionVotingChoice.add(missionVotingChoice.get(i));}
-
-
-
-
-                    //System.out.println(votingChoice.get(i));
+                    if(teamList.contains(i)){copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));}
 
                 }
                 //Allowing Spies To Know All Card Types
@@ -173,11 +152,12 @@ public class ResGameState extends AbstractGameState {
                 if (i != playerId){
                     ArrayList<ResVoting> hiddenChoiceVote = new ArrayList<>();
                     for (ResVoting c : votingChoice.get(i)) {
-                        System.out.println(c.getHiddenChoice(this).cardIdx +"ResVOting CARD");
+                        //System.out.println(c.getHiddenChoice(this).cardIdx +"ResVOting CARD");
                         hiddenChoiceVote.add(c.getHiddenChoice(this));
                     }
 
                     ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
+                    //Checking MissionVote Eligibility
                     if(teamList.contains(i)){
                     for (ResMissionVoting c : missionVotingChoice.get(i)) {
                         hiddenChoiceMissionVote.add(c.getHiddenChoice(this));

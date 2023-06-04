@@ -33,6 +33,8 @@ public class ResGameState extends AbstractGameState {
     boolean voteSuccess;
 
     int failedVoteCounter = 0;
+    int occurrenceCountTrue = 0;
+    int occurrenceCountFalse = 0;
     List<List<ResVoting>> votingChoice;
 
     List<List<ResMissionVoting>> missionVotingChoice;
@@ -40,7 +42,7 @@ public class ResGameState extends AbstractGameState {
     IGamePhase previousGamePhase = null;
 
 
-    ArrayList<int[]> finalTeamChoice = new ArrayList<>();
+    ArrayList<Integer> finalTeamChoice = new ArrayList<>();
 
     public enum ResGamePhase implements IGamePhase {
         MissionVote, TeamSelectionVote, LeaderSelectsTeam
@@ -115,13 +117,12 @@ public class ResGameState extends AbstractGameState {
         ResGameState copy = new ResGameState(gameParameters.copy(), getNPlayers());
         copy.gameBoard = gameBoard;
 
-
-
+        copy.teamChoice = teamChoice;
         copy.votingChoice = new ArrayList<>();
         copy.missionVotingChoice = new ArrayList<>();
         copy.previousGamePhase = previousGamePhase;
         copy.playerHandCards = new ArrayList<>(10);
-
+        copy.finalTeamChoice = finalTeamChoice;
 
         //Setup FinalTeamChoice
 
@@ -129,8 +130,8 @@ public class ResGameState extends AbstractGameState {
         if (playerId == -1) {
             copy.playerHandCards = playerHandCards;
             copy.gameBoardValues = gameBoardValues;
-            copy.teamChoice = teamChoice;
-            copy.finalTeamChoice = finalTeamChoice;
+            copy.occurrenceCountTrue = occurrenceCountTrue;
+            copy.occurrenceCountFalse = occurrenceCountFalse;
 
 
             for (int i = 0; i < getNPlayers(); i++) {
@@ -139,14 +140,13 @@ public class ResGameState extends AbstractGameState {
             }
         }
         else {
-            copy.teamChoice = teamChoice;
-            copy.finalTeamChoice = finalTeamChoice;
 
 
             for (int i = 0; i < getNPlayers(); i++) {
 
                 //Knowledge of Own Hand/Votes
                 if (i == playerId) {
+                    
                     copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
                     copy.playerHandCards.add(playerHandCards.get(i));
 

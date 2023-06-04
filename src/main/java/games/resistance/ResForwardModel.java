@@ -156,18 +156,15 @@ public class ResForwardModel extends StandardForwardModel {
             }
 
         if(resgs.getGamePhase()== MissionVote) {
+            if(resgs.finalTeamChoice.contains(currentPlayer)){
 
-            for(int i : resgs.finalTeamChoice.get(0)){
-
-            if(i == currentPlayer){
-                System.out.println(i + "i" + currentPlayer + " current");
                 actions.add(new ResMissionVoting(currentPlayer, currentPlayerHand.getSize() - 3));
                 actions.add(new ResMissionVoting(currentPlayer, currentPlayerHand.getSize() - 2));
             }
             else {
                 actions.add(new ResWait(currentPlayer));
             }
-        }}
+        }
 
             //System.out.println(actions.get(0).toString());
             return actions;
@@ -238,11 +235,11 @@ public class ResForwardModel extends StandardForwardModel {
 
 
                 // Check if the game is over
-                int occurrenceCountTrue = Collections.frequency(resgs.gameBoardValues, true);
-                int occurrenceCountFalse = Collections.frequency(resgs.gameBoardValues, false);
-                System.out.println("Occurrence True : " + occurrenceCountTrue);
-                System.out.println("Occurrence False : " + occurrenceCountFalse);
-                if (occurrenceCountTrue == 3) {
+                resgs.occurrenceCountTrue = Collections.frequency(resgs.gameBoardValues, true);
+                resgs.occurrenceCountFalse = Collections.frequency(resgs.gameBoardValues, false);
+                System.out.println("Occurrence True : " + resgs.occurrenceCountTrue);
+                System.out.println("Occurrence False : " + resgs.occurrenceCountFalse);
+                if (resgs.occurrenceCountTrue == 3) {
                     // Decide winner
                     for (int i = 0; i < resgs.getNPlayers(); i++) {
                         PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
@@ -253,12 +250,12 @@ public class ResForwardModel extends StandardForwardModel {
                         }
                     }
                     endGame(resgs);
-                    if(occurrenceCountTrue == 3){ System.out.println("GAME ENDED BY SUCCESSFUL MISSIONS");}
+                    if(resgs.occurrenceCountTrue == 3){ System.out.println("GAME ENDED BY SUCCESSFUL MISSIONS");}
                     ////MAYBE GET RID OF RETURNS
                     return;
                 }
 
-                if (occurrenceCountFalse == 3 || resgs.failedVoteCounter == 5) {
+                if (resgs.occurrenceCountFalse == 3 || resgs.failedVoteCounter == 5) {
                     // Decide winner
                     for (int i = 0; i < resgs.getNPlayers(); i++) {
                         PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
@@ -270,7 +267,7 @@ public class ResForwardModel extends StandardForwardModel {
                     }
                     endGame(resgs);
                     if(resgs.failedVoteCounter == 5){ System.out.println("GAME ENDED BY FAILED VOTE");}
-                    if(occurrenceCountFalse == 3){ System.out.println("GAME ENDED BY FAILED MISSIONS");}
+                    if(resgs.occurrenceCountFalse == 3){ System.out.println("GAME ENDED BY FAILED MISSIONS");}
                     return;
 
                 }
@@ -324,13 +321,15 @@ public class ResForwardModel extends StandardForwardModel {
 //                            ArrayList<ResTeamBuilding> intList = new ArrayList<ResTeamBuilding>(cc.team.length);
 //                            intList.add(cc);
 //                            System.out.println(intList);
-                            if (resgs.finalTeamChoice.size() == 1){resgs.finalTeamChoice = new ArrayList<>();}
-                            resgs.finalTeamChoice.add(cc);
-                            System.out.println("Final Team :  " + resgs.finalTeamChoice.get(0).toString());
+                            resgs.finalTeamChoice = new ArrayList<>();
+                            for (int member : cc){resgs.finalTeamChoice.add(member);}
+
+
                             //System.out.println(cc.team.length + " cc team size");
                             //System.out.println(resgs.finalTeamChoice.length + " final team size");
                         }
                         //System.out.println(allActions.get(0));
+                        System.out.println("Final Team :  " + resgs.finalTeamChoice);
                     }
 
             }
@@ -366,7 +365,9 @@ public class ResForwardModel extends StandardForwardModel {
             System.out.println("Mission No Occurrence Count : " + occurrenceCount  );
             if (occurrenceCount > 0){resgs.gameBoardValues.add(false);}
             else{resgs.gameBoardValues.add(true);}
+
         }
+
     }
 
     public void _startRound(ResGameState resgs) {

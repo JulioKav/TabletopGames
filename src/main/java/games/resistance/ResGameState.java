@@ -36,11 +36,11 @@ public class ResGameState extends AbstractGameState {
     List<List<ResVoting>> votingChoice;
 
     List<List<ResMissionVoting>> missionVotingChoice;
-    List<ResTeamBuilding> teamChoice = new ArrayList<>();
+    List<int[]> teamChoice = new ArrayList<>();
     IGamePhase previousGamePhase = null;
 
 
-    ArrayList<ResTeamBuilding> finalTeamChoice = new ArrayList<>();
+    ArrayList<int[]> finalTeamChoice = new ArrayList<>();
 
     public enum ResGamePhase implements IGamePhase {
         MissionVote, TeamSelectionVote, LeaderSelectsTeam
@@ -115,8 +115,7 @@ public class ResGameState extends AbstractGameState {
         ResGameState copy = new ResGameState(gameParameters.copy(), getNPlayers());
         copy.gameBoard = gameBoard;
 
-        copy.teamChoice = teamChoice;
-        copy.finalTeamChoice = finalTeamChoice;
+
 
         copy.votingChoice = new ArrayList<>();
         copy.missionVotingChoice = new ArrayList<>();
@@ -125,15 +124,13 @@ public class ResGameState extends AbstractGameState {
 
 
         //Setup FinalTeamChoice
-        ArrayList<Integer> teamList = new ArrayList<>();
-        for (int value : finalTeamChoice.get(0).team)
-        {  teamList.add(value);}
 
 
         if (playerId == -1) {
             copy.playerHandCards = playerHandCards;
             copy.gameBoardValues = gameBoardValues;
-
+            copy.teamChoice = teamChoice;
+            copy.finalTeamChoice = finalTeamChoice;
 
 
             for (int i = 0; i < getNPlayers(); i++) {
@@ -142,6 +139,8 @@ public class ResGameState extends AbstractGameState {
             }
         }
         else {
+            copy.teamChoice = teamChoice;
+            copy.finalTeamChoice = finalTeamChoice;
 
 
             for (int i = 0; i < getNPlayers(); i++) {
@@ -245,11 +244,11 @@ public class ResGameState extends AbstractGameState {
     }
 
 
-    public void addFinalTeamChoice(ResTeamBuilding ResTeamBuilding, int playerId) {
-        finalTeamChoice.add(ResTeamBuilding);
+    public void addTeamChoice(ResTeamBuilding ResTeamBuilding) {
+        teamChoice.add(ResTeamBuilding.team);
     }
 
-    public List<ResTeamBuilding> getTeamChoice() {
+    public List<int[]> getTeamChoice() {
         return teamChoice;
     }
     /**

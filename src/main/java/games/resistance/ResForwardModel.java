@@ -157,7 +157,7 @@ public class ResForwardModel extends StandardForwardModel {
 
         if(resgs.getGamePhase()== MissionVote) {
 
-            for(int i : resgs.finalTeamChoice.get(0).team){
+            for(int i : resgs.finalTeamChoice.get(0)){
 
             if(i == currentPlayer){
                 System.out.println(i + "i" + currentPlayer + " current");
@@ -295,17 +295,11 @@ public class ResForwardModel extends StandardForwardModel {
     }
 
     void revealCards(ResGameState resgs) {
-        if (resgs.getGamePhase() == TeamSelectionVote){ArrayList<ResPlayerCards.CardType> allVotes = new ArrayList<>();
-
+        if (resgs.getGamePhase() == TeamSelectionVote){
+            ArrayList<ResPlayerCards.CardType> allVotes = new ArrayList<>();
         for (int i = 0; i < resgs.getNPlayers(); i++) {
             PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
             for (ResVoting cc: resgs.votingChoice.get(i)) {
-//                System.out.println(hand.get(0) + "hand MCTS");
-//                System.out.println(hand.get(1) + "hand MCTS");
-//                System.out.println(hand.get(2) + "hand MCTS");
-//                System.out.println(cc.cardIdx + "CC");
-
-
                 ResPlayerCards cardToReveal = hand.get(cc.cardIdx);
                 allVotes.add(cardToReveal.cardType);
             }
@@ -325,20 +319,20 @@ public class ResForwardModel extends StandardForwardModel {
 
                 PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
                     if(hand.get(0).cardType == ResPlayerCards.CardType.LEADER) {
-                        for (ResTeamBuilding cc : resgs.teamChoice) {
+                        for (int[] cc : resgs.teamChoice) {
                             //System.out.println("team choice check: " + resgs.teamChoice);
-                            ArrayList<ResTeamBuilding> intList = new ArrayList<ResTeamBuilding>(cc.team.length);
-                            intList.add(cc);
-                            System.out.println(intList);
-
-                            resgs.finalTeamChoice = intList;
-
-                            System.out.println(cc.team.length + " cc team size");
+//                            ArrayList<ResTeamBuilding> intList = new ArrayList<ResTeamBuilding>(cc.team.length);
+//                            intList.add(cc);
+//                            System.out.println(intList);
+                            if (resgs.finalTeamChoice.size() == 1){resgs.finalTeamChoice = new ArrayList<>();}
+                            resgs.finalTeamChoice.add(cc);
+                            System.out.println("Final Team :  " + resgs.finalTeamChoice.get(0).toString());
+                            //System.out.println(cc.team.length + " cc team size");
                             //System.out.println(resgs.finalTeamChoice.length + " final team size");
                         }
                         //System.out.println(allActions.get(0));
                     }
-                    System.out.println("Final Team :  " + resgs.finalTeamChoice.toString());
+
             }
 
 
@@ -355,22 +349,12 @@ public class ResForwardModel extends StandardForwardModel {
 
         if (resgs.getGamePhase() == MissionVote){
             ArrayList<ResPlayerCards.CardType> allVotes = new ArrayList<>();
-            //System.out.println(Arrays.toString(resgs.finalTeamChoice));
-            int counter = 0;
-            //System.out.println(resgs.finalTeamChoice.length + " Final Team Choice length");
-            for (int i : resgs.finalTeamChoice.get(0).team) {
-                System.out.println("finalteamchoice" +resgs.finalTeamChoice);
+            for (int i = 0; i < resgs.getNPlayers(); i++) {
+                    PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
 
-                    if(i == resgs.getCurrentPlayer()){
-                        PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
-                        counter += 1;
-
-                        //System.out.println("resgs.missionVotingChoice.get(i)" + resgs.missionVotingChoice.get(i).size());
-                        System.out.println("what is J " + i);
-                        for (ResMissionVoting cc: resgs.missionVotingChoice.get(i)) {
-                            ResPlayerCards cardToReveal = hand.get(cc.cardIdx);
-                            allVotes.add(cardToReveal.cardType);
-                        }
+                    for (ResMissionVoting cc : resgs.missionVotingChoice.get(i)) {
+                        ResPlayerCards cardToReveal = hand.get(cc.cardIdx);
+                        allVotes.add(cardToReveal.cardType);
                     }
 
             }

@@ -25,7 +25,7 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
 
     @Override
     public boolean execute(AbstractGameState gs) {
-        ((ResGameState)gs).addFinalTeamChoice(this, gs.getCurrentPlayer());;
+        ((ResGameState)gs).addTeamChoice(this);;
         return true;
     }
 

@@ -37,13 +37,18 @@ public class ResGameState extends AbstractGameState {
 
     List<List<ResMissionVoting>> missionVotingChoice;
     List<ResTeamBuilding> teamChoice = new ArrayList<>();
+    IGamePhase previousGamePhase = null;
 
-    int[] finalTeamChoice = new int[20];
+
+    ArrayList<ResTeamBuilding> finalTeamChoice = new ArrayList<>();
 
     public enum ResGamePhase implements IGamePhase {
         MissionVote, TeamSelectionVote, LeaderSelectsTeam
     }
 
+    List<PartialObservableDeck<ResPlayerCards>> playerHandCards = new ArrayList<>(10);
+    //might not work as intended since casting component and also list and int[] usage/swapping
+    public ResGameBoard gameBoard = new ResGameBoard(new int[nPlayers]);
 
 
 
@@ -52,12 +57,11 @@ public class ResGameState extends AbstractGameState {
      * @param nPlayers       - number of players in the game
      */
 
-    List<PartialObservableDeck<ResPlayerCards>> playerHandCards = new ArrayList<>(10);
-    //might not work as intended since casting component and also list and int[] usage/swapping
-    public ResGameBoard gameBoard = new ResGameBoard(new int[nPlayers]);
+
 
     public ResGameState(AbstractParameters gameParameters, int nPlayers) {
         super(gameParameters, nPlayers);
+
 
     }
 
@@ -110,40 +114,54 @@ public class ResGameState extends AbstractGameState {
     protected ResGameState _copy(int playerId) {
         ResGameState copy = new ResGameState(gameParameters.copy(), getNPlayers());
         copy.gameBoard = gameBoard;
-        copy.gameBoardValues = gameBoardValues;
+
+        copy.teamChoice = teamChoice;
         copy.finalTeamChoice = finalTeamChoice;
+
         copy.votingChoice = new ArrayList<>();
         copy.missionVotingChoice = new ArrayList<>();
+        copy.previousGamePhase = previousGamePhase;
         copy.playerHandCards = new ArrayList<>(10);
+
+
+        //Setup FinalTeamChoice
+        ArrayList<Integer> teamList = new ArrayList<>();
+        for (int value : finalTeamChoice.get(0).team)
+        {  teamList.add(value);}
+
+
         if (playerId == -1) {
             copy.playerHandCards = playerHandCards;
+            copy.gameBoardValues = gameBoardValues;
+
+
+
             for (int i = 0; i < getNPlayers(); i++) {
                 copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
                 if(i < missionVotingChoice.size()){copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));}
-
             }
-
         }
         else {
-            ArrayList<Integer> teamList = new ArrayList<>();
-            for (int value : finalTeamChoice) {teamList.add(value);}
-            //System.out.println("Voting choice size: "+ votingChoice.size());
-            // Now we need to redeterminise
-            // We don't know what other players have chosen for this round, hide card choices
+
+
             for (int i = 0; i < getNPlayers(); i++) {
+
+                //Knowledge of Own Hand/Votes
                 if (i == playerId) {
                     copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
-                    //copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
                     copy.playerHandCards.add(playerHandCards.get(i));
 
                     //Checking MissionVote Eligibility
-                    if(teamList.contains(i)){copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));}
+                    copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
+
 
                 }
+
                 //Allowing Spies To Know All Card Types
                 if(playerHandCards.get(playerId).get(playerHandCards.get(playerId).getSize()-1).cardType == ResPlayerCards.CardType.SPY && i != playerId){
                     copy.playerHandCards.add(playerHandCards.get(i));
                 }
+
                 else if (i != playerId){
                     copy.playerHandCards.add(createHiddenHands(i));
 
@@ -153,19 +171,21 @@ public class ResGameState extends AbstractGameState {
                     ArrayList<ResVoting> hiddenChoiceVote = new ArrayList<>();
                     for (ResVoting c : votingChoice.get(i)) {
                         //System.out.println(c.getHiddenChoice(this).cardIdx +"ResVOting CARD");
-                        hiddenChoiceVote.add(c.getHiddenChoice(this));
+                        hiddenChoiceVote.add(c.getHiddenChoice(this, i));
                     }
 
                     ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
                     //Checking MissionVote Eligibility
-                    if(teamList.contains(i)){
-                    for (ResMissionVoting c : missionVotingChoice.get(i)) {
-                        hiddenChoiceMissionVote.add(c.getHiddenChoice(this));
-                    }}
 
+                        //System.out.println(hiddenChoiceMissionVote + " INSIDE");
+                    for (ResMissionVoting c : missionVotingChoice.get(i)) {
+                        hiddenChoiceMissionVote.add(c.getHiddenChoice(this,i));
+                    }
+                    //System.out.println(hiddenChoiceMissionVote + " hiddenmissionvote");
                     copy.votingChoice.add(hiddenChoiceVote);
                     copy.missionVotingChoice.add(hiddenChoiceMissionVote);}
             }
+
         }
 
 
@@ -201,11 +221,19 @@ public class ResGameState extends AbstractGameState {
     }
 
     public void addMissionChoice(ResMissionVoting ResMissionVoting, int playerId) {
-        missionVotingChoice.get(playerId).add(ResMissionVoting);
+//        ArrayList<Integer> teamList = new ArrayList<>();
+//        for (int[] valuearray : finalTeamChoice)
+//        {   for (int value : valuearray) teamList.add(value);}
+//
+//        if(teamList.contains(playerId)){
+            System.out.println("mission voting choice size      " + missionVotingChoice.size());
+            missionVotingChoice.get(playerId).add(ResMissionVoting);
+
     }
 
     public void clearMissionChoices() {
-        for (int i = 0; i < getNPlayers(); i++) missionVotingChoice.get(i).clear();
+        for (int i = 0; i < missionVotingChoice.size(); i++) missionVotingChoice.get(i).clear();
+
     }
 
     public List<List<ResVoting>> getvotingChoice() {
@@ -217,8 +245,8 @@ public class ResGameState extends AbstractGameState {
     }
 
 
-    public void addTeamChoice(ResTeamBuilding ResTeamBuilding, int playerId) {
-        teamChoice.add(ResTeamBuilding);
+    public void addFinalTeamChoice(ResTeamBuilding ResTeamBuilding, int playerId) {
+        finalTeamChoice.add(ResTeamBuilding);
     }
 
     public List<ResTeamBuilding> getTeamChoice() {

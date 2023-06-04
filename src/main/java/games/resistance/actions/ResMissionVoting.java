@@ -20,14 +20,18 @@ public class ResMissionVoting extends AbstractAction implements IExtendedSequenc
         this.cardIdx = cardIdx;
     }
 
-    public ResMissionVoting getHiddenChoice(ResGameState resgs) {
-        if (resgs.getPlayerHandCards().get(playerId).getSize() > 3)
-        {return new ResMissionVoting(playerId, 1);}
-        else{return new ResMissionVoting(playerId, 0);}
+    public ResMissionVoting getHiddenChoice(ResGameState resgs, int i) {
+        return new ResMissionVoting(i, 0);
+//        if (resgs.getPlayerHandCards().get(i).getSize() > 3)
+//        {
+//
+//            return new ResMissionVoting(i, 0);}
+//        else{return new ResMissionVoting(i, 0);}
     }
 
     @Override
     public boolean execute(AbstractGameState gs) {
+
         ((ResGameState)gs).addMissionChoice(this, gs.getCurrentPlayer());
         return true;
     }
@@ -35,9 +39,10 @@ public class ResMissionVoting extends AbstractAction implements IExtendedSequenc
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
+        List<AbstractAction> actions = new ArrayList<>();
         ResGameState resgs = (ResGameState) state;
         int idxSelected = resgs.getvotingChoice().get(playerId).get(0).cardIdx;
-        List<AbstractAction> actions = new ArrayList<>();
+
 
         PartialObservableDeck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(playerId);
         for (int i = 0; i < currentPlayerHand.getSize(); i++) {

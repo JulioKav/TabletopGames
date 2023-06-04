@@ -22,12 +22,12 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
 
 
     /////////// MIGHT BE DUMB RANDOMLY CHOOSING WITH HARDCODEd HAND
-    public ResVoting getHiddenChoice(ResGameState resgs) {
-        if (resgs.getPlayerHandCards().get(playerId).getSize() > 3) {
-            return new ResVoting(playerId, 1);
-        } else {
-            return new ResVoting(playerId, 0);
-        }
+    public ResVoting getHiddenChoice(ResGameState resgs, int i) {
+        if (resgs.getPlayerHandCards().get(i).getSize() > 3)
+        {
+
+            return new ResVoting(i, 1);}
+        else{return new ResVoting(i, 0);}
     }
 
     @Override
@@ -38,10 +38,10 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
 
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
-
+        List<AbstractAction> actions = new ArrayList<>();
         ResGameState resgs = (ResGameState) state;
         int idxSelected = resgs.getvotingChoice().get(playerId).get(0).cardIdx;
-        List<AbstractAction> actions = new ArrayList<>();
+
 
         PartialObservableDeck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(playerId);
         for (int i = 0; i < currentPlayerHand.getSize(); i++) {

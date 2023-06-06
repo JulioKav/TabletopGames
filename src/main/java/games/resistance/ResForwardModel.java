@@ -235,8 +235,9 @@ public class ResForwardModel extends StandardForwardModel {
 
 
                 // Check if the game is over
-                resgs.occurrenceCountTrue = Collections.frequency(resgs.gameBoardValues, true);
-                resgs.occurrenceCountFalse = Collections.frequency(resgs.gameBoardValues, false);
+//                resgs.occurrenceCountTrue = Collections.frequency(resgs.gameBoardValues, true);
+//                resgs.occurrenceCountFalse = Collections.frequency(resgs.gameBoardValues, false);
+                System.out.println("Size of gameboard values: " +  resgs.gameBoardValues.size());
                 System.out.println("Occurrence True : " + resgs.occurrenceCountTrue);
                 System.out.println("Occurrence False : " + resgs.occurrenceCountFalse);
                 if (resgs.occurrenceCountTrue == 3) {
@@ -249,6 +250,7 @@ public class ResForwardModel extends StandardForwardModel {
                             resgs.setPlayerResult(CoreConstants.GameResult.LOSE, i);
                         }
                     }
+                    resgs.setGameStatus(CoreConstants.GameResult.GAME_END);
                     endGame(resgs);
                     if(resgs.occurrenceCountTrue == 3){ System.out.println("GAME ENDED BY SUCCESSFUL MISSIONS");}
                     ////MAYBE GET RID OF RETURNS
@@ -265,6 +267,7 @@ public class ResForwardModel extends StandardForwardModel {
                             resgs.setPlayerResult(CoreConstants.GameResult.LOSE, i);
                         }
                     }
+                    resgs.setGameStatus(CoreConstants.GameResult.GAME_END);
                     endGame(resgs);
                     if(resgs.failedVoteCounter == 5){ System.out.println("GAME ENDED BY FAILED VOTE");}
                     if(resgs.occurrenceCountFalse == 3){ System.out.println("GAME ENDED BY FAILED MISSIONS");}

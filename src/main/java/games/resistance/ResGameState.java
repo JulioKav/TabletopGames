@@ -14,6 +14,7 @@ import games.resistance.components.ResPlayerCards;
 //import games.resistance.components.ResGameBoard;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -124,15 +125,20 @@ public class ResGameState extends AbstractGameState {
         copy.playerHandCards = new ArrayList<>(10);
         copy.finalTeamChoice = finalTeamChoice;
 
+        copy.gameBoardValues = new ArrayList<>();
+
         //Setup FinalTeamChoice
+
 
 
         if (playerId == -1) {
             copy.playerHandCards = playerHandCards;
-            copy.gameBoardValues = gameBoardValues;
-            copy.occurrenceCountTrue = occurrenceCountTrue;
-            copy.occurrenceCountFalse = occurrenceCountFalse;
+            copy.occurrenceCountTrue = Collections.frequency(gameBoardValues, true);
+            copy.occurrenceCountFalse = Collections.frequency(gameBoardValues, false);
 
+            for(int i = 0; i < gameBoardValues.size(); i++){
+                copy.gameBoardValues.add(gameBoardValues.get(i));
+            }
 
             for (int i = 0; i < getNPlayers(); i++) {
                 copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
@@ -140,13 +146,13 @@ public class ResGameState extends AbstractGameState {
             }
         }
         else {
-
-
             for (int i = 0; i < getNPlayers(); i++) {
-
                 //Knowledge of Own Hand/Votes
                 if (i == playerId) {
-                    
+                    for(int j = 0; j < gameBoardValues.size(); j++){
+                        copy.gameBoardValues.add(gameBoardValues.get(j));
+                    }
+
                     copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
                     copy.playerHandCards.add(playerHandCards.get(i));
 

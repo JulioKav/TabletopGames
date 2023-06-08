@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static games.resistance.ResGameState.ResGamePhase.LeaderSelectsTeam;
+
 /**
  * <p>The game state encapsulates all game information. It is a data-only class, with game functionality present
  * in the Forward Model or actions modifying the state of the game.</p>
@@ -29,10 +31,12 @@ import java.util.Random;
 public class ResGameState extends AbstractGameState {
     // int[] gameBoard;
 
+    int spyCounter = 0;
+    int resistanceCounter = 0;
     public int[] factions;
     List<Boolean> gameBoardValues = new ArrayList<>();
     boolean voteSuccess;
-
+    int leaderID;
     int failedVoteCounter = 0;
     int occurrenceCountTrue = 0;
     int occurrenceCountFalse = 0;
@@ -113,78 +117,103 @@ public class ResGameState extends AbstractGameState {
      *
      * @param playerId - player observing this game state.
      */
+
     @Override
     protected ResGameState _copy(int playerId) {
+
         ResGameState copy = new ResGameState(gameParameters.copy(), getNPlayers());
         copy.gameBoard = gameBoard;
+        copy.factions = factions;
 
-        copy.teamChoice = teamChoice;
+        copy.previousGamePhase = previousGamePhase;
+        copy.voteSuccess = voteSuccess;
+        copy.teamChoice = new ArrayList<>();
         copy.votingChoice = new ArrayList<>();
         copy.missionVotingChoice = new ArrayList<>();
-        copy.previousGamePhase = previousGamePhase;
-        copy.playerHandCards = new ArrayList<>(10);
-        copy.finalTeamChoice = finalTeamChoice;
-
+        copy.playerHandCards = new ArrayList<>();
+        copy.finalTeamChoice = new ArrayList<>();
         copy.gameBoardValues = new ArrayList<>();
 
-        //Setup FinalTeamChoice
-
-
-
         if (playerId == -1) {
-            copy.playerHandCards = playerHandCards;
-            copy.occurrenceCountTrue = Collections.frequency(gameBoardValues, true);
-            copy.occurrenceCountFalse = Collections.frequency(gameBoardValues, false);
+            copy.leaderID = leaderID;
+
+            for (int i = 0; i < getNPlayers(); i++) {
+                copy.playerHandCards.add(playerHandCards.get(i));
+            }
 
             for(int i = 0; i < gameBoardValues.size(); i++){
                 copy.gameBoardValues.add(gameBoardValues.get(i));
             }
+            for(int i = 0; i < finalTeamChoice.size(); i++){
+                copy.finalTeamChoice.add(finalTeamChoice.get(i));
+            }
+            for(int i = 0; i < teamChoice.size(); i++){
+                copy.teamChoice.add(teamChoice.get(i));
+            }
 
             for (int i = 0; i < getNPlayers(); i++) {
                 copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
+                //MAYBE REMOVE THE IF STATEMENT
                 if(i < missionVotingChoice.size()){copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));}
             }
+//            copy.occurrenceCountTrue = Collections.frequency(gameBoardValues, true);
+//            copy.occurrenceCountFalse = Collections.frequency(gameBoardValues, false);
         }
         else {
+            spyCounter = 0;
+            resistanceCounter = 0;
             for (int i = 0; i < getNPlayers(); i++) {
                 //Knowledge of Own Hand/Votes
                 if (i == playerId) {
+                    copy.leaderID = leaderID;
                     for(int j = 0; j < gameBoardValues.size(); j++){
                         copy.gameBoardValues.add(gameBoardValues.get(j));
+                    }
+                    for(int j = 0; j < finalTeamChoice.size(); j++){
+                        copy.finalTeamChoice.add(finalTeamChoice.get(j));
+                    }
+                    for(int j = 0; j < teamChoice.size(); j++){
+                        copy.teamChoice.add(teamChoice.get(j));
                     }
 
                     copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
                     copy.playerHandCards.add(playerHandCards.get(i));
-
+                    if (i == leaderID){copy.leaderID = i;}
                     //Checking MissionVote Eligibility
                     copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
 
-
+//                    copy.occurrenceCountTrue = Collections.frequency(gameBoardValues, true);
+//                    copy.occurrenceCountFalse = Collections.frequency(gameBoardValues, false);
                 }
 
                 //Allowing Spies To Know All Card Types
                 if(playerHandCards.get(playerId).get(playerHandCards.get(playerId).getSize()-1).cardType == ResPlayerCards.CardType.SPY && i != playerId){
                     copy.playerHandCards.add(playerHandCards.get(i));
+                    if (i == leaderID){copy.leaderID = i;}
                 }
 
                 else if (i != playerId){
                     copy.playerHandCards.add(createHiddenHands(i));
+                    if (i == leaderID){copy.leaderID = i;}
 
                 }
 
                 if (i != playerId){
                     ArrayList<ResVoting> hiddenChoiceVote = new ArrayList<>();
+                    ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
                     for (ResVoting c : votingChoice.get(i)) {
                         //System.out.println(c.getHiddenChoice(this).cardIdx +"ResVOting CARD");
-                        hiddenChoiceVote.add(c.getHiddenChoice(this, i));
+                        hiddenChoiceVote.add( c.getHiddenChoice(i));
                     }
 
-                    ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
+
                     //Checking MissionVote Eligibility
 
                         //System.out.println(hiddenChoiceMissionVote + " INSIDE");
+
                     for (ResMissionVoting c : missionVotingChoice.get(i)) {
-                        hiddenChoiceMissionVote.add(c.getHiddenChoice(this,i));
+
+                        hiddenChoiceMissionVote.add(c.getHiddenChoice(i));
                     }
                     //System.out.println(hiddenChoiceMissionVote + " hiddenmissionvote");
                     copy.votingChoice.add(hiddenChoiceVote);
@@ -247,6 +276,10 @@ public class ResGameState extends AbstractGameState {
 
     public void clearTeamChoices() {
         for (int i = 0; i < getNPlayers(); i++) teamChoice.clear();
+        for (int i = 0; i < getNPlayers(); i++) finalTeamChoice.clear();
+    }
+    public void clearVoteChoices() {
+        for (int i = 0; i < getNPlayers(); i++) votingChoice.get(i).clear();
     }
 
 
@@ -300,17 +333,34 @@ public class ResGameState extends AbstractGameState {
     }
 
     private PartialObservableDeck<ResPlayerCards> createHiddenHands(int i){PartialObservableDeck<ResPlayerCards> hiddenPlayerHandCards = new PartialObservableDeck<>("hiddenDeck",i);
-        Random random = new Random();
-        if (random.nextInt(2) == 0 ) {
+        Random rnd = new Random();
+        if (rnd.nextInt(2) == 0 && spyCounter != factions[1]) {
             ResPlayerCards SPY = new ResPlayerCards(ResPlayerCards.CardType.SPY);
             SPY.setOwnerId(i);
             hiddenPlayerHandCards.add(SPY);
+            spyCounter += 1;
         }
-        else
+        else if (resistanceCounter != factions[0])
         {
             ResPlayerCards resistor = new ResPlayerCards(ResPlayerCards.CardType.RESISTANCE);
             resistor.setOwnerId(i);
             hiddenPlayerHandCards.add(resistor);
+            resistanceCounter += 1;
+        }
+
+        else if (spyCounter != factions[1] && resistanceCounter == factions[0])
+        {
+            ResPlayerCards SPY = new ResPlayerCards(ResPlayerCards.CardType.SPY);
+            SPY.setOwnerId(i);
+            hiddenPlayerHandCards.add(SPY);
+            spyCounter += 1;
+        }
+        else if (spyCounter == factions[1] && resistanceCounter != factions[0])
+        {
+            ResPlayerCards resistor = new ResPlayerCards(ResPlayerCards.CardType.RESISTANCE);
+            resistor.setOwnerId(i);
+            hiddenPlayerHandCards.add(resistor);
+            resistanceCounter += 1;
         }
         ResPlayerCards No = new ResPlayerCards(ResPlayerCards.CardType.No);
         No.setOwnerId(i);
@@ -318,6 +368,17 @@ public class ResGameState extends AbstractGameState {
         No.setOwnerId(i);
         hiddenPlayerHandCards.add(No);
         hiddenPlayerHandCards.add(Yes);
+
+        //Setting correct leader
+
+
+        if (i == leaderID) {
+            ResPlayerCards leader = new ResPlayerCards(ResPlayerCards.CardType.LEADER);
+            leader.setOwnerId(leaderID);
+            hiddenPlayerHandCards.add(leader);
+
+
+        }
         return hiddenPlayerHandCards;
     }
 }

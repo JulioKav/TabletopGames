@@ -10,18 +10,22 @@ import games.resistance.components.ResPlayerCards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 
 public class ResMissionVoting extends AbstractAction implements IExtendedSequence {
     public final int playerId;
-    public final int cardIdx;
+    public final ResPlayerCards.CardType cardType;
 
-    public ResMissionVoting(int playerId, int cardIdx) {
+    public ResMissionVoting(int playerId, ResPlayerCards.CardType cardType) {
         this.playerId = playerId;
-        this.cardIdx = cardIdx;
+        this.cardType = cardType;
     }
 
-    public ResMissionVoting getHiddenChoice(ResGameState resgs, int i) {
-        return new ResMissionVoting(i, 0);
+    public ResMissionVoting getHiddenChoice( int i) {
+        Random rnd = new Random();
+        if (rnd.nextInt(2) == 0){return new ResMissionVoting(i, ResPlayerCards.CardType.Yes);}
+        else {return new ResMissionVoting(i, ResPlayerCards.CardType.No);}
+
 //        if (resgs.getPlayerHandCards().get(i).getSize() > 3)
 //        {
 //
@@ -40,16 +44,16 @@ public class ResMissionVoting extends AbstractAction implements IExtendedSequenc
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
         List<AbstractAction> actions = new ArrayList<>();
-        ResGameState resgs = (ResGameState) state;
-        int idxSelected = resgs.getvotingChoice().get(playerId).get(0).cardIdx;
-
-
-        PartialObservableDeck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(playerId);
-        for (int i = 0; i < currentPlayerHand.getSize(); i++) {
-            if (idxSelected != i) {
-                actions.add(new ResMissionVoting(playerId, i));
-            }
-        }
+//        ResGameState resgs = (ResGameState) state;
+//        int idxSelected = resgs.getvotingChoice().get(playerId).get(0).cardIdx;
+//
+//
+//        PartialObservableDeck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(playerId);
+//        for (int i = 0; i < currentPlayerHand.getSize(); i++) {
+//            if (idxSelected != i) {
+//                actions.add(new ResMissionVoting(playerId, i));
+//            }
+//        }
 
         return actions;
     }
@@ -79,16 +83,16 @@ public class ResMissionVoting extends AbstractAction implements IExtendedSequenc
         if (this == o) return true;
         if (!(o instanceof ResMissionVoting)) return false;
         ResMissionVoting that = (ResMissionVoting) o;
-        return playerId == that.playerId && cardIdx == that.cardIdx;
+        return playerId == that.playerId && cardType == that.cardType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(playerId, cardIdx);
+        return Objects.hash(playerId, cardType);
     }
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return "Choose card " + cardIdx;
+        return "Choose card " + cardType;
     }
 }

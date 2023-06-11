@@ -945,11 +945,11 @@ public class Game {
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
 ////        players.add(new MCTSPlayer());
 //          players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());

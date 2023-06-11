@@ -87,7 +87,7 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return "Choose card " + cardType;
+        return "Choose card " + cardType + "|  PlayerID : " + playerId;
     }
 }
 

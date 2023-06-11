@@ -7,6 +7,7 @@ import games.resistance.ResGameState;
 import utilities.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -84,8 +85,10 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return "Choose team " + team;
+
+        return "Action Chosen Team :  " + Arrays.toString(team) + "|  PlayerID : " + playerId;
     }
+
 
 
 }

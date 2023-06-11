@@ -77,7 +77,7 @@ public class ResWait extends AbstractAction implements IExtendedSequence {
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return "Waiting " ;
+        return "Waiting " + "|  PlayerID : " + playerId ;
     }
 
 

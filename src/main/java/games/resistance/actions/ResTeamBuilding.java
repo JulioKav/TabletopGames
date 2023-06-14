@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class ResTeamBuilding extends AbstractAction implements IExtendedSequence {
     public final int playerId;
-    public final int[] team;
+    private final int[] team;
 
     public ResTeamBuilding(int playerId, int[] team) {
         this.playerId = playerId;
@@ -24,6 +24,7 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
 //        return new ResTeamBuilding(playerId, -1);
 //    }
 
+    public int[] getTeam() {return team.clone();}
     @Override
     public boolean execute(AbstractGameState gs) {
         ((ResGameState)gs).addTeamChoice(this);;
@@ -75,12 +76,12 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
         if (this == o) return true;
         if (!(o instanceof ResTeamBuilding)) return false;
         ResTeamBuilding that = (ResTeamBuilding) o;
-        return playerId == that.playerId && team == that.team;
+        return playerId == that.playerId && Arrays.equals(team, that.team);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(playerId, team);
+        return playerId + Arrays.hashCode(team);
     }
 
     @Override

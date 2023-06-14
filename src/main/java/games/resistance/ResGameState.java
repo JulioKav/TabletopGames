@@ -284,7 +284,7 @@ public class ResGameState extends AbstractGameState {
 
 
     public void addTeamChoice(ResTeamBuilding ResTeamBuilding) {
-        teamChoice.add(ResTeamBuilding.team);
+        teamChoice.add(ResTeamBuilding.getTeam());
     }
 
     public List<int[]> getTeamChoice() {

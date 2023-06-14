@@ -19,6 +19,7 @@ import java.util.Objects;
  * automatic game parameter optimisation tools in the framework.</p>
  */
 public class ResParameters extends AbstractParameters {
+    public String dataPath = "data/sushigo/";
     public ResParameters(long seed) {
         super(seed);
     }
@@ -65,6 +66,7 @@ public class ResParameters extends AbstractParameters {
 
     }
 
+    public String getDataPath() { return dataPath; }
     @Override
     protected AbstractParameters _copy() {
         // TODO: deep copy of all variables.

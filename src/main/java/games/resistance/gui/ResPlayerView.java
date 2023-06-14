@@ -1,0 +1,57 @@
+package games.resistance.gui;
+
+import core.components.Deck;
+import games.resistance.ResGameState;
+import games.resistance.components.ResPlayerCards;
+import games.sushigo.SGGameState;
+import games.sushigo.cards.SGCard;
+
+import javax.swing.*;
+import java.awt.*;
+
+import static games.resistance.gui.ResGUIManager.playerAreaHeight;
+import static games.resistance.gui.ResGUIManager.playerAreaWidth;
+
+
+public class ResPlayerView extends JComponent {
+
+    // ID of player showing
+    int playerId;
+    // Number of points player has
+    ResDeckView playerHandView;
+    ResDeckView playedCardsView;
+    JLabel pointsText;
+
+    // Border offsets
+    int border = 5;
+    int borderBottom = 20;
+    int width, height;
+
+    ResGameState gs;
+
+    public ResPlayerView(Deck<ResPlayerCards> deck, int playerId, int humanId, String dataPath)
+    {
+        this.width = playerAreaWidth + border*20;
+        this.height = playerAreaHeight + border + borderBottom;
+        this.playerId = playerId;
+        this.playerHandView = new ResDeckView(humanId, deck, true, dataPath, new Rectangle(border, border, playerAreaWidth, playerAreaHeight));
+        this.pointsText = new JLabel(0 + " points");
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(playerHandView);
+        //add(playedCardsView);
+        add(pointsText);
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(width, height);
+    }
+
+    public void update(ResGameState gameState)
+    {
+        gs = gameState;
+        playerHandView.updateComponent(gameState.getPlayerHandCards().get(playerId));
+        //playedCardsView.updateComponent(gameState.getPlayerHandCards().get(playerId));
+
+    }
+}

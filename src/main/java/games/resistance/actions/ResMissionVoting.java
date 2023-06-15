@@ -93,6 +93,6 @@ public class ResMissionVoting extends AbstractAction implements IExtendedSequenc
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return "Choose card " + cardType + "|  PlayerID : " + playerId;
+        return cardType + ".";
     }
 }

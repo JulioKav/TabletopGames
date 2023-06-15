@@ -3,8 +3,10 @@ package games.resistance.gui;
 import core.AbstractGameState;
 import core.AbstractPlayer;
 import core.Game;
+import games.pandemic.gui.PandemicBoardView;
 import games.resistance.ResGameState;
 import games.resistance.ResParameters;
+import games.resistance.components.ResPlayerCards;
 import gui.AbstractGUIManager;
 import gui.GamePanel;
 import gui.IScreenHighlight;
@@ -18,11 +20,13 @@ import java.awt.*;
 
 public class ResGUIManager extends AbstractGUIManager {
     // Settings for display areas
-    final static int playerAreaWidth = 300;
-    final static int playerAreaHeight = 200;
+    final static int playerAreaWidth = 250;
+    final static int playerAreaHeight = 130;
     final static int ResPlayerCardsWidth = 60;
     final static int ResPlayerCardsHeight = 85;
 
+    JPanel missionSuccessText;
+    ResBoardView boardView;
     // List of player hand views
     ResPlayerView[] playerHands;
 
@@ -35,7 +39,6 @@ public class ResGUIManager extends AbstractGUIManager {
 
     public ResGUIManager(GamePanel parent, Game game, ActionController ac, int humanID) {
         super(parent, game, ac, humanID);
-
         if (game != null) {
             AbstractGameState gameState = game.getGameState();
             if (gameState != null) {
@@ -44,7 +47,7 @@ public class ResGUIManager extends AbstractGUIManager {
 
                 // Find required size of window
                 int nPlayers = gameState.getNPlayers();
-                int nHorizAreas = 1 + (nPlayers <= 3 ? 2 : nPlayers == 4 ? 3 : nPlayers <= 8 ? 4 : 5);
+                int nHorizAreas = 1 + nPlayers;
                 double nVertAreas = 3.5;
                 this.width = playerAreaWidth * nHorizAreas;
                 this.height = (int) (playerAreaHeight * nVertAreas);
@@ -59,12 +62,11 @@ public class ResGUIManager extends AbstractGUIManager {
                 mainGameArea.setLayout(new BorderLayout());
 
                 // Player hands go on the edges
-                String[] locations = new String[]{BorderLayout.NORTH, BorderLayout.EAST, BorderLayout.SOUTH, BorderLayout.WEST};
+                String[] locations = new String[]{BorderLayout.NORTH, BorderLayout.SOUTH};
                 JPanel[] sides = new JPanel[]{new JPanel(), new JPanel(), new JPanel(), new JPanel()};
                 int next = 0;
                 for (int i = 0; i < nPlayers; i++) {
                     ResPlayerView playerHand = new ResPlayerView(parsedGameState.getPlayerHandCards().get(i), i, humanID, parameters.getDataPath());
-
                     // Get agent name
                     String[] split = game.getPlayers().get(i).getClass().toString().split("\\.");
                     String agentName = split[split.length - 1];
@@ -80,6 +82,7 @@ public class ResGUIManager extends AbstractGUIManager {
                     sides[next].setLayout(new GridBagLayout());
                     next = (next + 1) % (locations.length);
                     playerHands[i] = playerHand;
+                    System.out.println(playerHand.playerHandView);
                 }
 
 
@@ -87,6 +90,9 @@ public class ResGUIManager extends AbstractGUIManager {
                     mainGameArea.add(sides[i], locations[i]);
                 }
 
+
+//                boardView = new ResBoardView(gameState,parameters.dataPath);
+                //mainGameArea.add(missionSuccessText,BorderLayout.CENTER);
                 // Discard and draw piles go in the center
                 JPanel centerArea = new JPanel();
                 centerArea.setLayout(new BoxLayout(centerArea, BoxLayout.Y_AXIS));
@@ -96,10 +102,11 @@ public class ResGUIManager extends AbstractGUIManager {
                 mainGameArea.add(jp, BorderLayout.CENTER);
 
                 // Top area will show state information
-                JPanel infoPanel = createGameStateInfoPanel("Sushi GO", gameState, width, defaultInfoPanelHeight);
+                JPanel infoPanel = createGameStateInfoPanel("The Resistance", gameState, width, defaultInfoPanelHeight);
                 // Bottom area will show actions available
                 JComponent actionPanel = createActionPanel(new IScreenHighlight[0], width, defaultActionPanelHeight, false, true, null);
 
+                //missionSuccessText = createGameStateInfoPanel("ROund", gameState, width, 100);
                 // Add all views to frame
                 parent.setLayout(new BorderLayout());
                 parent.add(mainGameArea, BorderLayout.CENTER);
@@ -127,17 +134,26 @@ public class ResGUIManager extends AbstractGUIManager {
                 activePlayer = gameState.getCurrentPlayer();
             }
 
+
             // Update decks and visibility
             ResGameState parsedGameState = (ResGameState) gameState;
+
+            //missionSuccessText = createGameStateInfoPanel("Size of Mission Team needed : " + parsedGameState.gameBoard.getMissionSuccessValues()[parsedGameState.getRoundCounter()], gameState, width, 100);
             for (int i = 0; i < gameState.getNPlayers(); i++) {
                 playerHands[i].update(parsedGameState);
-                if (i == gameState.getCurrentPlayer()
-                        || i == humanPlayerId) {
+                if(((ResGameState) gameState).getPlayerHandCards().get(gameState.getCurrentPlayer()).get(2).cardType == ResPlayerCards.CardType.SPY)
+                {
                     playerHands[i].playerHandView.setFront(true);
-                    playerHands[i].setFocusable(true);
-                } else {
-                    playerHands[i].playerHandView.setFront(false);
+                    //playerHands[i].setFocusable(true);
                 }
+                else{
+                    if (i == gameState.getCurrentPlayer()
+                            || i == humanPlayerId) {
+                        playerHands[i].playerHandView.setFront(true);
+                        playerHands[i].setFocusable(true);
+                    } else {
+                        playerHands[i].playerHandView.setFront(false);
+                    }}
 
                 // Highlight active player
                 if (i == gameState.getCurrentPlayer()) {
@@ -151,4 +167,5 @@ public class ResGUIManager extends AbstractGUIManager {
 
         }
     }
+
 }

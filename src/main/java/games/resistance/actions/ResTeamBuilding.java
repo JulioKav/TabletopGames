@@ -86,8 +86,8 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
 
     @Override
     public String getString(AbstractGameState gameState) {
-
-        return "Action Chosen Team :  " + Arrays.toString(team) + "|  PlayerID : " + playerId;
+//        return "Action Chosen Team :  " + Arrays.toString(team) + "|  PlayerID : " + playerId;
+        return "Leader Has Suggested Team :  " + Arrays.toString(team);
     }
 
 

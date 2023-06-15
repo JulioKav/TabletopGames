@@ -19,8 +19,9 @@ public class ResPlayerView extends JComponent {
     int playerId;
     // Number of points player has
     ResDeckView playerHandView;
-    ResDeckView playedCardsView;
+
     JLabel pointsText;
+    JLabel missionSuccessText;
 
     // Border offsets
     int border = 5;
@@ -31,14 +32,14 @@ public class ResPlayerView extends JComponent {
 
     public ResPlayerView(Deck<ResPlayerCards> deck, int playerId, int humanId, String dataPath)
     {
-        this.width = playerAreaWidth + border*20;
-        this.height = playerAreaHeight + border + borderBottom;
+        this.width = playerAreaWidth;
+        this.height = playerAreaHeight;
         this.playerId = playerId;
         this.playerHandView = new ResDeckView(humanId, deck, true, dataPath, new Rectangle(border, border, playerAreaWidth, playerAreaHeight));
         this.pointsText = new JLabel(0 + " points");
+
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(playerHandView);
-        //add(playedCardsView);
         add(pointsText);
     }
 
@@ -47,11 +48,14 @@ public class ResPlayerView extends JComponent {
         return new Dimension(width, height);
     }
 
+    public Dimension getMinimumSize() {
+        return new Dimension(width, height);
+    }
+
     public void update(ResGameState gameState)
     {
         gs = gameState;
         playerHandView.updateComponent(gameState.getPlayerHandCards().get(playerId));
-        //playedCardsView.updateComponent(gameState.getPlayerHandCards().get(playerId));
 
     }
 }

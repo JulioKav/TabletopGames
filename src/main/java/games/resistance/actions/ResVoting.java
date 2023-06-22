@@ -38,16 +38,8 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
         List<AbstractAction> actions = new ArrayList<>();
-//        ResGameState resgs = (ResGameState) state;
-//        int idxSelected = resgs.getvotingChoice().get(playerId).get(0).cardIdx;
-//
-//
-//        PartialObservableDeck<ResPlayerCards> currentPlayerHand = resgs.getPlayerHandCards().get(playerId);
-//        for (int i = 0; i < currentPlayerHand.getSize(); i++) {
-//            if (idxSelected == i) {
-//                actions.add(new ResVoting(playerId, i));
-//            }
-//        }
+        actions.add(new ResVoting(state.getCurrentPlayer(), ResPlayerCards.CardType.Yes));
+        actions.add(new ResVoting(state.getCurrentPlayer(), ResPlayerCards.CardType.No));
 
         return actions;
     }

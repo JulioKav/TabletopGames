@@ -38,16 +38,17 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
 
         List<AbstractAction> actions = new ArrayList<>();
 
-        int[] players = new int[resgs.getNPlayers()];
-        for (int i = 0; i < resgs.getNPlayers(); i++) {
-            players[i] = i;
-        }
 
-          ArrayList<int[]> chosenMarket = Utils.generateCombinations(players, resgs.gameBoard.getMissionSuccessValues()[resgs.getRoundCounter()]);
-            for(int[] teams : chosenMarket) {
-                actions.add(new ResTeamBuilding(playerId, teams));
+            int[] players = new int[resgs.getNPlayers()];
+            for (int i = 0; i < resgs.getNPlayers(); i++) {
+                players[i] = i;
             }
-        //System.out.println(actions);
+            ArrayList<int[]> choiceOfTeams = Utils.generateCombinations(players, resgs.gameBoard.getMissionSuccessValues()[resgs.getRoundCounter()]);
+            for(int[] team : choiceOfTeams) {
+                actions.add(new ResTeamBuilding(playerId, team));
+                if (team.length == 0){throw new AssertionError("Team Size Zero");}
+            }
+
         return actions;
     }
 

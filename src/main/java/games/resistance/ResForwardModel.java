@@ -11,6 +11,9 @@ import games.resistance.actions.*;
 import games.resistance.components.ResPlayerCards;
 import utilities.Utils;
 import java.util.*;
+import java.util.stream.IntStream;
+
+import static core.CoreConstants.GameResult.*;
 import static games.resistance.ResGameState.ResGamePhase.*;
 
 
@@ -70,7 +73,7 @@ public class ResForwardModel extends StandardForwardModel {
             boolean[] visible = new boolean[firstState.getNPlayers()];
             visible[i] = false;
             PartialObservableDeck<ResPlayerCards> playerCards = new PartialObservableDeck<>("Player Cards", visible);
-            resgs.playerHandCards.add(playerCards);
+
 
             // Add identity cards to hand
             if (rnd.nextInt(2) == 0 && spyCounter != resgs.factions[1]) {
@@ -128,6 +131,7 @@ public class ResForwardModel extends StandardForwardModel {
 //                no.setOwnerId(i);
 //                playerCards.add(no);
 //                System.out.println(playerCards);
+            resgs.playerHandCards.add(playerCards);
         }
 
         //Adding leader card
@@ -251,10 +255,14 @@ public class ResForwardModel extends StandardForwardModel {
             if(resgs.failedVoteCounter == 5){
                 for (int i = 0; i < resgs.getNPlayers(); i++) {
                     PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
-                    if(hand.get(0).cardType == ResPlayerCards.CardType.SPY || hand.get(1).cardType == ResPlayerCards.CardType.SPY) {
-                        resgs.setPlayerResult(CoreConstants.GameResult.WIN,i);}
-                    else{resgs.setPlayerResult(CoreConstants.GameResult.LOSE,i);}}
+                    if (hand.get(2).cardType == ResPlayerCards.CardType.SPY) {
+                        resgs.setPlayerResult(CoreConstants.GameResult.WIN, i);
+                    } else {
+                        resgs.setPlayerResult(CoreConstants.GameResult.LOSE, i);
+                    }
+                }
                 endGame(resgs);
+                resgs.winners = 1;
                 System.out.println("GAME ENDED BY FAILED TEAMVOTE");
             }
 
@@ -310,13 +318,14 @@ public class ResForwardModel extends StandardForwardModel {
                     // Decide winner
                     for (int i = 0; i < resgs.getNPlayers(); i++) {
                         PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
-                        if (hand.get(0).cardType == ResPlayerCards.CardType.RESISTANCE || hand.get(1).cardType == ResPlayerCards.CardType.RESISTANCE) {
+                        if (hand.get(2).cardType == ResPlayerCards.CardType.RESISTANCE) {
                             resgs.setPlayerResult(CoreConstants.GameResult.WIN, i);
                         } else {
                             resgs.setPlayerResult(CoreConstants.GameResult.LOSE, i);
                         }
                     }
-                    //resgs.setGameStatus(CoreConstants.GameResult.GAME_END);
+                    resgs.winners = 0;
+                    resgs.setGameStatus(CoreConstants.GameResult.GAME_END);
                     endGame(resgs);
                     //roundEnded = true;
                     if(occurrenceCountTrue == 3){ System.out.println("GAME ENDED BY SUCCESSFUL MISSIONS");}
@@ -324,26 +333,29 @@ public class ResForwardModel extends StandardForwardModel {
                     //return;
                 }
 
-                if (occurrenceCountFalse == 3 || resgs.failedVoteCounter == 5) {
+                if (occurrenceCountFalse == 3) {
                     // Decide winner
                     for (int i = 0; i < resgs.getNPlayers(); i++) {
                         PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
-                        if (hand.get(0).cardType == ResPlayerCards.CardType.SPY || hand.get(1).cardType == ResPlayerCards.CardType.SPY) {
+                        if (hand.get(2).cardType == ResPlayerCards.CardType.SPY) {
                             resgs.setPlayerResult(CoreConstants.GameResult.WIN, i);
                         } else {
                             resgs.setPlayerResult(CoreConstants.GameResult.LOSE, i);
                         }
                     }
-                    //resgs.setGameStatus(CoreConstants.GameResult.GAME_END);
+                    System.out.println(resgs.getPlayerResults()[0] + "      Player Results");
+                    resgs.winners = 1;
+                    resgs.setGameStatus(CoreConstants.GameResult.GAME_END);
                     endGame(resgs);
                     //roundEnded = true;
-                    if(resgs.failedVoteCounter == 5){ System.out.println("GAME ENDED BY FAILED VOTE");}
                     if(occurrenceCountFalse == 3){ System.out.println("GAME ENDED BY FAILED MISSIONS");}
                     //return;
 
                 }
-                resgs.failedVoteCounter = 0;
-                resgs.setGamePhase(LeaderSelectsTeam);
+                if(resgs.getGameStatus() == CoreConstants.GameResult.GAME_ONGOING) {
+                    resgs.failedVoteCounter = 0;
+                    resgs.setGamePhase(LeaderSelectsTeam);
+                }
 
 
 
@@ -441,6 +453,13 @@ public class ResForwardModel extends StandardForwardModel {
         roundEnded = true;
 
 
+    }
+    @Override
+    protected void endGame(AbstractGameState gs) {
+        gs.setGameStatus(CoreConstants.GameResult.GAME_END);
+        if (gs.getCoreGameParameters().verbose) {
+            System.out.println(Arrays.toString(gs.getPlayerResults()));
+        }
     }
     public void changeLeader(ResGameState resgs) {
         for (int i = 0; i < resgs.getNPlayers(); i++){

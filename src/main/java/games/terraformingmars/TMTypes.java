@@ -122,7 +122,7 @@ public class TMTypes {
         Plant("data/terraformingmars/images/resources/plant.png", true, false),
         Energy("data/terraformingmars/images/resources/power.png", true, false),
         Heat("data/terraformingmars/images/resources/heat.png", true, false),
-        Card("data/terraformingmars/images/resources/card.png", false, false),
+        Card("data/terraformingmars/images/resources/CardBack.png", false, false),
         TR("data/terraformingmars/images/resources/TR.png", false, false),
         Microbe("data/terraformingmars/images/resources/microbe.png", false, true),
         Animal("data/terraformingmars/images/resources/animal.png", false, true),

@@ -32,7 +32,7 @@ public class ResDeckView extends DeckView<ResPlayerCards> {
 
     private Image getCardImage(ResPlayerCards card)
     {
-        String cardName = card.getType().name().toLowerCase();
+        String cardName = card.cardType.name().toLowerCase();
         return ImageIO.GetInstance().getImage(dataPath + cardName + ".png");
     }
 

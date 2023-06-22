@@ -19,7 +19,7 @@ import java.util.Objects;
  * automatic game parameter optimisation tools in the framework.</p>
  */
 public class ResParameters extends AbstractParameters {
-    public String dataPath = "data/sushigo/";
+    public String dataPath = "data/resistance/";
     public ResParameters(long seed) {
         super(seed);
     }

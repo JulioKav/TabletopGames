@@ -14,11 +14,8 @@ import games.resistance.components.ResPlayerCards;
 //import games.resistance.components.ResGameBoard;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import static games.resistance.ResGameState.ResGamePhase.LeaderSelectsTeam;
 
 /**
  * <p>The game state encapsulates all game information. It is a data-only class, with game functionality present
@@ -37,6 +34,7 @@ public class ResGameState extends AbstractGameState {
     List<Boolean> gameBoardValues = new ArrayList<>();
     boolean voteSuccess;
     int leaderID;
+    int winners = 3; //0 is Resistance , 1 is Spy
     int failedVoteCounter = 0;
     int occurrenceCountTrue = 0;
     int occurrenceCountFalse = 0;
@@ -56,6 +54,7 @@ public class ResGameState extends AbstractGameState {
     List<PartialObservableDeck<ResPlayerCards>> playerHandCards = new ArrayList<>(10);
     //might not work as intended since casting component and also list and int[] usage/swapping
     public ResGameBoard gameBoard = new ResGameBoard(new int[nPlayers]);
+
 
 
 
@@ -136,6 +135,7 @@ public class ResGameState extends AbstractGameState {
 
         if (playerId == -1) {
             copy.leaderID = leaderID;
+            copy.winners = winners;
 
             for (int i = 0; i < getNPlayers(); i++) {
                 copy.playerHandCards.add(playerHandCards.get(i));
@@ -381,4 +381,24 @@ public class ResGameState extends AbstractGameState {
         }
         return hiddenPlayerHandCards;
     }
+
+    public int getLeaderID() {
+        return leaderID;
+    }
+    public ArrayList<Integer> getFinalTeam() {
+        return finalTeamChoice;
+    }
+    public List<Boolean> getGameBoardValues() {
+        return gameBoardValues;
+    }
+    public int getFailedVoteCounter() {
+        return failedVoteCounter;
+    }
+    public int getWinners() {
+        return winners;
+    }
+    public boolean getVoteSuccess() {
+        return voteSuccess;
+    }
+
 }

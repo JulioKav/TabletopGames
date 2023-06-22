@@ -75,6 +75,10 @@ public class ForwardModelTests {
         ForwardModelTester fmt = new ForwardModelTester("game=Uno", "nGames=2", "nPlayers=5");
     }
     @Test
+    public void testResistance() {
+        ForwardModelTester fmt = new ForwardModelTester("game=Resistance", "nGames=2", "nPlayers=5");
+    }
+    @Test
     public void testVirus() {
         ForwardModelTester fmt = new ForwardModelTester("game=Virus", "nGames=2", "nPlayers=3");
     }

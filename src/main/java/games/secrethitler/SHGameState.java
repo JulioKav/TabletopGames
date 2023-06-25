@@ -1,4 +1,4 @@
-package games.resistance;
+package games.secrethitler;
 
 import core.AbstractGameState;
 import core.AbstractParameters;
@@ -6,12 +6,12 @@ import core.components.Component;
 import core.components.PartialObservableDeck;
 import core.interfaces.IGamePhase;
 import games.GameType;
-import games.resistance.actions.ResMissionVoting;
-import games.resistance.actions.ResTeamBuilding;
-import games.resistance.actions.ResVoting;
-import games.resistance.components.ResGameBoard;
-import games.resistance.components.ResPlayerCards;
-//import games.resistance.components.SHGameBoard;
+import games.secrethitler.actions.SHChancellorSelection;
+import games.secrethitler.actions.SHPolicySelection;
+import games.secrethitler.actions.SHVoting;
+import games.secrethitler.components.SHGameBoard;
+import games.secrethitler.components.SHPlayerCards;
+import games.secrethitler.components.SHPolicyCards;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,36 +25,68 @@ import java.util.Random;
  * <p>Computation may be included in functions here for ease of access, but only if this is querying the game state information.
  * Functions on the game state should never <b>change</b> the state of the game.</p>
  */
-public class ResGameState extends AbstractGameState {
+public class SHGameState extends AbstractGameState {
     // int[] gameBoard;
 
-
+    int previousChancellor;
+    int previousLeader;
     int spyCounter = 0;
     int resistanceCounter = 0;
     public int[] factions;
     List<Boolean> gameBoardValues = new ArrayList<>();
+    ArrayList<SHPolicyCards> drawnPolicies;
+    ArrayList<SHPolicyCards> final2PolicyChoices;
     boolean voteSuccess;
     int leaderID;
     int winners = 3; //0 is Resistance , 1 is Spy
     int failedVoteCounter = 0;
     int occurrenceCountTrue = 0;
     int occurrenceCountFalse = 0;
-    List<List<ResVoting>> votingChoice;
+    List<List<SHVoting>> votingChoice;
 
-    List<List<ResMissionVoting>> missionVotingChoice;
+    PartialObservableDeck<SHPolicyCards> drawPile;
+    PartialObservableDeck<SHPolicyCards> discardPile;
+
+    List<List<SHPolicySelection>> missionVotingChoice;
     List<int[]> teamChoice = new ArrayList<>();
     IGamePhase previousGamePhase = null;
 
+    int chancellorID;
 
-    ArrayList<Integer> finalTeamChoice = new ArrayList<>();
+    ArrayList<SHPolicyCards> finalPolicyChoice;
 
-    public enum ResGamePhase implements IGamePhase {
-        MissionVote, TeamSelectionVote, LeaderSelectsTeam
+    public void addChancellorChoice(SHChancellorSelection shChancellorSelection) {
+        chancellorID = shChancellorSelection.chancellorID;
     }
 
-    List<PartialObservableDeck<ResPlayerCards>> playerHandCards = new ArrayList<>(10);
+    public void setDrawPile(PartialObservableDeck<SHPolicyCards> drawPile) {
+        this.drawPile = drawPile;
+    }
+
+    public PartialObservableDeck<SHPolicyCards> getDrawPile() {
+        return drawPile;
+    }
+
+    public void addPolicyChoice(SHPolicySelection shPolicySelection, int currentPlayer) {
+        if(currentPlayer == leaderID)
+        {
+            final2PolicyChoices.add(shPolicySelection.card.get(0));
+            final2PolicyChoices.add(shPolicySelection.card.get(1));
+        }
+        if(currentPlayer == chancellorID)
+        {
+            finalPolicyChoice.add(shPolicySelection.card.get(0));
+        }
+    }
+
+    public enum SHGamePhase implements IGamePhase {
+
+        LeaderSelectsChancellor,VotingOnLeader, VotingOnChancellor,LeaderSelectsPolicy,ChancellorSelectsPolicy
+    }
+
+    List<PartialObservableDeck<SHPlayerCards>> playerHandCards = new ArrayList<>(10);
     //might not work as intended since casting component and also list and int[] usage/swapping
-    public ResGameBoard gameBoard = new ResGameBoard(new int[nPlayers]);
+    public SHGameBoard gameBoard = new SHGameBoard(new int[nPlayers]);
 
 
 
@@ -66,7 +98,7 @@ public class ResGameState extends AbstractGameState {
 
 
 
-    public ResGameState(AbstractParameters gameParameters, int nPlayers) {
+    public SHGameState(AbstractParameters gameParameters, int nPlayers) {
         super(gameParameters, nPlayers);
 
 
@@ -119,11 +151,12 @@ public class ResGameState extends AbstractGameState {
      */
 
     @Override
-    protected ResGameState _copy(int playerId) {
+    protected SHGameState _copy(int playerId) {
 
-        ResGameState copy = new ResGameState(gameParameters.copy(), getNPlayers());
+        SHGameState copy = new SHGameState(gameParameters.copy(), getNPlayers());
         copy.gameBoard = gameBoard;
         copy.factions = factions;
+
 
         copy.previousGamePhase = previousGamePhase;
         copy.voteSuccess = voteSuccess;
@@ -131,12 +164,23 @@ public class ResGameState extends AbstractGameState {
         copy.votingChoice = new ArrayList<>();
         copy.missionVotingChoice = new ArrayList<>();
         copy.playerHandCards = new ArrayList<>();
-        copy.finalTeamChoice = new ArrayList<>();
+        copy.finalPolicyChoice = new ArrayList<>();
         copy.gameBoardValues = new ArrayList<>();
-
+        copy.drawnPolicies = new ArrayList<>();
+        copy.final2PolicyChoices = new ArrayList<>();
         if (playerId == -1) {
             copy.leaderID = leaderID;
             copy.winners = winners;
+            copy.drawPile = drawPile;
+            copy.discardPile = discardPile;
+
+            for (int i = 0; i < final2PolicyChoices.size(); i++) {
+                copy.final2PolicyChoices.add(final2PolicyChoices.get(i));
+            }
+
+            for (int i = 0; i < drawnPolicies.size(); i++) {
+                copy.drawnPolicies.add(drawnPolicies.get(i));
+            }
 
             for (int i = 0; i < getNPlayers(); i++) {
                 copy.playerHandCards.add(playerHandCards.get(i));
@@ -145,8 +189,8 @@ public class ResGameState extends AbstractGameState {
             for(int i = 0; i < gameBoardValues.size(); i++){
                 copy.gameBoardValues.add(gameBoardValues.get(i));
             }
-            for(int i = 0; i < finalTeamChoice.size(); i++){
-                copy.finalTeamChoice.add(finalTeamChoice.get(i));
+            for(int i = 0; i < finalPolicyChoice.size(); i++){
+                copy.finalPolicyChoice.add(finalPolicyChoice.get(i));
             }
             for(int i = 0; i < teamChoice.size(); i++){
                 copy.teamChoice.add(teamChoice.get(i));
@@ -166,12 +210,29 @@ public class ResGameState extends AbstractGameState {
             for (int i = 0; i < getNPlayers(); i++) {
                 //Knowledge of Own Hand/Votes
                 if (i == playerId) {
+                    copy.drawPile = drawPile;
                     copy.leaderID = leaderID;
+                    copy.discardPile = discardPile;
+                    if(i == leaderID){
+                        for (int j = 0; j < drawnPolicies.size(); j++) {
+                            copy.drawnPolicies.add(drawnPolicies.get(j));
+                        }
+                        for (int j = 0; j < final2PolicyChoices.size(); j++) {
+                            copy.final2PolicyChoices.add(final2PolicyChoices.get(j));
+                        }
+                    }
+                    if(i == chancellorID)
+                    {
+                        for (int j = 0; j < final2PolicyChoices.size(); j++) {
+                            copy.final2PolicyChoices.add(final2PolicyChoices.get(j));
+                        }
+                    }
+
                     for(int j = 0; j < gameBoardValues.size(); j++){
                         copy.gameBoardValues.add(gameBoardValues.get(j));
                     }
-                    for(int j = 0; j < finalTeamChoice.size(); j++){
-                        copy.finalTeamChoice.add(finalTeamChoice.get(j));
+                    for(int j = 0; j < finalPolicyChoice.size(); j++){
+                        copy.finalPolicyChoice.add(finalPolicyChoice.get(j));
                     }
                     for(int j = 0; j < teamChoice.size(); j++){
                         copy.teamChoice.add(teamChoice.get(j));
@@ -188,7 +249,7 @@ public class ResGameState extends AbstractGameState {
                 }
                 else{
                 //Allowing Spies To Know All Card Types
-                if(playerHandCards.get(playerId).get(playerHandCards.get(playerId).getSize()-1).cardType == ResPlayerCards.CardType.SPY && i != playerId){
+                if(playerHandCards.get(playerId).get(playerHandCards.get(playerId).getSize()-1).cardType == SHPlayerCards.CardType.Fascist && i != playerId){
                     copy.playerHandCards.add(playerHandCards.get(i));
 
                 }
@@ -200,11 +261,11 @@ public class ResGameState extends AbstractGameState {
                 }
 
                 if (i != playerId){
-                    ArrayList<ResVoting> hiddenChoiceVote = new ArrayList<>();
-                    ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
-                    for (ResVoting c : votingChoice.get(i)) {
+                    ArrayList<SHVoting> hiddenChoiceVote = new ArrayList<>();
+                    ArrayList<SHPolicySelection> hiddenChoiceMissionVote = new ArrayList<>();
+                    for (SHVoting c : votingChoice.get(i)) {
                         //System.out.println(c.getHiddenChoice(this).cardIdx +"ResVOting CARD");
-                        hiddenChoiceVote.add( c.getHiddenChoice(i));
+                        //hiddenChoiceVote.add( c.getHiddenChoice(i));
                     }
 
 
@@ -212,9 +273,9 @@ public class ResGameState extends AbstractGameState {
 
                         //System.out.println(hiddenChoiceMissionVote + " INSIDE");
 
-                    for (ResMissionVoting c : missionVotingChoice.get(i)) {
+                    for (SHPolicySelection c : missionVotingChoice.get(i)) {
 
-                        hiddenChoiceMissionVote.add(c.getHiddenChoice(i));
+                        //hiddenChoiceMissionVote.add(c.getHiddenChoice(i));
                     }
                     //System.out.println(hiddenChoiceMissionVote + " hiddenmissionvote");
                     copy.votingChoice.add(hiddenChoiceVote);
@@ -252,18 +313,18 @@ public class ResGameState extends AbstractGameState {
     }
 
 
-    public void addCardChoice(ResVoting ResVoting, int playerId) {
-        votingChoice.get(playerId).add(ResVoting);
+    public void addCardChoice(SHVoting SHVoting, int playerId) {
+        votingChoice.get(playerId).add(SHVoting);
     }
 
-    public void addMissionChoice(ResMissionVoting ResMissionVoting, int playerId) {
+    public void addMissionChoice(SHPolicySelection SHPolicySelection, int playerId) {
 //        ArrayList<Integer> teamList = new ArrayList<>();
 //        for (int[] valuearray : finalTeamChoice)
 //        {   for (int value : valuearray) teamList.add(value);}
 //
 //        if(teamList.contains(playerId)){
             System.out.println("mission voting choice size      " + missionVotingChoice.size());
-            missionVotingChoice.get(playerId).add(ResMissionVoting);
+            missionVotingChoice.get(playerId).add(SHPolicySelection);
 
     }
 
@@ -272,21 +333,21 @@ public class ResGameState extends AbstractGameState {
 
     }
 
-    public List<List<ResVoting>> getvotingChoice() {
+    public List<List<SHVoting>> getvotingChoice() {
         return votingChoice;
     }
 
     public void clearTeamChoices() {
         for (int i = 0; i < getNPlayers(); i++) teamChoice.clear();
-        for (int i = 0; i < getNPlayers(); i++) finalTeamChoice.clear();
+        for (int i = 0; i < getNPlayers(); i++) finalPolicyChoice.clear();
     }
     public void clearVoteChoices() {
         for (int i = 0; i < getNPlayers(); i++) votingChoice.get(i).clear();
     }
 
 
-    public void addTeamChoice(ResTeamBuilding ResTeamBuilding) {
-        teamChoice.add(ResTeamBuilding.getTeam());
+    public void addTeamChoice(SHChancellorSelection SHChancellorSelection) {
+        //teamChoice.add(SHChancellorSelection.getTeam());
     }
 
     public List<int[]> getTeamChoice() {
@@ -318,14 +379,14 @@ public class ResGameState extends AbstractGameState {
         return 0;
     }
 
-    public List<PartialObservableDeck<ResPlayerCards>> getPlayerHandCards(){
+    public List<PartialObservableDeck<SHPlayerCards>> getPlayerHandCards(){
         return playerHandCards;
     }
 
     @Override
     protected boolean _equals(Object o) {
         // TODO: compare all variables in the state
-        return o instanceof ResGameState;
+        return o instanceof SHGameState;
     }
 
     @Override
@@ -334,18 +395,18 @@ public class ResGameState extends AbstractGameState {
         return super.hashCode();
     }
 
-    private PartialObservableDeck<ResPlayerCards> createHiddenHands(int i){
-        PartialObservableDeck<ResPlayerCards> hiddenPlayerHandCards = new PartialObservableDeck<>("hiddenDeck",i);
+    private PartialObservableDeck<SHPlayerCards> createHiddenHands(int i){
+        PartialObservableDeck<SHPlayerCards> hiddenPlayerHandCards = new PartialObservableDeck<>("hiddenDeck",i);
         Random rnd = new Random();
         if (rnd.nextInt(2) == 0 && spyCounter != factions[1]) {
-            ResPlayerCards SPY = new ResPlayerCards(ResPlayerCards.CardType.SPY);
+            SHPlayerCards SPY = new SHPlayerCards(SHPlayerCards.CardType.Fascist);
             SPY.setOwnerId(i);
             hiddenPlayerHandCards.add(SPY);
             spyCounter += 1;
         }
         else if (resistanceCounter != factions[0])
         {
-            ResPlayerCards resistor = new ResPlayerCards(ResPlayerCards.CardType.RESISTANCE);
+            SHPlayerCards resistor = new SHPlayerCards(SHPlayerCards.CardType.Liberal);
             resistor.setOwnerId(i);
             hiddenPlayerHandCards.add(resistor);
             resistanceCounter += 1;
@@ -353,21 +414,21 @@ public class ResGameState extends AbstractGameState {
 
         else if (spyCounter != factions[1] && resistanceCounter == factions[0])
         {
-            ResPlayerCards SPY = new ResPlayerCards(ResPlayerCards.CardType.SPY);
+            SHPlayerCards SPY = new SHPlayerCards(SHPlayerCards.CardType.Liberal);
             SPY.setOwnerId(i);
             hiddenPlayerHandCards.add(SPY);
             spyCounter += 1;
         }
         else if (spyCounter == factions[1] && resistanceCounter != factions[0])
         {
-            ResPlayerCards resistor = new ResPlayerCards(ResPlayerCards.CardType.RESISTANCE);
+            SHPlayerCards resistor = new SHPlayerCards(SHPlayerCards.CardType.Liberal);
             resistor.setOwnerId(i);
             hiddenPlayerHandCards.add(resistor);
             resistanceCounter += 1;
         }
-        ResPlayerCards No = new ResPlayerCards(ResPlayerCards.CardType.No);
+        SHPlayerCards No = new SHPlayerCards(SHPlayerCards.CardType.No);
         No.setOwnerId(i);
-        ResPlayerCards Yes = new ResPlayerCards(ResPlayerCards.CardType.Yes);
+        SHPlayerCards Yes = new SHPlayerCards(SHPlayerCards.CardType.Yes);
         No.setOwnerId(i);
         hiddenPlayerHandCards.add(No);
         hiddenPlayerHandCards.add(Yes);
@@ -379,8 +440,8 @@ public class ResGameState extends AbstractGameState {
     public int getLeaderID() {
         return leaderID;
     }
-    public ArrayList<Integer> getFinalTeam() {
-        return finalTeamChoice;
+    public ArrayList<SHPolicyCards> getFinalPolicyChoice() {
+        return finalPolicyChoice;
     }
     public List<Boolean> getGameBoardValues() {
         return gameBoardValues;

@@ -1,9 +1,8 @@
-package games.resistance.gui;
+package games.secrethitler.gui;
 
 import core.AbstractGameState;
 import core.AbstractPlayer;
 import core.Game;
-import games.pandemic.gui.PandemicBoardView;
 import games.resistance.ResGameState;
 import games.resistance.ResParameters;
 import games.resistance.components.ResPlayerCards;
@@ -18,17 +17,17 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
-public class ResGUIManager extends AbstractGUIManager {
+public class SHGUIManager extends AbstractGUIManager {
     // Settings for display areas
     final static int playerAreaWidth = 250;
     final static int playerAreaHeight = 130;
-    final static int ResPlayerCardsWidth = 60;
-    final static int ResPlayerCardsHeight = 85;
+    final static int SHPlayerCardsWidth = 60;
+    final static int SHPlayerCardsHeight = 85;
 
     JPanel missionSuccessText;
-    ResBoardView boardView;
+    SHBoardView boardView;
     // List of player hand views
-    ResPlayerView[] playerHands;
+    SHPlayerView[] playerHands;
 
     // Currently active player
     int activePlayer = -1;
@@ -37,7 +36,7 @@ public class ResGUIManager extends AbstractGUIManager {
     Border highlightActive = BorderFactory.createLineBorder(new Color(47, 132, 220), 3);
     Border[] playerViewBorders;
 
-    public ResGUIManager(GamePanel parent, Game game, ActionController ac, int humanID) {
+    public SHGUIManager(GamePanel parent, Game game, ActionController ac, int humanID) {
         super(parent, game, ac, humanID);
         if (game != null) {
             AbstractGameState gameState = game.getGameState();
@@ -56,7 +55,7 @@ public class ResGUIManager extends AbstractGUIManager {
                 ResParameters parameters = (ResParameters) gameState.getGameParameters();
 
                 // Create main game area that will hold all game views
-                playerHands = new ResPlayerView[nPlayers];
+                playerHands = new SHPlayerView[nPlayers];
                 playerViewBorders = new Border[nPlayers];
                 JPanel mainGameArea = new JPanel();
                 mainGameArea.setLayout(new BorderLayout());
@@ -66,7 +65,7 @@ public class ResGUIManager extends AbstractGUIManager {
                 JPanel[] sides = new JPanel[]{new JPanel(), new JPanel(), new JPanel(), new JPanel()};
                 int next = 0;
                 for (int i = 0; i < nPlayers; i++) {
-                    ResPlayerView playerHand = new ResPlayerView(parsedGameState.getPlayerHandCards().get(i), i, humanID, parameters.getDataPath());
+                    SHPlayerView playerHand = new SHPlayerView(parsedGameState.getPlayerHandCards().get(i), i, humanID, parameters.getDataPath());
                     // Get agent name
                     String[] split = game.getPlayers().get(i).getClass().toString().split("\\.");
                     String agentName = split[split.length - 1];

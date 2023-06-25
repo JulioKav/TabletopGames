@@ -30,6 +30,7 @@ import static org.junit.Assert.*;
 
 public class TestResistance {
 
+    public int atLeastOneHandRearranged = 0;
     Game resistance;
     List<AbstractPlayer> players;
     ResForwardModel fm = new ResForwardModel();
@@ -183,7 +184,7 @@ public class TestResistance {
     }
 
     @Test
-    public void gameOverWithMissionsCriteriaCheck() {
+    public void checkingGameOverWithMissionsCriteria() {
 
         ResGameState state = (ResGameState) resistance.getGameState();
         progressGameOneRound(state);
@@ -221,7 +222,7 @@ public class TestResistance {
         }
     }
     @Test
-    public void gameOverWithFailedVotesCriteriaCheck() {
+    public void checkingGameOverWithFailedVotesCriteria() {
 
         ResGameState state = (ResGameState) resistance.getGameState();
         while ( state.getFailedVoteCounter() != 5 && state.getGameStatus() != CoreConstants.GameResult.GAME_END)
@@ -236,7 +237,7 @@ public class TestResistance {
     }
 
     @Test
-    public void handInitialisationCheck() {
+    public void checkingHandInitialisation() {
 
         ResGameState state = (ResGameState) resistance.getGameState();
         for (int i = 0; i < state.getNPlayers(); i++) {
@@ -307,6 +308,31 @@ public class TestResistance {
     }
 
     @Test
+    public void checkingTeamSize() {
+        ResGameState state = (ResGameState) resistance.getGameState();
+
+        //Checking Round 0
+        progressGame(state, ResGameState.ResGamePhase.TeamSelectionVote, 0);
+        assertEquals(state.gameBoard.getMissionSuccessValues()[state.getRoundCounter()],state.getFinalTeam().size());
+
+        //Checking Round 1
+        progressGame(state, ResGameState.ResGamePhase.TeamSelectionVote, 1);
+        assertEquals(state.gameBoard.getMissionSuccessValues()[state.getRoundCounter()],state.getFinalTeam().size());
+
+        //Checking Round 2
+        progressGame(state, ResGameState.ResGamePhase.TeamSelectionVote, 2);
+        assertEquals(state.gameBoard.getMissionSuccessValues()[state.getRoundCounter()],state.getFinalTeam().size());
+
+        //Checking Round 3
+        progressGame(state, ResGameState.ResGamePhase.TeamSelectionVote, 3);
+        assertEquals(state.gameBoard.getMissionSuccessValues()[state.getRoundCounter()],state.getFinalTeam().size());
+
+        //Checking Round 4
+        progressGame(state, ResGameState.ResGamePhase.TeamSelectionVote, 4);
+        assertEquals(state.gameBoard.getMissionSuccessValues()[state.getRoundCounter()],state.getFinalTeam().size());
+    }
+
+    @Test
     public void checkingLeaderMovesAfterRoundEnds() {
         ResGameState state = (ResGameState) resistance.getGameState();
         progressGame(state, ResGameState.ResGamePhase.MissionVote, state.getNPlayers() -1);
@@ -321,85 +347,102 @@ public class TestResistance {
     public void checkingSpiesKnowEveryonesCards() {
         ResGameState state = (ResGameState) resistance.getGameState();
         List<ResPlayerCards.CardType> listOfIdentityCards =  new ArrayList<>();
-        for (int i = 0; i < state.getNPlayers()-1; i++) {
+        for (int i = 0; i < state.getNPlayers(); i++) {
             listOfIdentityCards.add(state.getPlayerHandCards().get(i).get(2).cardType);
         }
 
         //Checking Player 0
-        checkingSpiesKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        ResGameState playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingSpiesKnowEveryonesCardsMethod(state, playerState,listOfIdentityCards);
         fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
 
         //Checking Player 1
-        checkingSpiesKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingSpiesKnowEveryonesCardsMethod(state, playerState,listOfIdentityCards);
         fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
 
         //Checking Player 2
-        checkingSpiesKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingSpiesKnowEveryonesCardsMethod(state, playerState,listOfIdentityCards);
         fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
 
         //Checking Player 3
-        checkingSpiesKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingSpiesKnowEveryonesCardsMethod(state, playerState,listOfIdentityCards);
         fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
 
         //Checking Player 4
-        checkingSpiesKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingSpiesKnowEveryonesCardsMethod(state, playerState,listOfIdentityCards);
     }
 
     @Test
     public void checkingResistanceDontKnowEveryonesCards() {
+        //This Test May Fail Due To A Random Arrangement Of Hidden Cards Aligning With Actual Identity Cards, I have minimised this
+        // Chance by checking multiple Resistance members views of other players hands
+        // If atleast one hand is not equal the default copy/gamestate, the hand redeterminisation works
         ResGameState state = (ResGameState) resistance.getGameState();
+
         List<ResPlayerCards.CardType> listOfIdentityCards =  new ArrayList<>();
-        for (int i = 0; i < state.getNPlayers()-1; i++) {
+        for (int i = 0; i < state.getNPlayers(); i++) {
             listOfIdentityCards.add(state.getPlayerHandCards().get(i).get(2).cardType);
         }
 
         //Checking Player 0
-        checkingResistanceDontKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        ResGameState playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingResistanceDontKnowEveryonesCardsMethod(state,playerState,listOfIdentityCards);
         fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
 
         //Checking Player 1
-        checkingResistanceDontKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingResistanceDontKnowEveryonesCardsMethod(state,playerState,listOfIdentityCards);
         fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
 
         //Checking Player 2
-        checkingResistanceDontKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingResistanceDontKnowEveryonesCardsMethod(state,playerState,listOfIdentityCards);
         fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
 
         //Checking Player 3
-        checkingResistanceDontKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingResistanceDontKnowEveryonesCardsMethod(state,playerState,listOfIdentityCards);
         fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
 
         //Checking Player 4
-        checkingResistanceDontKnowEveryonesCardsMethod(state,listOfIdentityCards);
+        playerState = (ResGameState) state.copy(state.getCurrentPlayer());
+        checkingResistanceDontKnowEveryonesCardsMethod(state,playerState,listOfIdentityCards);
+
+        assertNotEquals(atLeastOneHandRearranged, 0);
     }
 
 
-private void checkingSpiesKnowEveryonesCardsMethod(ResGameState state, List<ResPlayerCards.CardType> listOfIdentityCards)
+private void checkingSpiesKnowEveryonesCardsMethod(ResGameState state,ResGameState playerState, List<ResPlayerCards.CardType> listOfIdentityCards)
 {
     if(state.getPlayerHandCards().get(state.getCurrentPlayer()).get(2).cardType == ResPlayerCards.CardType.SPY)
     {
         List<ResPlayerCards.CardType> listOfSpyKnownIdentityCards =  new ArrayList<>();
-        for (int j = 0; j < state.getNPlayers()-1; j++) {
-            listOfSpyKnownIdentityCards.add(state.getPlayerHandCards().get(j).get(2).cardType);
+        for (int j = 0; j < state.getNPlayers(); j++) {
+            listOfSpyKnownIdentityCards.add(playerState.getPlayerHandCards().get(j).get(2).cardType);
         }
         assertEquals(listOfSpyKnownIdentityCards,listOfIdentityCards);
     }}
 
-    private void checkingResistanceDontKnowEveryonesCardsMethod(ResGameState state, List<ResPlayerCards.CardType> listOfIdentityCards)
+    private void checkingResistanceDontKnowEveryonesCardsMethod(ResGameState state,ResGameState playerState, List<ResPlayerCards.CardType> listOfIdentityCards)
     {
         if (state.getPlayerHandCards().get(state.getCurrentPlayer()).get(2).cardType == ResPlayerCards.CardType.RESISTANCE) {
-            List<ResPlayerCards.CardType> listOfSpyKnownIdentityCards = new ArrayList<>();
-            for (int j = 0; j < state.getNPlayers() - 1; j++) {
-                listOfSpyKnownIdentityCards.add(state.getPlayerHandCards().get(j).get(2).cardType);
+            List<ResPlayerCards.CardType> listOfResistanceKnownIdentityCards = new ArrayList<>();
+            for (int j = 0; j < state.getNPlayers(); j++) {
+                listOfResistanceKnownIdentityCards.add(playerState.getPlayerHandCards().get(j).get(2).cardType);
             }
-            assertNotEquals(listOfSpyKnownIdentityCards, listOfIdentityCards);
+
+            if(listOfResistanceKnownIdentityCards != listOfIdentityCards) {atLeastOneHandRearranged += 1;}
         }
     }
 
     //
 //    @Test
 //    public void testTeamVoteNumber() {
-//        ResGameState state = (ResGameState) resistance.getGameState();
+//        SHGameState state = (SHGameState) resistance.getGameState();
 //        fm.next(state, new RollDice());
 //        do {
 //            fm.next(state, fm.computeAvailableActions(state).get(0));

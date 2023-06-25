@@ -29,8 +29,8 @@ public class ResMissionVoting extends AbstractAction implements IExtendedSequenc
 //        if (resgs.getPlayerHandCards().get(i).getSize() > 3)
 //        {
 //
-//            return new ResMissionVoting(i, 0);}
-//        else{return new ResMissionVoting(i, 0);}
+//            return new SHPolicySelection(i, 0);}
+//        else{return new SHPolicySelection(i, 0);}
     }
 
     @Override

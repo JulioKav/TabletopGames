@@ -64,7 +64,7 @@ public class ResForwardModel extends StandardForwardModel {
         
         
 
-        //List<PartialObservableDeck<ResPlayerCards>> playerHandCards = new ArrayList<>(firstState.getNPlayers());
+        //List<PartialObservableDeck<SHPlayerCards>> playerHandCards = new ArrayList<>(firstState.getNPlayers());
         int spyCounter = 0;
         int resistanceCounter = 0;
         for (int i = 0; i < firstState.getNPlayers(); i++) {
@@ -90,14 +90,14 @@ public class ResForwardModel extends StandardForwardModel {
                 resistanceCounter += 1;
             }
 
-            else if (spyCounter != resgs.factions[1] && resistanceCounter == resgs.factions[0])
+            else if (spyCounter != resgs.factions[1] && resistanceCounter == resgs.factions[0] )
             {
                 ResPlayerCards SPY = new ResPlayerCards(ResPlayerCards.CardType.SPY);
                 SPY.setOwnerId(i);
                 playerCards.add(SPY);
                 spyCounter += 1;
             }
-            else if (spyCounter == resgs.factions[1] && resistanceCounter != resgs.factions[0])
+            else if (spyCounter == resgs.factions[1] && resistanceCounter != resgs.factions[0] )
             {
                 ResPlayerCards resistor = new ResPlayerCards(ResPlayerCards.CardType.RESISTANCE);
                 resistor.setOwnerId(i);
@@ -123,19 +123,11 @@ public class ResForwardModel extends StandardForwardModel {
                 yes.setOwnerId(i);
                 playerCards.add(yes);
             }
-//                            ResPlayerCards yes = new ResPlayerCards(ResPlayerCards.CardType.Yes);
-//                yes.setOwnerId(i);
-//                playerCards.add(yes);
-//
-//                ResPlayerCards no = new ResPlayerCards(ResPlayerCards.CardType.No);
-//                no.setOwnerId(i);
-//                playerCards.add(no);
-//                System.out.println(playerCards);
             resgs.playerHandCards.add(playerCards);
         }
 
         //Adding leader card
-        //ResPlayerCards leader = new ResPlayerCards(ResPlayerCards.CardType.LEADER);
+        //SHPlayerCards leader = new SHPlayerCards(SHPlayerCards.CardType.LEADER);
         int randomPlayerLeader = rnd.nextInt(resgs.getNPlayers());
         System.out.println("Random Player Leader : " +randomPlayerLeader);
 //        leader.setOwnerId(randomPlayerLeader);
@@ -145,7 +137,7 @@ public class ResForwardModel extends StandardForwardModel {
         resgs.previousGamePhase = LeaderSelectsTeam;
 //        int isThereLeaderCard = 0;
 //        for (int i = 0; i < resgs.getNPlayers(); i++) {
-//            if (resgs.getPlayerHandCards().get(i).get(0).cardType != ResPlayerCards.CardType.LEADER) {isThereLeaderCard += 1;}
+//            if (resgs.getPlayerHandCards().get(i).get(0).cardType != SHPlayerCards.CardType.LEADER) {isThereLeaderCard += 1;}
 //            if (isThereLeaderCard == resgs.getNPlayers()){throw new AssertionError("No Leader Card");}
 //        }
     }
@@ -169,7 +161,7 @@ public class ResForwardModel extends StandardForwardModel {
             //Leader Creates Team
 //            int isThereLeaderCard = 0;
 //            for (int i = 0; i < resgs.getNPlayers(); i++) {
-//                if (resgs.getPlayerHandCards().get(i).get(0).cardType != ResPlayerCards.CardType.LEADER) {isThereLeaderCard += 1;}
+//                if (resgs.getPlayerHandCards().get(i).get(0).cardType != SHPlayerCards.CardType.LEADER) {isThereLeaderCard += 1;}
 //                System.out.println(resgs.getPlayerHandCards().get(i));
 //                if (isThereLeaderCard == resgs.getNPlayers()){throw new AssertionError("No Leader Card");}
 //            }
@@ -196,10 +188,10 @@ public class ResForwardModel extends StandardForwardModel {
 
             if(resgs.getGamePhase()== TeamSelectionVote) {
                 
-//                if (resgs.playerHandCards.get(currentPlayer).get(0).cardType == ResPlayerCards.CardType.LEADER)
+//                if (resgs.playerHandCards.get(currentPlayer).get(0).cardType == SHPlayerCards.CardType.LEADER)
 //                {
-//                    actions.add(new ResVoting(currentPlayer, currentPlayerHand.getSize()-2));
-//                    actions.add(new ResVoting(currentPlayer, currentPlayerHand.getSize()-3));
+//                    actions.add(new SHVoting(currentPlayer, currentPlayerHand.getSize()-2));
+//                    actions.add(new SHVoting(currentPlayer, currentPlayerHand.getSize()-3));
 //                }
                 // All players can do is choose a yes or no card in hand to play.
                 actions.add(new ResVoting(currentPlayer, ResPlayerCards.CardType.Yes));
@@ -385,7 +377,7 @@ public class ResForwardModel extends StandardForwardModel {
 
             ArrayList<ResPlayerCards.CardType> allVotes = new ArrayList<>();
         for (int i = 0; i < resgs.getNPlayers(); i++) {
-            //PartialObservableDeck<ResPlayerCards> hand = resgs.playerHandCards.get(i);
+            //PartialObservableDeck<SHPlayerCards> hand = resgs.playerHandCards.get(i);
             for (ResVoting cc: resgs.votingChoice.get(i)) {
                 allVotes.add(cc.cardType);
             }
@@ -424,7 +416,7 @@ public class ResForwardModel extends StandardForwardModel {
             System.out.println("Mission Vote :  " + allVotes);
             if(allVotes.contains(ResPlayerCards.CardType.LEADER ) || allVotes.contains(ResPlayerCards.CardType.RESISTANCE ) || allVotes.contains(ResPlayerCards.CardType.SPY ))
             {throw new AssertionError("Incorrect Type in Mission Vote");}
-            //System.out.println(allVotes.get(0) == ResPlayerCards.CardType.No);
+            //System.out.println(allVotes.get(0) == SHPlayerCards.CardType.No);
             int occurrenceCount = Collections.frequency(allVotes, ResPlayerCards.CardType.No);
             System.out.println("Mission No Occurrence Count : " + occurrenceCount  );
             if (occurrenceCount > 0){resgs.gameBoardValues.add(false);}
@@ -445,7 +437,7 @@ public class ResForwardModel extends StandardForwardModel {
     }
     public void _endRound(ResGameState resgs) {
         // Apply card end of round rules
-//        for (ResPlayerCards.CardType type: ResPlayerCards.CardType.values()) {
+//        for (SHPlayerCards.CardType type: SHPlayerCards.CardType.values()) {
 //            type.onRoundEnd(resgs);
 //        }
         //resgs.setGamePhase(LeaderSelectsTeam);

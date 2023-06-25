@@ -1,20 +1,19 @@
-package games.resistance.actions;
+package games.secrethitler.actions;
 
 import core.AbstractGameState;
 import core.actions.AbstractAction;
 import core.interfaces.IExtendedSequence;
-import games.resistance.ResGameState;
-import utilities.Utils;
+import games.secrethitler.SHGameState;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ResWait extends AbstractAction implements IExtendedSequence {
+public class SHWait extends AbstractAction implements IExtendedSequence {
     public final int playerId;
 
 
-    public ResWait(int playerId ) {
+    public SHWait(int playerId ) {
         this.playerId = playerId;
 
     }
@@ -32,12 +31,12 @@ public class ResWait extends AbstractAction implements IExtendedSequence {
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
-        ResGameState resgs = (ResGameState) state;
+        SHGameState resgs = (SHGameState) state;
 
         List<AbstractAction> actions = new ArrayList<>();
 
 
-        actions.add(new ResWait(playerId));
+        actions.add(new SHWait(playerId));
 
         return actions;
     }
@@ -58,15 +57,15 @@ public class ResWait extends AbstractAction implements IExtendedSequence {
     }
 
     @Override
-    public ResWait copy() {
+    public SHWait copy() {
         return this; // immutable
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ResWait)) return false;
-        ResWait that = (ResWait) o;
+        if (!(o instanceof SHWait)) return false;
+        SHWait that = (SHWait) o;
         return playerId == that.playerId;
     }
 

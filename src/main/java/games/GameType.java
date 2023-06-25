@@ -27,6 +27,10 @@ import games.resistance.ResForwardModel;
 import games.resistance.ResGameState;
 import games.resistance.ResParameters;
 import games.resistance.gui.ResGUIManager;
+import games.secrethitler.SHForwardModel;
+import games.secrethitler.SHGameState;
+import games.secrethitler.SHParameters;
+import games.secrethitler.gui.SHGUIManager;
 import games.terraformingmars.*;
 import games.terraformingmars.gui.TMGUI;
 import games.poker.*;
@@ -169,6 +173,10 @@ public enum GameType {
             Arrays.asList(Strategy, Bluffing, Deduction, Abstract),
             Arrays.asList(Memory, GridMovement),
             ResGameState.class, ResForwardModel.class, ResParameters.class, ResGUIManager.class),
+    SecretHitler(5, 10,
+            Arrays.asList(Strategy, Bluffing, Deduction, Abstract),
+            Arrays.asList(Memory, GridMovement),
+            SHGameState.class, SHForwardModel.class, SHParameters.class, SHGUIManager.class),
 
     CantStop(2, 4,
             Arrays.asList(Dice, Abstract),

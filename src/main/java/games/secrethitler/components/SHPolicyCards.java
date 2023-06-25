@@ -1,15 +1,9 @@
-package games.resistance.components;
+package games.secrethitler.components;
 
-import core.CoreConstants;
 import core.components.Card;
 import core.components.Component;
-import games.explodingkittens.cards.ExplodingKittensCard;
-import games.resistance.ResGameState;
-import games.sushigo.cards.SGCard;
-
 
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * <p>Components represent a game piece, or encompass some unit of game information (e.g. cards, tokens, score counters, boards, dice etc.)</p>
@@ -19,13 +13,10 @@ import java.util.function.Consumer;
  * <p>They also need to include {@link Object#equals(Object)} and {@link Object#hashCode()} methods.</p>
  * <p>They <b>may</b> keep references to other components or actions (but these should be deep-copied in the copy() method, watch out for infinite loops!).</p>
  */
-public class ResPlayerCards extends Card {
+public class SHPolicyCards extends Card {
     public enum CardType {
-        SPY,
-        RESISTANCE,
-        LEADER,
-        Yes,
-        No,
+        Fascist,
+        Liberal,
     }
 
     /**
@@ -42,19 +33,19 @@ public class ResPlayerCards extends Card {
 
     public CardType cardType;
 
-    public ResPlayerCards(CardType cardType){
+    public SHPolicyCards(CardType cardType){
         super(cardType.toString());
         this.cardType = cardType;
     }
 
-    protected ResPlayerCards(CardType cardType, int ID){
+    protected SHPolicyCards(CardType cardType, int ID){
         super(cardType.toString(), ID);
         this.cardType = cardType;
     }
 
     @Override
-    public ResPlayerCards copy() {
-        ResPlayerCards copy = new ResPlayerCards(cardType, componentID);
+    public SHPolicyCards copy() {
+        SHPolicyCards copy = new SHPolicyCards(cardType, componentID);
         copyComponentTo(copy);
         return copy;
     }
@@ -62,9 +53,9 @@ public class ResPlayerCards extends Card {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ResPlayerCards)) return false;
+        if (!(o instanceof SHPolicyCards)) return false;
         if (!super.equals(o)) return false;
-        ResPlayerCards resCard = (ResPlayerCards) o;
+        SHPolicyCards shCard = (SHPolicyCards) o;
         return  cardType == this.cardType ;
     }
 

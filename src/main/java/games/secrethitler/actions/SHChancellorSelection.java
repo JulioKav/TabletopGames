@@ -1,9 +1,9 @@
-package games.resistance.actions;
+package games.secrethitler.actions;
 
 import core.AbstractGameState;
 import core.actions.AbstractAction;
 import core.interfaces.IExtendedSequence;
-import games.resistance.ResGameState;
+import games.secrethitler.SHGameState;
 import utilities.Utils;
 
 import java.util.ArrayList;
@@ -11,26 +11,26 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class ResTeamBuilding extends AbstractAction implements IExtendedSequence {
+public class SHChancellorSelection extends AbstractAction implements IExtendedSequence {
     public final int playerId;
-    private final int[] team;
+    public final int chancellorID;
 
-    public ResTeamBuilding(int playerId, int[] team) {
+    public SHChancellorSelection(int playerId, int chancellorID) {
         this.playerId = playerId;
-        this.team = team;
+        this.chancellorID = chancellorID;
     }
 
-    public int[] getTeam() {return team.clone();}
+    public int getChancellorID() {return chancellorID;}
     @Override
     public boolean execute(AbstractGameState gs) {
-        ((ResGameState)gs).addTeamChoice(this);
+        ((SHGameState)gs).addChancellorChoice(this);
         return true;
     }
 
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
-        ResGameState resgs = (ResGameState) state;
+        SHGameState resgs = (SHGameState) state;
 
         List<AbstractAction> actions = new ArrayList<>();
 
@@ -41,7 +41,7 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
             }
             ArrayList<int[]> choiceOfTeams = Utils.generateCombinations(players, resgs.gameBoard.getMissionSuccessValues()[resgs.getRoundCounter()]);
             for(int[] team : choiceOfTeams) {
-                actions.add(new ResTeamBuilding(playerId, team));
+                actions.add(new SHChancellorSelection(playerId, chancellorID));
                 if (team.length == 0){throw new AssertionError("Team Size Zero");}
             }
 
@@ -62,26 +62,26 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
     }
 
     @Override
-    public ResTeamBuilding copy() {
+    public SHChancellorSelection copy() {
         return this; // immutable
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ResTeamBuilding)) return false;
-        ResTeamBuilding that = (ResTeamBuilding) o;
-        return playerId == that.playerId && Arrays.equals(team, that.team);
+        if (!(o instanceof SHChancellorSelection)) return false;
+        SHChancellorSelection that = (SHChancellorSelection) o;
+        return playerId == that.playerId && chancellorID == that.chancellorID;
     }
 
     @Override
     public int hashCode() {
-        return playerId + Arrays.hashCode(team);
+        return playerId + chancellorID;
     }
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return "Leader Has Suggested Team :  " + Arrays.toString(team);
+        return "Leader Has Suggested Chancellor :  " + chancellorID;
     }
 
 

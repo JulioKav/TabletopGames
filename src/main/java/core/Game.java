@@ -920,7 +920,7 @@ public class Game {
      * and then run this class.
      */
     public static void main(String[] args) {
-        String gameType = Utils.getArg(args, "game", "Resistance");
+        String gameType = Utils.getArg(args, "game", "SecretHitler");
         boolean useGUI = Utils.getArg(args, "gui", true);
         int playerCount = Utils.getArg(args, "nPlayers", 5);
         int turnPause = Utils.getArg(args, "turnPause", 0);

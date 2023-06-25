@@ -213,27 +213,31 @@ public class SHGameState extends AbstractGameState {
                     copy.drawPile = drawPile;
                     copy.leaderID = leaderID;
                     copy.discardPile = discardPile;
-                    if(i == leaderID){
+                    if(i == leaderID && getGamePhase() == SHGamePhase.LeaderSelectsPolicy){
                         for (int j = 0; j < drawnPolicies.size(); j++) {
                             copy.drawnPolicies.add(drawnPolicies.get(j));
                         }
                         for (int j = 0; j < final2PolicyChoices.size(); j++) {
                             copy.final2PolicyChoices.add(final2PolicyChoices.get(j));
                         }
+                        for(int j = 0; j < finalPolicyChoice.size(); j++){
+                            copy.finalPolicyChoice.add(finalPolicyChoice.get(j));
+                        }
                     }
-                    if(i == chancellorID)
+                    if(i == chancellorID  && getGamePhase() == SHGamePhase.ChancellorSelectsPolicy)
                     {
                         for (int j = 0; j < final2PolicyChoices.size(); j++) {
                             copy.final2PolicyChoices.add(final2PolicyChoices.get(j));
+                        }
+                        for(int j = 0; j < finalPolicyChoice.size(); j++){
+                            copy.finalPolicyChoice.add(finalPolicyChoice.get(j));
                         }
                     }
 
                     for(int j = 0; j < gameBoardValues.size(); j++){
                         copy.gameBoardValues.add(gameBoardValues.get(j));
                     }
-                    for(int j = 0; j < finalPolicyChoice.size(); j++){
-                        copy.finalPolicyChoice.add(finalPolicyChoice.get(j));
-                    }
+
                     for(int j = 0; j < teamChoice.size(); j++){
                         copy.teamChoice.add(teamChoice.get(j));
                     }

@@ -7,6 +7,7 @@ import core.components.PartialObservableDeck;
 import core.interfaces.IGamePhase;
 import games.GameType;
 import games.secrethitler.actions.SHChancellorSelection;
+import games.secrethitler.actions.SHKill;
 import games.secrethitler.actions.SHPolicySelection;
 import games.secrethitler.actions.SHVoting;
 import games.secrethitler.components.SHGameBoard;
@@ -29,8 +30,10 @@ public class SHGameState extends AbstractGameState {
     // int[] gameBoard;
 
     int previousChancellor;
+    int hitlerID;
     int previousLeader;
     int spyCounter = 0;
+    boolean hasSomeoneBeenKilledThisRound = false;
     int resistanceCounter = 0;
     public int[] factions;
     List<Boolean> gameBoardValues = new ArrayList<>();
@@ -42,6 +45,7 @@ public class SHGameState extends AbstractGameState {
     int failedVoteCounter = 0;
     int occurrenceCountTrue = 0;
     int occurrenceCountFalse = 0;
+    int previousOccurrenceCountFalse = 0; // Used for checking If you've killed someone at that fascist policy stage/level
     List<List<SHVoting>> votingChoice;
 
     PartialObservableDeck<SHPolicyCards> drawPile;
@@ -51,12 +55,13 @@ public class SHGameState extends AbstractGameState {
     List<int[]> teamChoice = new ArrayList<>();
     IGamePhase previousGamePhase = null;
 
+    List<Integer> deceasedFellas = new ArrayList<>();
     int chancellorID;
 
     ArrayList<SHPolicyCards> finalPolicyChoice;
 
     public void addChancellorChoice(SHChancellorSelection shChancellorSelection) {
-        chancellorID = shChancellorSelection.chancellorID;
+        chancellorID = shChancellorSelection.getChancellorID();
     }
 
     public void setDrawPile(PartialObservableDeck<SHPolicyCards> drawPile) {
@@ -67,21 +72,38 @@ public class SHGameState extends AbstractGameState {
         return drawPile;
     }
 
+    public void addKillChoice(SHKill shKillSelection, int currentPlayer) {
+        deceasedFellas.add(shKillSelection.victim);
+    }
     public void addPolicyChoice(SHPolicySelection shPolicySelection, int currentPlayer) {
         if(currentPlayer == leaderID)
         {
-            final2PolicyChoices.add(shPolicySelection.card.get(0));
-            final2PolicyChoices.add(shPolicySelection.card.get(1));
+            final2PolicyChoices = new ArrayList<>();
+            final2PolicyChoices.add(shPolicySelection.selectedCards.get(0));
+            final2PolicyChoices.add(shPolicySelection.selectedCards.get(1));
+
+            drawnPolicies = new ArrayList<>();
+            drawnPolicies.add(shPolicySelection.drawn3Cards.get(0));
+            drawnPolicies.add(shPolicySelection.drawn3Cards.get(1));
+            drawnPolicies.add(shPolicySelection.drawn3Cards.get(2));
+
+            discardPile = shPolicySelection.discardPile;
+
         }
         if(currentPlayer == chancellorID)
         {
-            finalPolicyChoice.add(shPolicySelection.card.get(0));
+            finalPolicyChoice = new ArrayList<>();
+            finalPolicyChoice.add(shPolicySelection.selectedCards.get(0));
+
+
+            discardPile = shPolicySelection.discardPile;
+
         }
     }
 
     public enum SHGamePhase implements IGamePhase {
 
-        LeaderSelectsChancellor,VotingOnLeader, VotingOnChancellor,LeaderSelectsPolicy,ChancellorSelectsPolicy
+        LeaderSelectsChancellor,VotingOnLeader, VotingOnChancellor,LeaderSelectsPolicy,ChancellorSelectsPolicy,LeaderKillsPlayer
     }
 
     List<PartialObservableDeck<SHPlayerCards>> playerHandCards = new ArrayList<>(10);
@@ -168,11 +190,24 @@ public class SHGameState extends AbstractGameState {
         copy.gameBoardValues = new ArrayList<>();
         copy.drawnPolicies = new ArrayList<>();
         copy.final2PolicyChoices = new ArrayList<>();
+        copy.deceasedFellas = new ArrayList<>();
         if (playerId == -1) {
+            copy.hitlerID = hitlerID;
             copy.leaderID = leaderID;
+            copy.chancellorID = chancellorID;
+            copy.previousLeader = previousLeader;
+            copy.previousChancellor = previousChancellor;
             copy.winners = winners;
             copy.drawPile = drawPile;
             copy.discardPile = discardPile;
+            copy.hasSomeoneBeenKilledThisRound = hasSomeoneBeenKilledThisRound;
+            copy.previousOccurrenceCountFalse = previousOccurrenceCountFalse;
+            copy.occurrenceCountTrue = occurrenceCountTrue;
+            copy.occurrenceCountFalse = occurrenceCountFalse;
+
+            for (int i = 0; i < deceasedFellas.size(); i++) {
+                copy.deceasedFellas.add(deceasedFellas.get(i));
+            }
 
             for (int i = 0; i < final2PolicyChoices.size(); i++) {
                 copy.final2PolicyChoices.add(final2PolicyChoices.get(i));
@@ -212,30 +247,43 @@ public class SHGameState extends AbstractGameState {
                 if (i == playerId) {
                     copy.drawPile = drawPile;
                     copy.leaderID = leaderID;
+                    copy.chancellorID = chancellorID;
+                    copy.previousLeader = previousLeader;
+                    copy.previousChancellor = previousChancellor;
                     copy.discardPile = discardPile;
-                    if(i == leaderID && getGamePhase() == SHGamePhase.LeaderSelectsPolicy){
-                        for (int j = 0; j < drawnPolicies.size(); j++) {
-                            copy.drawnPolicies.add(drawnPolicies.get(j));
-                        }
-                        for (int j = 0; j < final2PolicyChoices.size(); j++) {
-                            copy.final2PolicyChoices.add(final2PolicyChoices.get(j));
-                        }
-                        for(int j = 0; j < finalPolicyChoice.size(); j++){
-                            copy.finalPolicyChoice.add(finalPolicyChoice.get(j));
+                    copy.hasSomeoneBeenKilledThisRound = hasSomeoneBeenKilledThisRound;
+                    copy.previousOccurrenceCountFalse = previousOccurrenceCountFalse;
+                    copy.occurrenceCountTrue = occurrenceCountTrue;
+                    copy.occurrenceCountFalse = occurrenceCountFalse;
+                    if(i == hitlerID){copy.hitlerID = hitlerID;}
+
+                    if(i == leaderID){
+                        if(drawnPolicies != null) {
+                            for (int j = 0; j < drawnPolicies.size(); j++) {
+                                copy.drawnPolicies.add(drawnPolicies.get(j));
+                            }
                         }
                     }
-                    if(i == chancellorID  && getGamePhase() == SHGamePhase.ChancellorSelectsPolicy)
+                    if(i == chancellorID || i == leaderID)
                     {
-                        for (int j = 0; j < final2PolicyChoices.size(); j++) {
-                            copy.final2PolicyChoices.add(final2PolicyChoices.get(j));
+                        if(final2PolicyChoices != null) {
+                            for (int j = 0; j < final2PolicyChoices.size(); j++) {
+                                copy.final2PolicyChoices.add(final2PolicyChoices.get(j));
+                            }
                         }
-                        for(int j = 0; j < finalPolicyChoice.size(); j++){
-                            copy.finalPolicyChoice.add(finalPolicyChoice.get(j));
+                        if(finalPolicyChoice != null) {
+                            for (int j = 0; j < finalPolicyChoice.size(); j++) {
+                                copy.finalPolicyChoice.add(finalPolicyChoice.get(j));
+                            }
                         }
                     }
 
                     for(int j = 0; j < gameBoardValues.size(); j++){
                         copy.gameBoardValues.add(gameBoardValues.get(j));
+                    }
+
+                    for (int j = 0; j < deceasedFellas.size(); j++) {
+                        copy.deceasedFellas.add(deceasedFellas.get(j));
                     }
 
                     for(int j = 0; j < teamChoice.size(); j++){
@@ -288,32 +336,22 @@ public class SHGameState extends AbstractGameState {
             }
 
         }
-
-
-        //copy.teamChoice = new ArrayList<>(1);
-        //System.out.println(votingChoice);
-
-
-
-//        for (int i = 0; i < teamChoice.size(); i++) {
-//            copy.teamChoice.add(teamChoice.get(i));
-//        }
-        //NOT SURE IF NEEDEDD
-
-//        if (playerId == -1) {
-//            for (int i = 0; i < getNPlayers(); i++) {
-//
-//                copy.teamChoice.add(teamChoice.get(i));
-//            }}
-        
-
-        //System.out.println(copy.votingChoice.size() + "voting choice SIZE");
         return copy;
 
     }
 
     public void clearCardChoices() {
         for (int i = 0; i < getNPlayers(); i++) votingChoice.get(i).clear();
+    }
+
+    public void clearDiscardPile() {
+        //for (int i = getNPlayers()-1; i > 0; i--) discardPile.remove(i);
+        boolean[] visible = new boolean[17];
+        for (int i = 0; i < visible.length ; i++) {
+            visible[i] = false;
+        }
+
+        discardPile = new PartialObservableDeck<>("discard pile", 0, visible);
     }
 
 
@@ -332,10 +370,7 @@ public class SHGameState extends AbstractGameState {
 
     }
 
-    public void clearMissionChoices() {
-        for (int i = 0; i < missionVotingChoice.size(); i++) missionVotingChoice.get(i).clear();
 
-    }
 
     public List<List<SHVoting>> getvotingChoice() {
         return votingChoice;

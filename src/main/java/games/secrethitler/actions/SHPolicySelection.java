@@ -2,6 +2,7 @@ package games.secrethitler.actions;
 
 import core.AbstractGameState;
 import core.actions.AbstractAction;
+import core.components.PartialObservableDeck;
 import core.interfaces.IExtendedSequence;
 import games.secrethitler.SHGameState;
 import games.secrethitler.components.SHPlayerCards;
@@ -14,11 +15,15 @@ import java.util.Random;
 
 public class SHPolicySelection extends AbstractAction implements IExtendedSequence {
     public final int playerId;
-    public final ArrayList<SHPolicyCards> card;
+    public final ArrayList<SHPolicyCards> selectedCards;
+    public final ArrayList<SHPolicyCards> drawn3Cards;
+    public final PartialObservableDeck<SHPolicyCards> discardPile;
 
-    public SHPolicySelection(int playerId, ArrayList<SHPolicyCards> card) {
+    public SHPolicySelection(int playerId, ArrayList<SHPolicyCards> selectedCards,ArrayList<SHPolicyCards> drawn3Cards,PartialObservableDeck<SHPolicyCards> discardPile) {
         this.playerId = playerId;
-        this.card = card;
+        this.selectedCards = selectedCards;
+        this.drawn3Cards = drawn3Cards;
+        this.discardPile = discardPile;
     }
 
 //    public SHPolicySelection getHiddenChoice(int i) {
@@ -82,16 +87,16 @@ public class SHPolicySelection extends AbstractAction implements IExtendedSequen
         if (this == o) return true;
         if (!(o instanceof SHPolicySelection)) return false;
         SHPolicySelection that = (SHPolicySelection) o;
-        return playerId == that.playerId && card == that.card;
+        return playerId == that.playerId && selectedCards == that.selectedCards && drawn3Cards == that.drawn3Cards && discardPile == that.discardPile;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(playerId, card);
+        return Objects.hash(playerId, selectedCards,drawn3Cards,discardPile);
     }
 
     @Override
     public String getString(AbstractGameState gameState) {
-        return card + ".";
+        return selectedCards + ".";
     }
 }

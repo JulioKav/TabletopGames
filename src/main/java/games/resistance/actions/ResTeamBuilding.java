@@ -9,6 +9,7 @@ import utilities.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class ResTeamBuilding extends AbstractAction implements IExtendedSequence {
@@ -76,7 +77,7 @@ public class ResTeamBuilding extends AbstractAction implements IExtendedSequence
 
     @Override
     public int hashCode() {
-        return playerId + Arrays.hashCode(team);
+        return Objects.hash(playerId)  + Arrays.hashCode(team);
     }
 
     @Override

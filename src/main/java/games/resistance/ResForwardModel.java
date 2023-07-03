@@ -380,6 +380,7 @@ public class ResForwardModel extends StandardForwardModel {
             //PartialObservableDeck<SHPlayerCards> hand = resgs.playerHandCards.get(i);
             for (ResVoting cc: resgs.votingChoice.get(i)) {
                 allVotes.add(cc.cardType);
+                break;
             }
             //System.out.println("player :"+ i + "  |card");
         }

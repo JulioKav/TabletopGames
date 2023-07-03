@@ -920,7 +920,7 @@ public class Game {
      * and then run this class.
      */
     public static void main(String[] args) {
-        String gameType = Utils.getArg(args, "game", "SecretHitler");
+        String gameType = Utils.getArg(args, "game", "Resistance");
         boolean useGUI = Utils.getArg(args, "gui", false);
         int playerCount = Utils.getArg(args, "nPlayers", 5);
         int turnPause = Utils.getArg(args, "turnPause", 0);
@@ -935,21 +935,21 @@ public class Game {
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 ////        players.add(new RHEAPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
 ////        players.add(new MCTSPlayer());
 //          players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());

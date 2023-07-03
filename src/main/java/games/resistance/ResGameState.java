@@ -11,11 +11,10 @@ import games.resistance.actions.ResTeamBuilding;
 import games.resistance.actions.ResVoting;
 import games.resistance.components.ResGameBoard;
 import games.resistance.components.ResPlayerCards;
+import games.sushigo.SGGameState;
 //import games.resistance.components.SHGameBoard;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * <p>The game state encapsulates all game information. It is a data-only class, with game functionality present
@@ -27,6 +26,8 @@ import java.util.Random;
  */
 public class ResGameState extends AbstractGameState {
     // int[] gameBoard;
+
+
 
 
     int spyCounter = 0;
@@ -56,6 +57,46 @@ public class ResGameState extends AbstractGameState {
     //might not work as intended since casting component and also list and int[] usage/swapping
     public ResGameBoard gameBoard = new ResGameBoard(new int[nPlayers]);
 
+    @Override
+    public int hashCode() {
+        int result = super.hashCode() + 31 * Objects.hash(leaderID,playerHandCards,teamChoice, gameBoardValues,
+                missionVotingChoice, finalTeamChoice);
+
+        return result;
+    }
+
+    @Override
+    public boolean _equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ResGameState)) return false;
+        if (!super.equals(o)) return false;
+        ResGameState that = (ResGameState) o;
+        return
+                leaderID == that.leaderID &&
+                 Objects.equals(playerHandCards, that.playerHandCards) &&
+                Objects.equals(gameBoardValues, that.gameBoardValues) && Objects.equals(missionVotingChoice, that.missionVotingChoice) &&
+                //GET RID OF LIST<INT[]>
+                Objects.equals(teamChoice, that.teamChoice) &&
+                         Objects.equals(votingChoice, that.votingChoice) &&
+                Objects.equals(finalTeamChoice, that.finalTeamChoice);
+
+    }
+
+    @Override
+    public String toString() {
+        return
+                leaderID +"leaderID|"+
+                gameBoardValues.hashCode() + "gameBoardValues|" +
+                        teamChoice.hashCode() + "teamChoice|" +
+                        votingChoice.hashCode() + "votingChoice|" +
+                        playerHandCards.hashCode() + "|" +
+                        missionVotingChoice.hashCode() + "|" +
+                        finalTeamChoice.hashCode() + "|" +
+//                Arrays.hashCode(playerScore) + "|" +
+//                Arrays.hashCode(playedCardTypes) + "|" +
+//                Arrays.hashCode(playedCardTypesAllGame) + "|" +
+                super.hashCode() + "|";
+    }
 
 
 
@@ -152,11 +193,20 @@ public class ResGameState extends AbstractGameState {
                 copy.teamChoice.add(teamChoice.get(i));
             }
 
+            //ResGameState individualPlayerCopy = (ResGameState) copy();
             for (int i = 0; i < getNPlayers(); i++) {
+
                 copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
                 //MAYBE REMOVE THE IF STATEMENT
-                if(i < missionVotingChoice.size()){copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));}
+                copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
             }
+
+//            for (int i = 0; i < getNPlayers(); i++) {
+//                ResGameState individualPlayerCopy = (ResGameState) copy(i);
+//                copy.votingChoice.add(votingChoice.get(i));
+//                //MAYBE REMOVE THE IF STATEMENT
+//                copy.missionVotingChoice.add(missionVotingChoice.get(i));
+//            }
 //            copy.occurrenceCountTrue = Collections.frequency(gameBoardValues, true);
 //            copy.occurrenceCountFalse = Collections.frequency(gameBoardValues, false);
         }
@@ -177,49 +227,55 @@ public class ResGameState extends AbstractGameState {
                         copy.teamChoice.add(teamChoice.get(j));
                     }
 
-                    copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
+
                     copy.playerHandCards.add(playerHandCards.get(i));
                     copy.leaderID = leaderID;
                     //Checking MissionVote Eligibility
-                    copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
+                    //copy.votingChoice.add(votingChoice.get(0));
+                    //copy.missionVotingChoice.add(missionVotingChoice.get(0));
+
+
+                        //ResGameState individualPlayerCopy = (ResGameState) copy();
+                        copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
+                        //MAYBE REMOVE THE IF STATEMENT
+                        copy.missionVotingChoice.add(new ArrayList<>(missionVotingChoice.get(i)));
 
 //                    copy.occurrenceCountTrue = Collections.frequency(gameBoardValues, true);
 //                    copy.occurrenceCountFalse = Collections.frequency(gameBoardValues, false);
                 }
-                else{
-                //Allowing Spies To Know All Card Types
-                if(playerHandCards.get(playerId).get(playerHandCards.get(playerId).getSize()-1).cardType == ResPlayerCards.CardType.SPY && i != playerId){
-                    copy.playerHandCards.add(playerHandCards.get(i));
+                else {
+                    //Allowing Spies To Know All Card Types
+                    if (playerHandCards.get(playerId).get(playerHandCards.get(playerId).getSize() - 1).cardType == ResPlayerCards.CardType.SPY && i != playerId) {
+                        copy.playerHandCards.add(playerHandCards.get(i));
 
-                }
-
-                else if (i != playerId){
-                    copy.playerHandCards.add(createHiddenHands(i));
+                    } else if (i != playerId) {
+                        copy.playerHandCards.add(createHiddenHands(i));
 
 
+                    }
                 }
 
                 if (i != playerId){
-                    ArrayList<ResVoting> hiddenChoiceVote = new ArrayList<>();
-                    ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
-                    for (ResVoting c : votingChoice.get(i)) {
-                        //System.out.println(c.getHiddenChoice(this).cardIdx +"ResVOting CARD");
-                        hiddenChoiceVote.add( c.getHiddenChoice(i));
-                    }
+//                    ArrayList<ResVoting> hiddenChoiceVote = new ArrayList<>();
+//                    ArrayList<ResMissionVoting> hiddenChoiceMissionVote = new ArrayList<>();
+//                    for (ResVoting c : votingChoice.get(i)) {
+//                        //System.out.println(c.getHiddenChoice(this).cardIdx +"ResVOting CARD");
+//                        hiddenChoiceVote.add( c.getHiddenChoice(i));
+//                    }
+//
+//
+//                    //Checking MissionVote Eligibility
+//
+//                        //System.out.println(hiddenChoiceMissionVote + " INSIDE");
+//
+//                    for (ResMissionVoting c : missionVotingChoice.get(i)) {
+//
+//                        hiddenChoiceMissionVote.add(c.getHiddenChoice(i));
+//                    }
+//                    //System.out.println(hiddenChoiceMissionVote + " hiddenmissionvote");
+                    copy.votingChoice.add(new ArrayList<>());
+                    copy.missionVotingChoice.add(new ArrayList<>());}
 
-
-                    //Checking MissionVote Eligibility
-
-                        //System.out.println(hiddenChoiceMissionVote + " INSIDE");
-
-                    for (ResMissionVoting c : missionVotingChoice.get(i)) {
-
-                        hiddenChoiceMissionVote.add(c.getHiddenChoice(i));
-                    }
-                    //System.out.println(hiddenChoiceMissionVote + " hiddenmissionvote");
-                    copy.votingChoice.add(hiddenChoiceVote);
-                    copy.missionVotingChoice.add(hiddenChoiceMissionVote);}
-                }
             }
 
         }
@@ -293,10 +349,11 @@ public class ResGameState extends AbstractGameState {
         return teamChoice;
     }
     /**
-     * @param playerId - player observing the state.
+     * @param //playerId - player observing the state.
      * @return a score for the given player approximating how well they are doing (e.g. how close they are to winning
      * the game); a value between 0 and 1 is preferred, where 0 means the game was lost, and 1 means the game was won.
      */
+
     @Override
     protected double _getHeuristicScore(int playerId) {
         if (isNotTerminal()) {
@@ -322,17 +379,8 @@ public class ResGameState extends AbstractGameState {
         return playerHandCards;
     }
 
-    @Override
-    protected boolean _equals(Object o) {
-        // TODO: compare all variables in the state
-        return o instanceof ResGameState;
-    }
 
-    @Override
-    public int hashCode() {
-        // TODO: include the hash code of all variables
-        return super.hashCode();
-    }
+
 
     private PartialObservableDeck<ResPlayerCards> createHiddenHands(int i){
         PartialObservableDeck<ResPlayerCards> hiddenPlayerHandCards = new PartialObservableDeck<>("hiddenDeck",i);

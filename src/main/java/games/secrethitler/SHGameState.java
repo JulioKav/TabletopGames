@@ -6,15 +6,13 @@ import core.components.Component;
 import core.components.PartialObservableDeck;
 import core.interfaces.IGamePhase;
 import games.GameType;
-import games.secrethitler.actions.SHChancellorSelection;
-import games.secrethitler.actions.SHKill;
-import games.secrethitler.actions.SHPolicySelection;
-import games.secrethitler.actions.SHVoting;
+import games.secrethitler.actions.*;
 import games.secrethitler.components.SHGameBoard;
 import games.secrethitler.components.SHPlayerCards;
 import games.secrethitler.components.SHPolicyCards;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -52,16 +50,48 @@ public class SHGameState extends AbstractGameState {
     PartialObservableDeck<SHPolicyCards> discardPile;
 
     List<List<SHPolicySelection>> missionVotingChoice;
+
+    HashMap<Integer,List<Integer>> knownIdentities;
     List<int[]> teamChoice = new ArrayList<>();
     IGamePhase previousGamePhase = null;
 
     List<Integer> deceasedFellas = new ArrayList<>();
     int chancellorID;
+    int investigatingID;
 
     ArrayList<SHPolicyCards> finalPolicyChoice;
 
     public void addChancellorChoice(SHChancellorSelection shChancellorSelection) {
         chancellorID = shChancellorSelection.getChancellorID();
+    }
+
+    ////////////////////////////PASSING SHGAMESTTE COULD BE ERROR
+    //////////////////////////////////////////
+    //////////////////////////////////////////////
+    /////
+    ////////
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    ///
+    public void addInvestigatingChoice(SHInvestigateIdentity SHInvestigateIdentity,SHGameState shgs) {
+        investigatingID = SHInvestigateIdentity.getinvestigatingID();
+        int currentPlayer = SHInvestigateIdentity.getCurrentPlayer(shgs);
+        List<Integer> currentPlayerList = new ArrayList<>();
+        currentPlayerList.add(investigatingID);
+
+        if(knownIdentities.containsKey(currentPlayer))
+        {
+            List<Integer> newKnownIdentities = knownIdentities.get(currentPlayer);
+            newKnownIdentities.add(investigatingID);
+            knownIdentities.put(currentPlayer,newKnownIdentities);
+        }
+        else {knownIdentities.put(currentPlayer,currentPlayerList);}
     }
 
     public void setDrawPile(PartialObservableDeck<SHPolicyCards> drawPile) {
@@ -103,7 +133,7 @@ public class SHGameState extends AbstractGameState {
 
     public enum SHGamePhase implements IGamePhase {
 
-        LeaderSelectsChancellor,VotingOnLeader, VotingOnChancellor,LeaderSelectsPolicy,ChancellorSelectsPolicy,LeaderKillsPlayer
+        LeaderSelectsChancellor,VotingOnLeader, VotingOnChancellor,LeaderSelectsPolicy,ChancellorSelectsPolicy,LeaderKillsPlayer,LeaderInvestigatesPlayer
     }
 
     List<PartialObservableDeck<SHPlayerCards>> playerHandCards = new ArrayList<>(10);
@@ -179,7 +209,7 @@ public class SHGameState extends AbstractGameState {
         copy.gameBoard = gameBoard;
         copy.factions = factions;
 
-
+        copy.knownIdentities = new HashMap<>();
         copy.previousGamePhase = previousGamePhase;
         copy.voteSuccess = voteSuccess;
         copy.teamChoice = new ArrayList<>();
@@ -192,6 +222,7 @@ public class SHGameState extends AbstractGameState {
         copy.final2PolicyChoices = new ArrayList<>();
         copy.deceasedFellas = new ArrayList<>();
         if (playerId == -1) {
+            copy.investigatingID = investigatingID;
             copy.hitlerID = hitlerID;
             copy.leaderID = leaderID;
             copy.chancellorID = chancellorID;
@@ -207,6 +238,10 @@ public class SHGameState extends AbstractGameState {
 
             for (int i = 0; i < deceasedFellas.size(); i++) {
                 copy.deceasedFellas.add(deceasedFellas.get(i));
+            }
+//MIGHT BE WRONG
+            for (int i = 0; i < getNPlayers(); i++) {
+                    copy.knownIdentities.put(i,knownIdentities.get(i));
             }
 
             for (int i = 0; i < final2PolicyChoices.size(); i++) {
@@ -278,6 +313,11 @@ public class SHGameState extends AbstractGameState {
                         }
                     }
 
+                    for (int j = 0; j < getNPlayers(); j++) {
+                        if(playerId == j)
+                        {copy.knownIdentities.put(j,knownIdentities.get(j));}
+                    }
+
                     for(int j = 0; j < gameBoardValues.size(); j++){
                         copy.gameBoardValues.add(gameBoardValues.get(j));
                     }
@@ -307,7 +347,9 @@ public class SHGameState extends AbstractGameState {
                 }
 
                 else if (i != playerId){
-                    copy.playerHandCards.add(createHiddenHands(i));
+                    if(knownIdentities.get(playerId).contains(i)){copy.playerHandCards.add(playerHandCards.get(i));}
+                    else{copy.playerHandCards.add(createHiddenHands(i));}
+
 
 
                 }

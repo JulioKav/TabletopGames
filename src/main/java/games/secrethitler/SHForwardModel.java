@@ -60,6 +60,10 @@ public class SHForwardModel extends StandardForwardModel {
         shgs.previousChancellor = 66;
         shgs.previousLeader = 67;
         shgs.finalPolicyChoice = new ArrayList<>();
+        shgs.knownIdentities = new HashMap<>();
+        for (int i = 0; i < shgs.getNPlayers(); i++) {
+            shgs.knownIdentities.put(i,new ArrayList<>());
+        }
         if(shgs.gameBoard == null)
         {throw new AssertionError("GameBoard shouldn't be null");};
         shgs.factions = resp.getFactions(firstState.getNPlayers());
@@ -277,6 +281,20 @@ public class SHForwardModel extends StandardForwardModel {
                 else {actions.add(new SHDeceased(currentPlayer));}
             }
         }
+        if(shgs.getGamePhase()== LeaderInvestigatesPlayer) {
+            if (currentPlayer == shgs.leaderID) {
+                for (int i = 0; i < shgs.getNPlayers(); i++) {
+                    if ( i != shgs.leaderID && !shgs.deceasedFellas.contains(i)) {
+                        actions.add(new SHInvestigateIdentity(currentPlayer, i));
+                    }
+                }
+            }
+
+            //Every Other Player Waits
+            else{
+                actions.add(new SHWait(currentPlayer));
+            }
+        }
 
 
 
@@ -475,6 +493,18 @@ public class SHForwardModel extends StandardForwardModel {
 
                     shgs.setGamePhase(LeaderKillsPlayer);
                 }
+                if(shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && shgs.occurrenceCountFalse == 2 && (shgs.getNPlayers() == 7 || shgs.getNPlayers() == 8))
+                {
+                    shgs.previousOccurrenceCountFalse = shgs.occurrenceCountFalse;
+
+                    shgs.setGamePhase(LeaderInvestigatesPlayer);
+                }
+                if(shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && (shgs.occurrenceCountFalse == 1 || shgs.occurrenceCountFalse == 2) && (shgs.getNPlayers() == 9 || shgs.getNPlayers() == 10))
+                {
+                    shgs.previousOccurrenceCountFalse = shgs.occurrenceCountFalse;
+
+                    shgs.setGamePhase(LeaderInvestigatesPlayer);
+                }
                 else {
                     if (shgs.getGameStatus() == CoreConstants.GameResult.GAME_ONGOING) {
                         shgs.previousChancellor = shgs.chancellorID;
@@ -504,6 +534,33 @@ public class SHForwardModel extends StandardForwardModel {
                 shgs.previousLeader = shgs.leaderID;
                 changeLeader(shgs);
                 shgs.setGamePhase(VotingOnLeader);
+            }
+
+            else{shgs.previousGamePhase = shgs.getGamePhase();}
+            haveBeenInLoop = true;
+        }
+
+        if (shgs.getGamePhase() == LeaderInvestigatesPlayer && haveBeenInLoop == false) {
+
+            int turn = shgs.getTurnCounter();
+            System.out.println();
+            if ((turn+1) % shgs.getNPlayers() == 0 && shgs.previousGamePhase == shgs.getGamePhase())
+            {
+                revealCards(shgs);
+                shgs.previousChancellor = shgs.chancellorID;
+                shgs.previousLeader = shgs.leaderID;
+                changeLeader(shgs);
+                shgs.setGamePhase(VotingOnLeader);
+                System.out.println();
+                SHGameState test = (SHGameState) shgs.copy(8);
+
+                System.out.println();
+                SHGameState test1 = (SHGameState) shgs.copy(2);
+                SHGameState test2 = (SHGameState) shgs.copy(3);
+                SHGameState test3 = (SHGameState) shgs.copy(4);
+                SHGameState test4 = (SHGameState) shgs.copy(5);
+                System.out.println();
+
             }
 
             else{shgs.previousGamePhase = shgs.getGamePhase();}

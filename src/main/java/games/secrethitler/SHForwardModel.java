@@ -52,9 +52,11 @@ public class SHForwardModel extends StandardForwardModel {
         SHParameters resp = (SHParameters)firstState.getGameParameters();
         System.out.println(firstState.getNPlayers() +"firststate");
         shgs.votingChoice = new ArrayList<>(firstState.getNPlayers());
+        shgs.vetoChoice = new ArrayList<>(2);
         shgs.missionVotingChoice = new ArrayList<>(firstState.getNPlayers());
         shgs.gameBoardValues = new ArrayList<>(11);
         shgs.failedVoteCounter = 0;
+        shgs.peekedCards = new ArrayList<>();
         shgs.playerHandCards = new ArrayList<>(firstState.getNPlayers());
         shgs.gameBoard = resp.getPlayerBoard(firstState.getNPlayers());
         shgs.previousChancellor = 66;
@@ -179,7 +181,7 @@ public class SHForwardModel extends StandardForwardModel {
         List<AbstractAction> actions = new ArrayList<>();
         int currentPlayer = shgs.getCurrentPlayer();
 
-        Deck<SHPlayerCards> currentPlayerHand = shgs.getPlayerHandCards().get(currentPlayer);
+        //Deck<SHPlayerCards> currentPlayerHand = shgs.getPlayerHandCards().get(currentPlayer);
 
         if (shgs.getGamePhase() == VotingOnLeader || shgs.getGamePhase() == VotingOnChancellor)
         {
@@ -190,6 +192,18 @@ public class SHForwardModel extends StandardForwardModel {
             else {actions.add(new SHDeceased(currentPlayer));}
         }
 
+        if(shgs.getGamePhase()== Veto) {
+            if (currentPlayer == shgs.leaderID || currentPlayer == shgs.chancellorID) {
+                    actions.add(new SHVeto(currentPlayer, SHPlayerCards.CardType.Yes));
+                    actions.add(new SHVeto(currentPlayer, SHPlayerCards.CardType.No));
+            }
+
+            //Every Other Player Waits
+            else{
+                if(!shgs.deceasedFellas.contains(currentPlayer)) {actions.add(new SHWait(currentPlayer));}
+                else {actions.add(new SHDeceased(currentPlayer));}
+            }
+        }
 
         if(shgs.getGamePhase()== LeaderSelectsChancellor) {
             if (currentPlayer == shgs.leaderID) {
@@ -199,6 +213,20 @@ public class SHForwardModel extends StandardForwardModel {
                             actions.add(new SHChancellorSelection(currentPlayer, i));
                         }
                     //}
+                }
+            }
+
+            //Every Other Player Waits
+            else{
+                if(!shgs.deceasedFellas.contains(currentPlayer)) {actions.add(new SHWait(currentPlayer));}
+                else {actions.add(new SHDeceased(currentPlayer));}
+            }
+        }
+
+        if(shgs.getGamePhase() == LeaderSelectsLeader) {
+            if (currentPlayer == shgs.leaderID) {
+                for (int i = 0; i < shgs.getNPlayers(); i++) {
+                    actions.add(new SHLeaderSelectsLeader(currentPlayer, i));
                 }
             }
 
@@ -281,6 +309,19 @@ public class SHForwardModel extends StandardForwardModel {
                 else {actions.add(new SHDeceased(currentPlayer));}
             }
         }
+        if(shgs.getGamePhase() == LeaderPeeksTop3Cards) {
+            if (currentPlayer == shgs.leaderID) {
+                for (int i = 0; i < shgs.getNPlayers(); i++) {
+                    actions.add(new SHLeaderPeeks(currentPlayer, shgs.drawPile.peek(0,3)));
+                }
+            }
+
+            //Every Other Player Waits
+            else{
+                if(!shgs.deceasedFellas.contains(currentPlayer)) {actions.add(new SHWait(currentPlayer));}
+                else {actions.add(new SHDeceased(currentPlayer));}
+            }
+        }
         if(shgs.getGamePhase()== LeaderInvestigatesPlayer) {
             if (currentPlayer == shgs.leaderID) {
                 for (int i = 0; i < shgs.getNPlayers(); i++) {
@@ -328,13 +369,14 @@ public class SHForwardModel extends StandardForwardModel {
                     if(shgs.occurrenceCountTrue == 5) {
                         liberalWin(shgs);
                     }
-                    if(shgs.occurrenceCountFalse == 6) {
+                    else if(shgs.occurrenceCountFalse == 6) {
                         fascistWin(shgs);
                     }
                     else {
                         changeLeader(shgs);
                         shgs.clearVoteChoices();
                         shgs.setGamePhase(VotingOnLeader);
+                        endRound(shgs);
                         System.out.println("Failed Vote Caused Policy To Be Flipped");
                     }
                 }
@@ -396,7 +438,7 @@ public class SHForwardModel extends StandardForwardModel {
                     if(shgs.occurrenceCountTrue == 5) {
                         liberalWin(shgs);
                     }
-                    if(shgs.occurrenceCountFalse == 6) {
+                    else if(shgs.occurrenceCountFalse == 6) {
                         fascistWin(shgs);
                     }
                     else {
@@ -404,6 +446,7 @@ public class SHForwardModel extends StandardForwardModel {
                         changeLeader(shgs);
                         shgs.clearVoteChoices();
                         shgs.setGamePhase(VotingOnLeader);
+                        endRound(shgs);
                         System.out.println("Failed Vote Caused Policy To Be Flipped");
                     }
                 }
@@ -445,67 +488,100 @@ public class SHForwardModel extends StandardForwardModel {
             //if(shgs.finalTeamChoice.size() == 0) {throw new AssertionError("Final Team Choice Size is Zero");}
             if ((turn + 1) % shgs.getNPlayers() == 0 && shgs.previousGamePhase == shgs.getGamePhase()) {
 
+                if(shgs.failedVoteCounter == 3){
+                    drawSingleCardAndPlay(shgs);
+                    shgs.occurrenceCountTrue = Collections.frequency(shgs.gameBoardValues, true);
+                    shgs.occurrenceCountFalse = Collections.frequency(shgs.gameBoardValues, false);
+                    if(shgs.occurrenceCountTrue == 5) {
+                        liberalWin(shgs);
+                        System.out.println("Failed Veto Votes Caused Policy To Be Flipped For Liberal Win");
+                    }
+                    else if(shgs.occurrenceCountFalse == 6) {
+                        fascistWin(shgs);
+                        System.out.println("Failed Veto Votes Caused Policy To Be Flipped For Fascist Win");
+                    }
+                    else {
+                        shgs.previousLeader = shgs.leaderID;
+                        changeLeader(shgs);
+                        shgs.clearVoteChoices();
+                        shgs.setGamePhase(VotingOnLeader);
+                        endRound(shgs);
+                        System.out.println("Failed Veto Votes Caused Policy To Be Flipped");
+                    }
+                }
+
+                shgs.occurrenceCountFalse = Collections.frequency(shgs.gameBoardValues, false);
+                shgs.vetoVoteFalse = Collections.frequency(shgs.vetoChoice, SHPolicyCards.CardType.Fascist);
+                if (shgs.occurrenceCountFalse == 5 && shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse) {
+                    shgs.previousOccurrenceCountFalse = shgs.occurrenceCountFalse;
+                    shgs.setGamePhase(Veto);
+
+                }
+                else if (shgs.vetoVoteFalse == 2) {shgs.setGamePhase(Veto); shgs.failedVoteCounter += 1;}
+                else{
                 revealCards(shgs);
                 shgs.occurrenceCountTrue = Collections.frequency(shgs.gameBoardValues, true);
                 shgs.occurrenceCountFalse = Collections.frequency(shgs.gameBoardValues, false);
 
 
 //                // Check if the round is over
-                    //              if (isRoundOver(shgs)) {
-                    // It is! Process end of round rules.
-                    shgs.clearCardChoices();
-                    //shgs.clearMissionChoices();
-                    shgs.clearVoteChoices();
-                    shgs.clearTeamChoices();
+                //              if (isRoundOver(shgs)) {
+                // It is! Process end of round rules.
+                shgs.clearCardChoices();
+                //shgs.clearMissionChoices();
+                shgs.clearVoteChoices();
+                shgs.clearTeamChoices();
 
-                    endRound(shgs);
-                    roundEnded = true;
-                    _endRound(shgs);
+                endRound(shgs);
+                roundEnded = true;
+                _endRound(shgs);
 
 
-                    // Check if the game is over
+                // Check if the game is over
 
-                    System.out.println("Size of gameboard values: " + shgs.gameBoardValues.size());
-                    System.out.println("Occurrence True : " + shgs.occurrenceCountTrue);
-                    System.out.println("Occurrence False : " + shgs.occurrenceCountFalse);
+                System.out.println("Size of gameboard values: " + shgs.gameBoardValues.size());
+                System.out.println("Occurrence True : " + shgs.occurrenceCountTrue);
+                System.out.println("Occurrence False : " + shgs.occurrenceCountFalse);
+                if (shgs.occurrenceCountTrue == 5) {
+
+                    liberalWin(shgs);
                     if (shgs.occurrenceCountTrue == 5) {
-
-                        liberalWin(shgs);
-                        if (shgs.occurrenceCountTrue == 5) {
-                            System.out.println("GAME ENDED BY SUCCESSFUL MISSIONS");
-                        }
-                        ////MAYBE GET RID OF RETURNS
-                        //return;
+                        System.out.println("GAME ENDED BY SUCCESSFUL MISSIONS");
                     }
+                    ////MAYBE GET RID OF RETURNS
+                    //return;
+                }
 
+                if (shgs.occurrenceCountFalse == 6) {
+                    fascistWin(shgs);
                     if (shgs.occurrenceCountFalse == 6) {
-                        fascistWin(shgs);
-                        if (shgs.occurrenceCountFalse == 6) {
-                            System.out.println("GAME ENDED BY FAILED MISSIONS");
-                        }
-                        //return;
-
+                        System.out.println("GAME ENDED BY FAILED MISSIONS");
                     }
+                    //return;
 
-                if(shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && (shgs.occurrenceCountFalse == 4 || shgs.occurrenceCountFalse == 5))
-                {
+                }
+
+                if (shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && (shgs.occurrenceCountFalse == 4 || shgs.occurrenceCountFalse == 5)) {
                     shgs.previousOccurrenceCountFalse = shgs.occurrenceCountFalse;
 
                     shgs.setGamePhase(LeaderKillsPlayer);
-                }
-                if(shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && shgs.occurrenceCountFalse == 2 && (shgs.getNPlayers() == 7 || shgs.getNPlayers() == 8))
-                {
+                } else if (shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && shgs.occurrenceCountFalse == 3 && shgs.getNPlayers() >= 7) {
+                    shgs.previousOccurrenceCountFalse = shgs.occurrenceCountFalse;
+
+                    shgs.setGamePhase(LeaderSelectsLeader);
+                } else if (shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && shgs.occurrenceCountFalse == 2 && (shgs.getNPlayers() == 7 || shgs.getNPlayers() == 8)) {
                     shgs.previousOccurrenceCountFalse = shgs.occurrenceCountFalse;
 
                     shgs.setGamePhase(LeaderInvestigatesPlayer);
-                }
-                if(shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && (shgs.occurrenceCountFalse == 1 || shgs.occurrenceCountFalse == 2) && (shgs.getNPlayers() == 9 || shgs.getNPlayers() == 10))
-                {
+                } else if (shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && (shgs.occurrenceCountFalse == 1 || shgs.occurrenceCountFalse == 2) && (shgs.getNPlayers() == 9 || shgs.getNPlayers() == 10)) {
                     shgs.previousOccurrenceCountFalse = shgs.occurrenceCountFalse;
 
                     shgs.setGamePhase(LeaderInvestigatesPlayer);
-                }
-                else {
+                } else if (shgs.previousOccurrenceCountFalse != shgs.occurrenceCountFalse && (shgs.occurrenceCountFalse == 3) && (shgs.getNPlayers() == 5 || shgs.getNPlayers() == 6)) {
+                    shgs.previousOccurrenceCountFalse = shgs.occurrenceCountFalse;
+
+                    shgs.setGamePhase(LeaderPeeksTop3Cards);
+                } else {
                     if (shgs.getGameStatus() == CoreConstants.GameResult.GAME_ONGOING) {
                         shgs.previousChancellor = shgs.chancellorID;
                         shgs.previousLeader = shgs.leaderID;
@@ -516,14 +592,14 @@ public class SHForwardModel extends StandardForwardModel {
                 }
 
 
-
+            }
 
             }
 
             else{shgs.previousGamePhase = shgs.getGamePhase();}
             haveBeenInLoop = true;
         }
-
+        //haveBeenInLoop = false;
         if (shgs.getGamePhase() == LeaderKillsPlayer && haveBeenInLoop == false) {
 
             int turn = shgs.getTurnCounter();
@@ -534,6 +610,46 @@ public class SHForwardModel extends StandardForwardModel {
                 shgs.previousLeader = shgs.leaderID;
                 changeLeader(shgs);
                 shgs.setGamePhase(VotingOnLeader);
+            }
+
+            else{shgs.previousGamePhase = shgs.getGamePhase();}
+            haveBeenInLoop = true;
+        }
+        if (shgs.getGamePhase() == LeaderSelectsLeader && haveBeenInLoop == false) {
+
+            int turn = shgs.getTurnCounter();
+            if ((turn+1) % shgs.getNPlayers() == 0 && shgs.previousGamePhase == shgs.getGamePhase())
+            {
+                revealCards(shgs);
+                shgs.previousChancellor = shgs.chancellorID;
+                shgs.previousLeader = shgs.leaderID;
+                shgs.setGamePhase(LeaderSelectsChancellor);
+            }
+
+            else{shgs.previousGamePhase = shgs.getGamePhase();}
+            haveBeenInLoop = true;
+        }
+        if (shgs.getGamePhase() == LeaderPeeksTop3Cards && haveBeenInLoop == false) {
+
+            int turn = shgs.getTurnCounter();
+            if ((turn+1) % shgs.getNPlayers() == 0 && shgs.previousGamePhase == shgs.getGamePhase())
+            {
+                revealCards(shgs);
+                shgs.previousChancellor = shgs.chancellorID;
+                shgs.previousLeader = shgs.leaderID;
+                shgs.setGamePhase(VotingOnLeader);
+            }
+
+            else{shgs.previousGamePhase = shgs.getGamePhase();}
+            haveBeenInLoop = true;
+        }
+        if (shgs.getGamePhase() == Veto && haveBeenInLoop == false) {
+
+            int turn = shgs.getTurnCounter();
+            if ((turn+1) % shgs.getNPlayers() == 0 && shgs.previousGamePhase == shgs.getGamePhase())
+            {
+                revealCards(shgs);
+                shgs.setGamePhase(LeaderSelectsPolicy);
             }
 
             else{shgs.previousGamePhase = shgs.getGamePhase();}
@@ -551,15 +667,6 @@ public class SHForwardModel extends StandardForwardModel {
                 shgs.previousLeader = shgs.leaderID;
                 changeLeader(shgs);
                 shgs.setGamePhase(VotingOnLeader);
-                System.out.println();
-                SHGameState test = (SHGameState) shgs.copy(8);
-
-                System.out.println();
-                SHGameState test1 = (SHGameState) shgs.copy(2);
-                SHGameState test2 = (SHGameState) shgs.copy(3);
-                SHGameState test3 = (SHGameState) shgs.copy(4);
-                SHGameState test4 = (SHGameState) shgs.copy(5);
-                System.out.println();
 
             }
 

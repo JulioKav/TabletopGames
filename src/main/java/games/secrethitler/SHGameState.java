@@ -43,8 +43,13 @@ public class SHGameState extends AbstractGameState {
     int failedVoteCounter = 0;
     int occurrenceCountTrue = 0;
     int occurrenceCountFalse = 0;
+
+    int vetoVoteFalse = 0;
     int previousOccurrenceCountFalse = 0; // Used for checking If you've killed someone at that fascist policy stage/level
     List<List<SHVoting>> votingChoice;
+    List<List<SHVeto>> vetoChoice;
+    List<SHPolicyCards> peekedCards;
+    int knowerOfPeekedCards = 999;
 
     PartialObservableDeck<SHPolicyCards> drawPile;
     PartialObservableDeck<SHPolicyCards> discardPile;
@@ -59,10 +64,20 @@ public class SHGameState extends AbstractGameState {
     int chancellorID;
     int investigatingID;
 
+
     ArrayList<SHPolicyCards> finalPolicyChoice;
 
+    public void addPeekedCards(SHLeaderPeeks shLeaderPeeks) {
+        peekedCards = shLeaderPeeks.cardsPeeked;
+        knowerOfPeekedCards = shLeaderPeeks.playerId;
+    }
+    public void addChosenLeaderChoice(SHLeaderSelectsLeader shLeaderSelectsLeader) {
+        leaderID = shLeaderSelectsLeader.getchosenLeaderID();
+
+    }
     public void addChancellorChoice(SHChancellorSelection shChancellorSelection) {
         chancellorID = shChancellorSelection.getChancellorID();
+
     }
 
     ////////////////////////////PASSING SHGAMESTTE COULD BE ERROR
@@ -133,7 +148,9 @@ public class SHGameState extends AbstractGameState {
 
     public enum SHGamePhase implements IGamePhase {
 
-        LeaderSelectsChancellor,VotingOnLeader, VotingOnChancellor,LeaderSelectsPolicy,ChancellorSelectsPolicy,LeaderKillsPlayer,LeaderInvestigatesPlayer
+        LeaderSelectsChancellor,VotingOnLeader, VotingOnChancellor,
+        LeaderSelectsPolicy,ChancellorSelectsPolicy,LeaderKillsPlayer,
+        LeaderInvestigatesPlayer,LeaderSelectsLeader,LeaderPeeksTop3Cards, Veto
     }
 
     List<PartialObservableDeck<SHPlayerCards>> playerHandCards = new ArrayList<>(10);
@@ -221,6 +238,8 @@ public class SHGameState extends AbstractGameState {
         copy.drawnPolicies = new ArrayList<>();
         copy.final2PolicyChoices = new ArrayList<>();
         copy.deceasedFellas = new ArrayList<>();
+        copy.peekedCards = new ArrayList<>();
+        copy.vetoChoice = new ArrayList<>();
         if (playerId == -1) {
             copy.investigatingID = investigatingID;
             copy.hitlerID = hitlerID;
@@ -235,9 +254,13 @@ public class SHGameState extends AbstractGameState {
             copy.previousOccurrenceCountFalse = previousOccurrenceCountFalse;
             copy.occurrenceCountTrue = occurrenceCountTrue;
             copy.occurrenceCountFalse = occurrenceCountFalse;
-
+            copy.vetoVoteFalse = vetoVoteFalse;
+            copy.knowerOfPeekedCards = knowerOfPeekedCards;
             for (int i = 0; i < deceasedFellas.size(); i++) {
                 copy.deceasedFellas.add(deceasedFellas.get(i));
+            }
+            for (int i = 0; i < peekedCards.size(); i++) {
+                copy.peekedCards.add(peekedCards.get(i));
             }
 //MIGHT BE WRONG
             for (int i = 0; i < getNPlayers(); i++) {
@@ -265,6 +288,9 @@ public class SHGameState extends AbstractGameState {
             for(int i = 0; i < teamChoice.size(); i++){
                 copy.teamChoice.add(teamChoice.get(i));
             }
+            for (int j = 0; j < vetoChoice.size(); j++) {
+                copy.vetoChoice.add(vetoChoice.get(j));
+            }
 
             for (int i = 0; i < getNPlayers(); i++) {
                 copy.votingChoice.add(new ArrayList<>(votingChoice.get(i)));
@@ -290,8 +316,17 @@ public class SHGameState extends AbstractGameState {
                     copy.previousOccurrenceCountFalse = previousOccurrenceCountFalse;
                     copy.occurrenceCountTrue = occurrenceCountTrue;
                     copy.occurrenceCountFalse = occurrenceCountFalse;
+                    copy.knowerOfPeekedCards = knowerOfPeekedCards;
+                    copy.vetoVoteFalse = vetoVoteFalse;
                     if(i == hitlerID){copy.hitlerID = hitlerID;}
 
+                    if(knowerOfPeekedCards < 11){
+                        if(i== knowerOfPeekedCards){
+                            for (int j = 0; j < peekedCards.size(); j++) {
+                                copy.peekedCards.add(peekedCards.get(j));
+                            }
+                        }
+                    }
                     if(i == leaderID){
                         if(drawnPolicies != null) {
                             for (int j = 0; j < drawnPolicies.size(); j++) {
@@ -326,6 +361,10 @@ public class SHGameState extends AbstractGameState {
                         copy.deceasedFellas.add(deceasedFellas.get(j));
                     }
 
+                    for (int j = 0; j < vetoChoice.size(); j++) {
+                        copy.vetoChoice.add(vetoChoice.get(j));
+                    }
+
                     for(int j = 0; j < teamChoice.size(); j++){
                         copy.teamChoice.add(teamChoice.get(j));
                     }
@@ -340,9 +379,13 @@ public class SHGameState extends AbstractGameState {
 //                    copy.occurrenceCountFalse = Collections.frequency(gameBoardValues, false);
                 }
                 else{
-                //Allowing Spies To Know All Card Types
+                //Allowing Spies To Know All Card Types with Hitler Logic Done
                 if(playerHandCards.get(playerId).get(playerHandCards.get(playerId).getSize()-1).cardType == SHPlayerCards.CardType.Fascist && i != playerId){
-                    copy.playerHandCards.add(playerHandCards.get(i));
+                    if(getNPlayers() < 7 && playerId == hitlerID){copy.playerHandCards.add(playerHandCards.get(i));}
+                    else if (getNPlayers() < 7) {copy.playerHandCards.add(playerHandCards.get(i));}
+                    if (getNPlayers() > 6 && playerId != hitlerID){copy.playerHandCards.add(playerHandCards.get(i));}
+
+                    copy.hitlerID = hitlerID;
 
                 }
 
@@ -399,6 +442,9 @@ public class SHGameState extends AbstractGameState {
 
     public void addCardChoice(SHVoting SHVoting, int playerId) {
         votingChoice.get(playerId).add(SHVoting);
+    }
+    public void addVetoChoice(SHVeto shVeto, int playerId) {
+        vetoChoice.get(playerId).add(shVeto);
     }
 
     public void addMissionChoice(SHPolicySelection SHPolicySelection, int playerId) {

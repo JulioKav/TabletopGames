@@ -76,6 +76,11 @@ public class SHForwardModel extends StandardForwardModel {
         PartialObservableDeck<SHPolicyCards> drawPile = new PartialObservableDeck<>("Draw Pile", firstState.getNPlayers());
         shgs.setDrawPile(drawPile);
 
+        boolean[] visible = new boolean[17];
+        for (int i = 0; i < visible.length ; i++) {
+            visible[i] = false;
+        }
+        shgs.discardPile = new PartialObservableDeck<>("discard pile", -1, visible);
         // Add 11 fascist policies
         for (int i = 0; i < 11; i++) {
             SHPolicyCards card = new SHPolicyCards(SHPolicyCards.CardType.Fascist);
@@ -96,8 +101,6 @@ public class SHForwardModel extends StandardForwardModel {
         for (int i = 0; i < firstState.getNPlayers(); i++) {
             shgs.votingChoice.add(new ArrayList<>());
             shgs.missionVotingChoice.add(new ArrayList<>());
-            boolean[] visible = new boolean[firstState.getNPlayers()];
-            visible[i] = false;
             PartialObservableDeck<SHPlayerCards> playerCards = new PartialObservableDeck<>("Player Cards", visible);
 
 
@@ -247,6 +250,7 @@ public class SHForwardModel extends StandardForwardModel {
                 {
                     shuffleDiscardsIntoDrawPile(shgs);
                 }
+
                 SHPolicyCards card = shgs.drawPile.draw();
                 shgs.drawnPolicies.add(card);
                 SHPolicyCards card1 = shgs.drawPile.draw();
@@ -716,11 +720,12 @@ public class SHForwardModel extends StandardForwardModel {
                     visible[i] = false;
                 }
 
-                shgs.discardPile = new PartialObservableDeck<>("discard pile", 0, visible);
+                shgs.discardPile = new PartialObservableDeck<>("discard pile", -1, visible);
             }
             if(!shgs.final2PolicyChoices.contains(shgs.drawnPolicies.get(0))){shgs.discardPile.add(shgs.drawnPolicies.get(0));}
             if(!shgs.final2PolicyChoices.contains(shgs.drawnPolicies.get(1))){shgs.discardPile.add(shgs.drawnPolicies.get(1));}
             if(!shgs.final2PolicyChoices.contains(shgs.drawnPolicies.get(2))){shgs.discardPile.add(shgs.drawnPolicies.get(2));}
+            System.out.println(shgs.discardPile + "discard pile");
 
         }
 
@@ -792,8 +797,7 @@ public class SHForwardModel extends StandardForwardModel {
         if(shgs.drawPile.getSize() < 1){shuffleDiscardsIntoDrawPile(shgs);}
         SHPolicyCards card = shgs.drawPile.draw();
         if(card.cardType == SHPolicyCards.CardType.Liberal){shgs.gameBoardValues.add(true);}
-        else {shgs.gameBoardValues.add(true);}
-
+        else {shgs.gameBoardValues.add(false);}
     }
 
     public void shuffleDiscardsIntoDrawPile(SHGameState shgs) {

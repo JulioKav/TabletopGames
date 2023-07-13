@@ -931,12 +931,12 @@ public class Game {
         /* Set up players for the game */
         ArrayList<AbstractPlayer> players = new ArrayList<>(playerCount);
 
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
+//        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
@@ -945,12 +945,12 @@ public class Game {
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 ////        players.add(new RHEAPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
 //        players.add(new MCTSPlayer());
 //        players.add(new MCTSPlayer());
 //        players.add(new MCTSPlayer());

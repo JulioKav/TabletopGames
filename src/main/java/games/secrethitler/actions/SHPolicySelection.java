@@ -87,7 +87,7 @@ public class SHPolicySelection extends AbstractAction implements IExtendedSequen
         if (this == o) return true;
         if (!(o instanceof SHPolicySelection)) return false;
         SHPolicySelection that = (SHPolicySelection) o;
-        return playerId == that.playerId && selectedCards == that.selectedCards && drawn3Cards == that.drawn3Cards && discardPile == that.discardPile;
+        return playerId == that.playerId && selectedCards == that.selectedCards && drawn3Cards == that.drawn3Cards && discardPile.equals(that.discardPile);
     }
 
     @Override

@@ -132,18 +132,15 @@ public class SHGameState extends AbstractGameState {
             drawnPolicies.add(shPolicySelection.drawn3Cards.get(1));
             drawnPolicies.add(shPolicySelection.drawn3Cards.get(2));
 
-            discardPile = shPolicySelection.discardPile;
+            //discardPile = shPolicySelection.discardPile;
 
         }
         if(currentPlayer == chancellorID)
         {
             finalPolicyChoice = new ArrayList<>();
             finalPolicyChoice.add(shPolicySelection.selectedCards.get(0));
-
-
-            discardPile = shPolicySelection.discardPile;
-
         }
+        if (currentPlayer == chancellorID || currentPlayer == leaderID){discardPile = shPolicySelection.discardPile;}
     }
 
     public enum SHGamePhase implements IGamePhase {
@@ -225,7 +222,6 @@ public class SHGameState extends AbstractGameState {
         SHGameState copy = new SHGameState(gameParameters.copy(), getNPlayers());
         copy.gameBoard = gameBoard;
         copy.factions = factions;
-
         copy.knownIdentities = new HashMap<>();
         copy.previousGamePhase = previousGamePhase;
         copy.voteSuccess = voteSuccess;
@@ -240,6 +236,12 @@ public class SHGameState extends AbstractGameState {
         copy.deceasedFellas = new ArrayList<>();
         copy.peekedCards = new ArrayList<>();
         copy.vetoChoice = new ArrayList<>();
+        boolean[] visible = new boolean[17];
+        for (int i = 0; i < visible.length ; i++) {
+            visible[i] = false;
+        }
+        copy.discardPile = new PartialObservableDeck<>("discard pile", -1, visible);
+        copy.drawPile = new PartialObservableDeck<>("draw pile", -1, visible);
         if (playerId == -1) {
             copy.investigatingID = investigatingID;
             copy.hitlerID = hitlerID;
@@ -248,8 +250,7 @@ public class SHGameState extends AbstractGameState {
             copy.previousLeader = previousLeader;
             copy.previousChancellor = previousChancellor;
             copy.winners = winners;
-            copy.drawPile = drawPile;
-            copy.discardPile = discardPile;
+            //copy.drawPile = drawPile;
             copy.hasSomeoneBeenKilledThisRound = hasSomeoneBeenKilledThisRound;
             copy.previousOccurrenceCountFalse = previousOccurrenceCountFalse;
             copy.occurrenceCountTrue = occurrenceCountTrue;
@@ -261,6 +262,12 @@ public class SHGameState extends AbstractGameState {
             }
             for (int i = 0; i < peekedCards.size(); i++) {
                 copy.peekedCards.add(peekedCards.get(i));
+            }
+            for (int i = 0; i < discardPile.getSize(); i++) {
+                copy.discardPile.add(discardPile.get(i));
+            }
+            for (int i = 0; i < drawPile.getSize(); i++) {
+                copy.drawPile.add(drawPile.get(i));
             }
 //MIGHT BE WRONG
             for (int i = 0; i < getNPlayers(); i++) {
@@ -306,12 +313,12 @@ public class SHGameState extends AbstractGameState {
             for (int i = 0; i < getNPlayers(); i++) {
                 //Knowledge of Own Hand/Votes
                 if (i == playerId) {
-                    copy.drawPile = drawPile;
+                    //copy.drawPile = drawPile;
                     copy.leaderID = leaderID;
                     copy.chancellorID = chancellorID;
                     copy.previousLeader = previousLeader;
                     copy.previousChancellor = previousChancellor;
-                    copy.discardPile = discardPile;
+                    //copy.discardPile = discardPile;
                     copy.hasSomeoneBeenKilledThisRound = hasSomeoneBeenKilledThisRound;
                     copy.previousOccurrenceCountFalse = previousOccurrenceCountFalse;
                     copy.occurrenceCountTrue = occurrenceCountTrue;
@@ -319,6 +326,13 @@ public class SHGameState extends AbstractGameState {
                     copy.knowerOfPeekedCards = knowerOfPeekedCards;
                     copy.vetoVoteFalse = vetoVoteFalse;
                     if(i == hitlerID){copy.hitlerID = hitlerID;}
+
+                    for (int j = 0; j < discardPile.getSize(); j++) {
+                        copy.discardPile.add(discardPile.get(j));
+                    }
+                    for (int j = 0; j < drawPile.getSize(); j++) {
+                        copy.drawPile.add(drawPile.get(j));
+                    }
 
                     if(knowerOfPeekedCards < 11){
                         if(i== knowerOfPeekedCards){
@@ -436,7 +450,7 @@ public class SHGameState extends AbstractGameState {
             visible[i] = false;
         }
 
-        discardPile = new PartialObservableDeck<>("discard pile", 0, visible);
+        discardPile = new PartialObservableDeck<>("discard pile", -1, visible);
     }
 
 

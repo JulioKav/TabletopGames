@@ -30,6 +30,7 @@ import static games.secrethitler.SHGameState.SHGamePhase.*;
  */
 public class SHForwardModel extends StandardForwardModel {
     public int counter = 0;
+    public int whereDrawPileCHanges;
     boolean haveBeenInLoop = false;
     boolean roundEnded = false;
 
@@ -73,8 +74,7 @@ public class SHForwardModel extends StandardForwardModel {
 
         // Set up draw pile deck
 
-        PartialObservableDeck<SHPolicyCards> drawPile = new PartialObservableDeck<>("Draw Pile", firstState.getNPlayers());
-        shgs.setDrawPile(drawPile);
+        shgs.drawPile = new PartialObservableDeck<>("Draw Pile", firstState.getNPlayers());
 
         boolean[] visible = new boolean[17];
         for (int i = 0; i < visible.length ; i++) {
@@ -84,17 +84,17 @@ public class SHForwardModel extends StandardForwardModel {
         // Add 11 fascist policies
         for (int i = 0; i < 11; i++) {
             SHPolicyCards card = new SHPolicyCards(SHPolicyCards.CardType.Fascist);
-            drawPile.add(card);
+            shgs.drawPile.add(card);
         }
 
         // Add 6 liberal policies
         for (int i = 0; i < 6; i++) {
             SHPolicyCards card = new SHPolicyCards(SHPolicyCards.CardType.Liberal);
-            drawPile.add(card);
+            shgs.drawPile.add(card);
         }
 
         //Shuffle Deck
-        shgs.getDrawPile().shuffle(rnd);
+        shgs.drawPile.shuffle(rnd);
 
         int fascistCounter = 0;
         int liberalCounter = 0;
@@ -179,8 +179,10 @@ public class SHForwardModel extends StandardForwardModel {
     @Override
     protected List<AbstractAction> _computeAvailableActions(AbstractGameState gameState) {
 
+
         SHGameState shgs = (SHGameState) gameState;
 
+        whereDrawPileCHanges = shgs.drawPile.getSize();
         List<AbstractAction> actions = new ArrayList<>();
         int currentPlayer = shgs.getCurrentPlayer();
 
@@ -738,6 +740,7 @@ public class SHForwardModel extends StandardForwardModel {
             if(shgs.finalPolicyChoice.get(0).cardType == SHPolicyCards.CardType.Fascist){shgs.gameBoardValues.add(false);}
             else {shgs.gameBoardValues.add(true);}
         }
+
 
     }
 

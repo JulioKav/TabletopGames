@@ -922,7 +922,7 @@ public class Game {
     public static void main(String[] args) {
         String gameType = Utils.getArg(args, "game", "SecretHitler");
         boolean useGUI = Utils.getArg(args, "gui", false);
-        int playerCount = Utils.getArg(args, "nPlayers", 6);
+        int playerCount = Utils.getArg(args, "nPlayers", 9);
         int turnPause = Utils.getArg(args, "turnPause", 0);
         long seed = Utils.getArg(args, "seed", System.currentTimeMillis());
 
@@ -940,22 +940,32 @@ public class Game {
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
 //        players.add(new RandomPlayer());
+   //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
-////        players.add(new RHEAPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
+//        players.add(new RHEAPlayer());
+//        players.add(new RHEAPlayer());
+//        players.add(new RHEAPlayer());
+//        players.add(new RHEAPlayer());
+//        players.add(new RHEAPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
 //        players.add(new MCTSPlayer());
 //        players.add(new MCTSPlayer());
 //        players.add(new MCTSPlayer());
 ////        players.add(new MCTSPlayer());
 //          players.add(new RMHCPlayer());
+//        players.add(new RMHCPlayer());
+//        players.add(new RMHCPlayer());
+//        players.add(new RMHCPlayer());
+//        players.add(new RMHCPlayer());
+//        players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());

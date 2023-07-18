@@ -51,7 +51,7 @@ public class SHGameState extends AbstractGameState {
     List<SHPolicyCards> peekedCards;
     int knowerOfPeekedCards = 999;
 
-    PartialObservableDeck<SHPolicyCards> drawPile;
+     PartialObservableDeck<SHPolicyCards> drawPile;
     PartialObservableDeck<SHPolicyCards> discardPile;
 
     List<List<SHPolicySelection>> missionVotingChoice;
@@ -61,6 +61,7 @@ public class SHGameState extends AbstractGameState {
     IGamePhase previousGamePhase = null;
 
     List<Integer> deceasedFellas = new ArrayList<>();
+    int whereDrawPileCHanges;
     int chancellorID;
     int investigatingID;
 
@@ -109,13 +110,8 @@ public class SHGameState extends AbstractGameState {
         else {knownIdentities.put(currentPlayer,currentPlayerList);}
     }
 
-    public void setDrawPile(PartialObservableDeck<SHPolicyCards> drawPile) {
-        this.drawPile = drawPile;
-    }
 
-    public PartialObservableDeck<SHPolicyCards> getDrawPile() {
-        return drawPile;
-    }
+
 
     public void addKillChoice(SHKill shKillSelection, int currentPlayer) {
         deceasedFellas.add(shKillSelection.victim);
@@ -140,7 +136,7 @@ public class SHGameState extends AbstractGameState {
             finalPolicyChoice = new ArrayList<>();
             finalPolicyChoice.add(shPolicySelection.selectedCards.get(0));
         }
-        if (currentPlayer == chancellorID || currentPlayer == leaderID){discardPile = shPolicySelection.discardPile;}
+        //if (currentPlayer == chancellorID || currentPlayer == leaderID){discardPile = shPolicySelection.discardPile;}
     }
 
     public enum SHGamePhase implements IGamePhase {
@@ -219,6 +215,7 @@ public class SHGameState extends AbstractGameState {
     @Override
     protected SHGameState _copy(int playerId) {
 
+        whereDrawPileCHanges = drawPile.getSize();
         SHGameState copy = new SHGameState(gameParameters.copy(), getNPlayers());
         copy.gameBoard = gameBoard;
         copy.factions = factions;
@@ -311,6 +308,10 @@ public class SHGameState extends AbstractGameState {
             spyCounter = 0;
             resistanceCounter = 0;
             for (int i = 0; i < getNPlayers(); i++) {
+                //UNIVERSAL KNOWLEDGE OF DECK
+                for (int j = 0; j < drawPile.getSize(); j++) {
+                    copy.drawPile.add(drawPile.get(j));
+                }
                 //Knowledge of Own Hand/Votes
                 if (i == playerId) {
                     //copy.drawPile = drawPile;
@@ -330,9 +331,7 @@ public class SHGameState extends AbstractGameState {
                     for (int j = 0; j < discardPile.getSize(); j++) {
                         copy.discardPile.add(discardPile.get(j));
                     }
-                    for (int j = 0; j < drawPile.getSize(); j++) {
-                        copy.drawPile.add(drawPile.get(j));
-                    }
+
 
                     if(knowerOfPeekedCards < 11){
                         if(i== knowerOfPeekedCards){
@@ -365,6 +364,7 @@ public class SHGameState extends AbstractGameState {
                     for (int j = 0; j < getNPlayers(); j++) {
                         if(playerId == j)
                         {copy.knownIdentities.put(j,knownIdentities.get(j));}
+                        else{copy.knownIdentities.put(j, new ArrayList<>());}
                     }
 
                     for(int j = 0; j < gameBoardValues.size(); j++){
@@ -398,7 +398,11 @@ public class SHGameState extends AbstractGameState {
                     if(getNPlayers() < 7 && playerId == hitlerID){copy.playerHandCards.add(playerHandCards.get(i));}
                     else if (getNPlayers() < 7) {copy.playerHandCards.add(playerHandCards.get(i));}
                     if (getNPlayers() > 6 && playerId != hitlerID){copy.playerHandCards.add(playerHandCards.get(i));}
-
+                    else if (getNPlayers() > 6 && playerId == hitlerID)
+                    {
+                        if(knownIdentities.get(playerId).contains(i)){copy.playerHandCards.add(playerHandCards.get(i));}
+                        else{copy.playerHandCards.add(createHiddenHands(i));}
+                    }
                     copy.hitlerID = hitlerID;
 
                 }
@@ -435,6 +439,7 @@ public class SHGameState extends AbstractGameState {
             }
 
         }
+
         return copy;
 
     }

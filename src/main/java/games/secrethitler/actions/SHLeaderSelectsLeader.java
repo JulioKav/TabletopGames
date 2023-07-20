@@ -29,20 +29,14 @@ public class SHLeaderSelectsLeader extends AbstractAction implements IExtendedSe
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
-        SHGameState resgs = (SHGameState) state;
+        SHGameState shgs = (SHGameState) state;
 
         List<AbstractAction> actions = new ArrayList<>();
-
-
-            int[] players = new int[resgs.getNPlayers()];
-            for (int i = 0; i < resgs.getNPlayers(); i++) {
-                players[i] = i;
+        if (shgs.getCurrentPlayer()== shgs.getLeaderID()) {
+            for (int i = 0; i < shgs.getNPlayers(); i++) {
+                actions.add(new SHLeaderSelectsLeader(shgs.getCurrentPlayer(), i));
             }
-            ArrayList<int[]> choiceOfTeams = Utils.generateCombinations(players, resgs.gameBoard.getMissionSuccessValues()[resgs.getRoundCounter()]);
-            for(int[] team : choiceOfTeams) {
-                actions.add(new SHLeaderSelectsLeader(playerId, chosenLeaderID));
-                if (team.length == 0){throw new AssertionError("Team Size Zero");}
-            }
+        }
 
         return actions;
     }

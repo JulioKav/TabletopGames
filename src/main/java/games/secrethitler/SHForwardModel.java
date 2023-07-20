@@ -53,7 +53,7 @@ public class SHForwardModel extends StandardForwardModel {
         SHParameters resp = (SHParameters)firstState.getGameParameters();
         System.out.println(firstState.getNPlayers() +"firststate");
         shgs.votingChoice = new ArrayList<>(firstState.getNPlayers());
-        shgs.vetoChoice = new ArrayList<>(2);
+        shgs.vetoChoice = new ArrayList<>(10);
         shgs.missionVotingChoice = new ArrayList<>(firstState.getNPlayers());
         shgs.gameBoardValues = new ArrayList<>(11);
         shgs.failedVoteCounter = 0;
@@ -66,6 +66,9 @@ public class SHForwardModel extends StandardForwardModel {
         shgs.knownIdentities = new HashMap<>();
         for (int i = 0; i < shgs.getNPlayers(); i++) {
             shgs.knownIdentities.put(i,new ArrayList<>());
+        }
+        for (int i = 0; i < shgs.getNPlayers(); i++) {
+            shgs.vetoChoice.add(new ArrayList<>());
         }
         if(shgs.gameBoard == null)
         {throw new AssertionError("GameBoard shouldn't be null");};
@@ -523,7 +526,7 @@ public class SHForwardModel extends StandardForwardModel {
                     shgs.setGamePhase(Veto);
 
                 }
-                else if (shgs.vetoVoteFalse == 2) {shgs.setGamePhase(Veto); shgs.failedVoteCounter += 1;}
+                else if (shgs.vetoVoteFalse == 2) {shgs.clearVetoChoice(); shgs.setGamePhase(Veto); shgs.failedVoteCounter += 1;}
                 else{
                 revealCards(shgs);
                 shgs.occurrenceCountTrue = Collections.frequency(shgs.gameBoardValues, true);
@@ -708,7 +711,7 @@ public class SHForwardModel extends StandardForwardModel {
         }
 
         if (shgs.getGamePhase() == LeaderSelectsChancellor){}
-        if (shgs.getGamePhase() == VotingOnChancellor){}
+
 
 
         if (shgs.getGamePhase() == LeaderSelectsPolicy)

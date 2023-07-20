@@ -33,20 +33,14 @@ public class SHLeaderPeeks extends AbstractAction implements IExtendedSequence {
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
-        SHGameState resgs = (SHGameState) state;
+        SHGameState shgs = (SHGameState) state;
 
         List<AbstractAction> actions = new ArrayList<>();
-
-
-            int[] players = new int[resgs.getNPlayers()];
-            for (int i = 0; i < resgs.getNPlayers(); i++) {
-                players[i] = i;
+        if (shgs.getCurrentPlayer() == shgs.getLeaderID()) {
+            for (int i = 0; i < shgs.getNPlayers(); i++) {
+                actions.add(new SHLeaderPeeks(shgs.getCurrentPlayer(), shgs.getDrawPile().peek(0,3)));
             }
-            ArrayList<int[]> choiceOfTeams = Utils.generateCombinations(players, resgs.gameBoard.getMissionSuccessValues()[resgs.getRoundCounter()]);
-            for(int[] team : choiceOfTeams) {
-                actions.add(new SHLeaderPeeks(playerId, cardsPeeked));
-                if (team.length == 0){throw new AssertionError("Team Size Zero");}
-            }
+        }
 
         return actions;
     }

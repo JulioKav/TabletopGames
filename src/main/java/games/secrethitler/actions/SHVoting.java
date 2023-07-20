@@ -39,7 +39,6 @@ public class SHVoting extends AbstractAction implements IExtendedSequence {
         List<AbstractAction> actions = new ArrayList<>();
         actions.add(new SHVoting(state.getCurrentPlayer(), SHPlayerCards.CardType.Yes));
         actions.add(new SHVoting(state.getCurrentPlayer(), SHPlayerCards.CardType.No));
-
         return actions;
     }
 

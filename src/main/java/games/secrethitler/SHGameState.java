@@ -34,9 +34,9 @@ public class SHGameState extends AbstractGameState {
     boolean hasSomeoneBeenKilledThisRound = false;
     int resistanceCounter = 0;
     public int[] factions;
-    List<Boolean> gameBoardValues = new ArrayList<>();
-    ArrayList<SHPolicyCards> drawnPolicies;
-    ArrayList<SHPolicyCards> final2PolicyChoices;
+    public List<Boolean> gameBoardValues = new ArrayList<>();
+    public ArrayList<SHPolicyCards> drawnPolicies;
+    public ArrayList<SHPolicyCards> final2PolicyChoices;
     boolean voteSuccess;
     int leaderID;
     int winners = 3; //0 is Resistance , 1 is Spy
@@ -51,8 +51,8 @@ public class SHGameState extends AbstractGameState {
     List<SHPolicyCards> peekedCards;
     int knowerOfPeekedCards = 999;
 
-     PartialObservableDeck<SHPolicyCards> drawPile;
-    PartialObservableDeck<SHPolicyCards> discardPile;
+     public PartialObservableDeck<SHPolicyCards> drawPile;
+    public PartialObservableDeck<SHPolicyCards> discardPile;
 
     List<List<SHPolicySelection>> missionVotingChoice;
 
@@ -81,20 +81,7 @@ public class SHGameState extends AbstractGameState {
 
     }
 
-    ////////////////////////////PASSING SHGAMESTTE COULD BE ERROR
-    //////////////////////////////////////////
-    //////////////////////////////////////////////
-    /////
-    ////////
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
-    ///
+
     public void addInvestigatingChoice(SHInvestigateIdentity SHInvestigateIdentity,SHGameState shgs) {
         investigatingID = SHInvestigateIdentity.getinvestigatingID();
         int currentPlayer = SHInvestigateIdentity.getCurrentPlayer(shgs);
@@ -447,6 +434,9 @@ public class SHGameState extends AbstractGameState {
     public void clearCardChoices() {
         for (int i = 0; i < getNPlayers(); i++) votingChoice.get(i).clear();
     }
+    public void clearVetoChoice() {
+        for (int i = 0; i < getNPlayers(); i++) vetoChoice.get(i).clear();
+    }
 
     public void clearDiscardPile() {
         //for (int i = getNPlayers()-1; i > 0; i--) discardPile.remove(i);
@@ -585,6 +575,27 @@ public class SHGameState extends AbstractGameState {
 
     public int getLeaderID() {
         return leaderID;
+    }
+    public int getChancellorID() {
+        return chancellorID;
+    }
+    public int getPreviousChancellor() {
+        return previousChancellor;
+    }
+    public int getPreviousLeader() {
+        return previousLeader;
+    }
+    public int getHitlerID() {
+        return hitlerID;
+    }
+    public List<Integer> getDeceasedFellas() {
+        return deceasedFellas;
+    }
+    public PartialObservableDeck<SHPolicyCards> getDrawPile() {
+        return drawPile;
+    }
+    public ArrayList<SHPolicyCards> getPoliciesDrawnPile() {
+        return drawnPolicies;
     }
     public ArrayList<SHPolicyCards> getFinalPolicyChoice() {
         return finalPolicyChoice;

@@ -33,12 +33,16 @@ public class SHKill extends AbstractAction implements IExtendedSequence {
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
-        SHGameState resgs = (SHGameState) state;
+        SHGameState shgs = (SHGameState) state;
 
         List<AbstractAction> actions = new ArrayList<>();
-
-
-        actions.add(new SHKill(playerId,victim));
+        if (shgs.getCurrentPlayer() == shgs.getLeaderID()) {
+            for (int i = 0; i < shgs.getNPlayers(); i++) {
+                if (i != shgs.getPreviousLeader() && i != shgs.getPreviousChancellor() && i != shgs.getLeaderID() && !shgs.getDeceasedFellas().contains(i)) {
+                    actions.add(new SHKill(shgs.getCurrentPlayer(), i));
+                }
+            }
+        }
 
         return actions;
     }

@@ -32,12 +32,8 @@ public class SHDeceased extends AbstractAction implements IExtendedSequence {
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
         SHGameState resgs = (SHGameState) state;
-
         List<AbstractAction> actions = new ArrayList<>();
-
-
         actions.add(new SHDeceased(playerId));
-
         return actions;
     }
 

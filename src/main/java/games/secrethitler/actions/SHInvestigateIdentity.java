@@ -29,20 +29,15 @@ public class SHInvestigateIdentity extends AbstractAction implements IExtendedSe
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
 
-        SHGameState resgs = (SHGameState) state;
-
+        SHGameState shgs = (SHGameState) state;
         List<AbstractAction> actions = new ArrayList<>();
-
-
-            int[] players = new int[resgs.getNPlayers()];
-            for (int i = 0; i < resgs.getNPlayers(); i++) {
-                players[i] = i;
+        if (shgs.getCurrentPlayer() == shgs.getLeaderID()) {
+            for (int i = 0; i < shgs.getNPlayers(); i++) {
+                if ( i != shgs.getLeaderID() && !shgs.getDeceasedFellas().contains(i)) {
+                    actions.add(new SHInvestigateIdentity(shgs.getCurrentPlayer(), i));
+                }
             }
-            ArrayList<int[]> choiceOfTeams = Utils.generateCombinations(players, resgs.gameBoard.getMissionSuccessValues()[resgs.getRoundCounter()]);
-            for(int[] team : choiceOfTeams) {
-                actions.add(new SHInvestigateIdentity(playerId, investigatingID));
-                if (team.length == 0){throw new AssertionError("Team Size Zero");}
-            }
+        }
 
         return actions;
     }

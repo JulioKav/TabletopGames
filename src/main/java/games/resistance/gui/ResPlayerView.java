@@ -15,17 +15,17 @@ import static games.resistance.gui.ResGUIManager.playerAreaWidth;
 
 public class ResPlayerView extends JComponent {
 
-    // ID of player showing
+
     int playerId;
-    // Number of points player has
+
     ResDeckView playerHandView;
 
     JLabel pointsText;
-    JLabel missionSuccessText;
+
 
     // Border offsets
     int border = 5;
-    int borderBottom = 20;
+
     int width, height;
 
     ResGameState gs;

@@ -39,6 +39,14 @@ public class SHChancellorSelection extends AbstractAction implements IExtendedSe
                     actions.add(new SHChancellorSelection(state.getCurrentPlayer(), i));
                 }
             }
+            if(actions.size() == 0)
+            {
+                for (int i = 0; i < shgs.getNPlayers(); i++) {
+                    if ( i != shgs.getLeaderID() && !shgs.getDeceasedFellas().contains(i)) {
+                        actions.add(new SHChancellorSelection(state.getCurrentPlayer(), i));
+                    }
+                }
+            }
         }
 
         return actions;

@@ -1,28 +1,29 @@
 package games.secrethitler.gui;
 
-import core.AbstractGameState;
-import games.resistance.ResGameState;
-import utilities.ImageIO;
+
 
 import javax.swing.*;
 import java.awt.*;
 
-public class SHBoardView extends JComponent {
+public class SHBoardView extends JPanel {
 
-    String dataPath;
-    ResGameState gameState;
-    Image backOfCard;
-    SHBoardView gameBoardView;
-    public SHBoardView(AbstractGameState gs, String dataPath) {
-        gameState = (ResGameState) gs;
-        this.dataPath = dataPath;
-        this.gameBoardView = new SHBoardView(gameState,dataPath);
-        backOfCard = ImageIO.GetInstance().getImage(dataPath + "CardBack.png");
+        private Image backgroundImage;
+
+        public SHBoardView(Image backgroundImage) {
+            this.backgroundImage = backgroundImage;
+        }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        int imgWidth = backgroundImage.getWidth(this);
+        int imgHeight = backgroundImage.getHeight(this);
+
+        // Calculate the position to center the image
+        int x = (getWidth() - imgWidth) / 2;
+        int y = (getHeight() - imgHeight) / 2;
+
+        g.drawImage(backgroundImage, x, y, imgWidth, imgHeight, this);
     }
 
-    public void update(ResGameState gameState)
-    {
-        this.gameState = gameState;
-
-    }
 }

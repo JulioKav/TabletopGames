@@ -20,9 +20,6 @@ public class SHKill extends AbstractAction implements IExtendedSequence {
 
     }
 
-//    public SHChancellorSelection getHiddenChoice() {
-//        return new SHChancellorSelection(playerId, -1);
-//    }
 
     @Override
     public boolean execute(AbstractGameState gs) {

@@ -31,7 +31,7 @@ public class SHPolicyCards extends Card {
      * <p>If all variables in this class are final or effectively final, then you can just return <code>`this`</code>.</p>
      */
 
-    public CardType cardType;
+    public final CardType cardType;
 
     public SHPolicyCards(CardType cardType){
         super(cardType.toString());
@@ -45,9 +45,7 @@ public class SHPolicyCards extends Card {
 
     @Override
     public SHPolicyCards copy() {
-        SHPolicyCards copy = new SHPolicyCards(cardType, componentID);
-        copyComponentTo(copy);
-        return copy;
+        return this;
     }
 
     @Override

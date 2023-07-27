@@ -3,28 +3,36 @@ package games.secrethitler.gui;
 import core.AbstractGameState;
 import core.AbstractPlayer;
 import core.Game;
-import games.resistance.ResGameState;
-import games.resistance.ResParameters;
-import games.resistance.components.ResPlayerCards;
+import games.pandemic.gui.PandemicBoardView;
+import games.secrethitler.SHGameState;
+import games.secrethitler.SHParameters;
+import games.secrethitler.components.SHPlayerCards;
 import gui.AbstractGUIManager;
 import gui.GamePanel;
 import gui.IScreenHighlight;
 import players.human.ActionController;
+import utilities.ImageIO;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.Collections;
 
+
+/// Code Was Taken and adapted from SushiGo! Assets were taken from the secret hitler board game.
 public class SHGUIManager extends AbstractGUIManager {
     // Settings for display areas
+
     final static int playerAreaWidth = 250;
     final static int playerAreaHeight = 130;
     final static int SHPlayerCardsWidth = 60;
     final static int SHPlayerCardsHeight = 85;
+    protected JLabel fascistPolicies = new JLabel("Amount Of Fascist Policies Played :" + 0 );
+    protected JLabel liberalPolicies = new JLabel("Amount Of Liberal Policies Played :" + 0 );
+    protected JLabel failedVoteCounter = new JLabel("Failed Vote Counter :" + 0 );
 
-    JPanel missionSuccessText;
     SHBoardView boardView;
     // List of player hand views
     SHPlayerView[] playerHands;
@@ -35,7 +43,6 @@ public class SHGUIManager extends AbstractGUIManager {
     // Border highlight of active player
     Border highlightActive = BorderFactory.createLineBorder(new Color(47, 132, 220), 3);
     Border[] playerViewBorders;
-
     public SHGUIManager(GamePanel parent, Game game, ActionController ac, int humanID) {
         super(parent, game, ac, humanID);
         if (game != null) {
@@ -51,14 +58,16 @@ public class SHGUIManager extends AbstractGUIManager {
                 this.width = playerAreaWidth * nHorizAreas;
                 this.height = (int) (playerAreaHeight * nVertAreas);
 
-                ResGameState parsedGameState = (ResGameState) gameState;
-                ResParameters parameters = (ResParameters) gameState.getGameParameters();
+                SHGameState parsedGameState = (SHGameState) gameState;
+                SHParameters parameters = (SHParameters) gameState.getGameParameters();
 
                 // Create main game area that will hold all game views
                 playerHands = new SHPlayerView[nPlayers];
                 playerViewBorders = new Border[nPlayers];
+
                 JPanel mainGameArea = new JPanel();
                 mainGameArea.setLayout(new BorderLayout());
+
 
                 // Player hands go on the edges
                 String[] locations = new String[]{BorderLayout.NORTH, BorderLayout.SOUTH};
@@ -90,18 +99,24 @@ public class SHGUIManager extends AbstractGUIManager {
                 }
 
 
-//                boardView = new SHBoardView(gameState,parameters.dataPath);
-                //mainGameArea.add(missionSuccessText,BorderLayout.CENTER);
-                // Discard and draw piles go in the center
                 JPanel centerArea = new JPanel();
+
                 centerArea.setLayout(new BoxLayout(centerArea, BoxLayout.Y_AXIS));
-                JPanel jp = new JPanel();
+                Image backgroundImage;
+                if(gameState.getNPlayers() < 7){ backgroundImage = ImageIO.GetInstance().getImage("data/secrethitler/lib+fasc5man.png");}
+                else if (gameState.getNPlayers() > 6 && gameState.getNPlayers() < 9){ backgroundImage = ImageIO.GetInstance().getImage("data/secrethitler/7manfascist.png");}
+                else{ backgroundImage = ImageIO.GetInstance().getImage("data/secrethitler/10manfascist.png");}
+
+                int newWidth = backgroundImage.getWidth(null) / 2; // Replace 2 with the desired scale factor
+                int newHeight = backgroundImage.getHeight(null) /2; // Replace 2 with the desired scale factor
+                backgroundImage = backgroundImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                SHBoardView jp = new SHBoardView(backgroundImage);
                 jp.setLayout(new GridBagLayout());
                 jp.add(centerArea);
                 mainGameArea.add(jp, BorderLayout.CENTER);
 
                 // Top area will show state information
-                JPanel infoPanel = createGameStateInfoPanel("The Resistance", gameState, width, defaultInfoPanelHeight);
+                JPanel infoPanel = createGameStateInfoPanel("Secret Hitler", gameState, width, defaultInfoPanelHeight);
                 // Bottom area will show actions available
                 JComponent actionPanel = createActionPanel(new IScreenHighlight[0], width, defaultActionPanelHeight, false, true, null);
 
@@ -109,6 +124,7 @@ public class SHGUIManager extends AbstractGUIManager {
                 // Add all views to frame
                 parent.setLayout(new BorderLayout());
                 parent.add(mainGameArea, BorderLayout.CENTER);
+                //parent.add(boardView, BorderLayout.CENTER);
                 parent.add(infoPanel, BorderLayout.NORTH);
                 parent.add(actionPanel, BorderLayout.SOUTH);
                 parent.setPreferredSize(new Dimension(width, height + defaultActionPanelHeight + defaultInfoPanelHeight + 20));
@@ -120,6 +136,43 @@ public class SHGUIManager extends AbstractGUIManager {
         parent.repaint();
     }
 
+    @Override
+    protected JPanel createGameStateInfoPanel(String gameTitle, AbstractGameState gameState, int width, int height) {
+        JPanel gameInfo = new JPanel();
+        gameInfo.setOpaque(false);
+        gameInfo.setLayout(new BoxLayout(gameInfo, BoxLayout.Y_AXIS));
+        gameInfo.add(new JLabel("<html><h1>" + gameTitle + "</h1></html>"));
+
+        SHGameState shgs = (SHGameState) gameState;
+
+        updateGameStateInfo(gameState);
+
+        gameInfo.add(fascistPolicies);
+        gameInfo.add(liberalPolicies);
+        gameInfo.add(failedVoteCounter);
+        gameInfo.add(gamePhase);
+        gameInfo.add(turn);
+        gameInfo.add(currentPlayer);
+        gameInfo.add(gameStatus);
+
+        gameInfo.setPreferredSize(new Dimension(width/2 - 10, height));
+
+        JPanel wrapper = new JPanel();
+        wrapper.setOpaque(false);
+        wrapper.setLayout(new FlowLayout());
+        wrapper.add(gameInfo);
+
+        historyInfo.setPreferredSize(new Dimension(width/2 - 10, height));
+        historyContainer = new JScrollPane(historyInfo);
+        historyContainer.setPreferredSize(new Dimension(width/2 - 25, height));
+        wrapper.add(historyContainer);
+        historyInfo.setOpaque(false);
+        historyContainer.setOpaque(false);
+        historyContainer.getViewport().setBackground(new Color(43, 108, 25, 111));
+//        historyContainer.getViewport().setOpaque(false);
+        historyInfo.setEditable(false);
+        return wrapper;
+    }
     @Override
     public int getMaxActionSpace() {
         return 15;
@@ -135,15 +188,27 @@ public class SHGUIManager extends AbstractGUIManager {
 
 
             // Update decks and visibility
-            ResGameState parsedGameState = (ResGameState) gameState;
+            SHGameState parsedGameState = (SHGameState) gameState;
 
             //missionSuccessText = createGameStateInfoPanel("Size of Mission Team needed : " + parsedGameState.gameBoard.getMissionSuccessValues()[parsedGameState.getRoundCounter()], gameState, width, 100);
             for (int i = 0; i < gameState.getNPlayers(); i++) {
                 playerHands[i].update(parsedGameState);
-                if(((ResGameState) gameState).getPlayerHandCards().get(gameState.getCurrentPlayer()).get(2).cardType == ResPlayerCards.CardType.SPY)
+                if(((SHGameState) gameState).getPlayerHandCards().get(gameState.getCurrentPlayer()).get(2).cardType == SHPlayerCards.CardType.Fascist )
                 {
-                    playerHands[i].playerHandView.setFront(true);
-                    //playerHands[i].setFocusable(true);
+                    if(gameState.getCurrentPlayer() == ((SHGameState) gameState).getHitlerID() && gameState.getNPlayers() < 7 )
+                    {playerHands[i].playerHandView.setFront(true);}
+                    else
+                    {
+                        if (i == gameState.getCurrentPlayer()
+                                || i == humanPlayerId) {
+                            playerHands[i].playerHandView.setFront(true);
+                            playerHands[i].setFocusable(true);
+                        } else {
+                            playerHands[i].playerHandView.setFront(false);
+                        }
+
+                    }
+                    if(gameState.getCurrentPlayer() != ((SHGameState) gameState).getHitlerID()){playerHands[i].playerHandView.setFront(true);}
                 }
                 else{
                     if (i == gameState.getCurrentPlayer()
@@ -167,4 +232,12 @@ public class SHGUIManager extends AbstractGUIManager {
         }
     }
 
+    protected void updateGameStateInfo(AbstractGameState gameState) {
+        super.updateGameStateInfo(gameState);
+        SHGameState shgs = (SHGameState) gameState;
+
+        fascistPolicies.setText( "Amount Of Fascist Policies Played :" + Collections.frequency(shgs.gameBoardValues,false) );
+        liberalPolicies.setText( "Amount Of Liberal Policies Played :" + Collections.frequency(shgs.gameBoardValues,true) );
+        failedVoteCounter.setText("Failed Vote Counter :" + shgs.getFailedVoteCounter());
+    }
 }

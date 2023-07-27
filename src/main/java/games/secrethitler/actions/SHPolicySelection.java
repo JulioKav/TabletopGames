@@ -23,22 +23,11 @@ public class SHPolicySelection extends AbstractAction implements IExtendedSequen
 
     public SHPolicySelection(int playerId, ArrayList<SHPolicyCards> selectedCards,ArrayList<SHPolicyCards> drawn3Cards,PartialObservableDeck<SHPolicyCards> discardPile) {
         this.playerId = playerId;
-        this.selectedCards = selectedCards;
-        this.drawn3Cards = drawn3Cards;
-        this.discardPile = discardPile;
+        this.selectedCards = new ArrayList<>(selectedCards);
+        this.drawn3Cards = new ArrayList<>(drawn3Cards);
+        this.discardPile = discardPile.copy();
     }
 
-//    public SHPolicySelection getHiddenChoice(int i) {
-//        Random rnd = new Random();
-//        if (rnd.nextInt(2) == 0){return new SHPolicySelection(i, SHPlayerCards.CardType.Yes);}
-//        else {return new SHPolicySelection(i, SHPolicyCards.CardType.No);}
-
-//        if (resgs.getPlayerHandCards().get(i).getSize() > 3)
-//        {
-//
-//            return new SHPolicySelection(i, 0);}
-//        else{return new SHPolicySelection(i, 0);}
- //   }
 
     @Override
     public boolean execute(AbstractGameState gs) {
@@ -54,21 +43,9 @@ public class SHPolicySelection extends AbstractAction implements IExtendedSequen
         List<AbstractAction> actions = new ArrayList<>();
         if (playerId == shgs.getLeaderID() && shgs.getGamePhase() == SHGameState.SHGamePhase.LeaderSelectsPolicy) {
 
-            shgs.drawnPolicies = new ArrayList<>();
+
+
             //shgs.discardPile.add(card); REMMEBER TO ADD DISCARDS/PLAYED CARDS CORRECTLY
-
-            if(shgs.drawPile.getSize() < 3)
-            {
-                shuffleDiscardsIntoDrawPile(shgs);
-            }
-
-            SHPolicyCards card = shgs.drawPile.draw();
-            shgs.drawnPolicies.add(card);
-            SHPolicyCards card1 = shgs.drawPile.draw();
-            shgs.drawnPolicies.add(card1);
-            SHPolicyCards card2 = shgs.drawPile.draw();
-            shgs.drawnPolicies.add(card2);
-
             System.out.println(shgs.drawnPolicies + " drawn policies");
             int[] numberOfDrawnPolicies = new int[3];
             for (int i = 0; i < 3; i++) {numberOfDrawnPolicies[i] = i;}
@@ -127,7 +104,7 @@ public class SHPolicySelection extends AbstractAction implements IExtendedSequen
         if (this == o) return true;
         if (!(o instanceof SHPolicySelection)) return false;
         SHPolicySelection that = (SHPolicySelection) o;
-        return playerId == that.playerId && selectedCards.equals(that.selectedCards) && drawn3Cards.equals(that.drawn3Cards) && discardPile.equals(that.discardPile);
+        return playerId == that.playerId && selectedCards==that.selectedCards && drawn3Cards==that.drawn3Cards && discardPile==that.discardPile;
     }
 
     @Override

@@ -19,6 +19,9 @@ public class SHPlayerCards extends Card {
         Liberal,
         Yes,
         No,
+        Hitler,
+        FascistID,
+        LiberalID
     }
 
     /**
@@ -33,7 +36,7 @@ public class SHPlayerCards extends Card {
      * <p>If all variables in this class are final or effectively final, then you can just return <code>`this`</code>.</p>
      */
 
-    public CardType cardType;
+    public final CardType cardType;
 
     public SHPlayerCards(CardType cardType){
         super(cardType.toString());
@@ -47,9 +50,7 @@ public class SHPlayerCards extends Card {
 
     @Override
     public SHPlayerCards copy() {
-        SHPlayerCards copy = new SHPlayerCards(cardType, componentID);
-        copyComponentTo(copy);
-        return copy;
+        return this;
     }
 
     @Override

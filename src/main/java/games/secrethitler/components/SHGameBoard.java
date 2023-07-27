@@ -12,11 +12,7 @@ public class SHGameBoard extends Component {
     int[] missionSuccessValues = new int[5];
     SHGameBoard type;
 
-    public enum BoardTileType {
-        Bullet,
-        InspectDeck,
-        InspectIdentity,
-    }
+
     public SHGameBoard(int[] missionSuccessValues) {
         super(BOARD, "Board");
         this.missionSuccessValues = missionSuccessValues;
@@ -30,9 +26,7 @@ public class SHGameBoard extends Component {
     public void setType(SHGameBoard type) {
         this.type = type;
     }
-    public int[] getMissionSuccessValues() {
-        return missionSuccessValues;
-    }
+
 
     @Override
     public SHGameBoard copy() {

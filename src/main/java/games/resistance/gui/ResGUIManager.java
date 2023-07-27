@@ -7,17 +7,22 @@ import games.pandemic.gui.PandemicBoardView;
 import games.resistance.ResGameState;
 import games.resistance.ResParameters;
 import games.resistance.components.ResPlayerCards;
+import games.secrethitler.gui.SHBoardView;
 import gui.AbstractGUIManager;
 import gui.GamePanel;
 import gui.IScreenHighlight;
 import players.human.ActionController;
+import utilities.ImageIO;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.Collections;
 
+
+/// Code Was Taken and adapted from SushiGo!
 public class ResGUIManager extends AbstractGUIManager {
     // Settings for display areas
     final static int playerAreaWidth = 250;
@@ -25,8 +30,6 @@ public class ResGUIManager extends AbstractGUIManager {
     final static int ResPlayerCardsWidth = 60;
     final static int ResPlayerCardsHeight = 85;
 
-    JPanel missionSuccessText;
-    ResBoardView boardView;
     // List of player hand views
     ResPlayerView[] playerHands;
 
@@ -36,6 +39,12 @@ public class ResGUIManager extends AbstractGUIManager {
     // Border highlight of active player
     Border highlightActive = BorderFactory.createLineBorder(new Color(47, 132, 220), 3);
     Border[] playerViewBorders;
+
+    protected JLabel failedVoteCounter = new JLabel("Failed Vote Counter :" + 0 );
+
+    protected JLabel missionSuccessCounter = new JLabel("Mission Success Counter :" + 0 );
+
+    protected JLabel missionFailCounter = new JLabel("Mission Fail Counter :" + 0 );
 
     public ResGUIManager(GamePanel parent, Game game, ActionController ac, int humanID) {
         super(parent, game, ac, humanID);
@@ -59,6 +68,7 @@ public class ResGUIManager extends AbstractGUIManager {
                 playerHands = new ResPlayerView[nPlayers];
                 playerViewBorders = new Border[nPlayers];
                 JPanel mainGameArea = new JPanel();
+
                 mainGameArea.setLayout(new BorderLayout());
 
                 // Player hands go on the edges
@@ -91,14 +101,22 @@ public class ResGUIManager extends AbstractGUIManager {
                 }
 
 
-//                boardView = new SHBoardView(gameState,parameters.dataPath);
-                //mainGameArea.add(missionSuccessText,BorderLayout.CENTER);
-                // Discard and draw piles go in the center
                 JPanel centerArea = new JPanel();
                 centerArea.setLayout(new BoxLayout(centerArea, BoxLayout.Y_AXIS));
-                JPanel jp = new JPanel();
+                Image backgroundImage;
+                if(gameState.getNPlayers() == 5){ backgroundImage = ImageIO.GetInstance().getImage("data/resistance/5missions.png");}
+                else if (gameState.getNPlayers() == 6){ backgroundImage = ImageIO.GetInstance().getImage("data/resistance/6missions.png");}
+                else if (gameState.getNPlayers() == 7){ backgroundImage = ImageIO.GetInstance().getImage("data/resistance/7missions.png");}
+                else{ backgroundImage = ImageIO.GetInstance().getImage("data/resistance/8missions.png");}
+
+
+                int newWidth = backgroundImage.getWidth(null) / 2; // Replace 2 with the desired scale factor
+                int newHeight = backgroundImage.getHeight(null) /2; // Replace 2 with the desired scale factor
+                backgroundImage = backgroundImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                SHBoardView jp = new SHBoardView(backgroundImage);
                 jp.setLayout(new GridBagLayout());
                 jp.add(centerArea);
+                mainGameArea.add(jp, BorderLayout.CENTER);
                 mainGameArea.add(jp, BorderLayout.CENTER);
 
                 // Top area will show state information
@@ -106,8 +124,6 @@ public class ResGUIManager extends AbstractGUIManager {
                 // Bottom area will show actions available
                 JComponent actionPanel = createActionPanel(new IScreenHighlight[0], width, defaultActionPanelHeight, false, true, null);
 
-                //missionSuccessText = createGameStateInfoPanel("ROund", gameState, width, 100);
-                // Add all views to frame
                 parent.setLayout(new BorderLayout());
                 parent.add(mainGameArea, BorderLayout.CENTER);
                 parent.add(infoPanel, BorderLayout.NORTH);
@@ -166,6 +182,53 @@ public class ResGUIManager extends AbstractGUIManager {
             }
 
         }
+    }
+
+    @Override
+    protected JPanel createGameStateInfoPanel(String gameTitle, AbstractGameState gameState, int width, int height) {
+        JPanel gameInfo = new JPanel();
+        gameInfo.setOpaque(false);
+        gameInfo.setLayout(new BoxLayout(gameInfo, BoxLayout.Y_AXIS));
+        gameInfo.add(new JLabel("<html><h1>" + gameTitle + "</h1></html>"));
+
+        ResGameState shgs = (ResGameState) gameState;
+
+        updateGameStateInfo(gameState);
+
+        gameInfo.add(missionFailCounter);
+        gameInfo.add(missionSuccessCounter);
+        gameInfo.add(failedVoteCounter);
+        gameInfo.add(gamePhase);
+        gameInfo.add(turn);
+        gameInfo.add(currentPlayer);
+        gameInfo.add(gameStatus);
+
+        gameInfo.setPreferredSize(new Dimension(width/2 - 10, height));
+
+        JPanel wrapper = new JPanel();
+        wrapper.setOpaque(false);
+        wrapper.setLayout(new FlowLayout());
+        wrapper.add(gameInfo);
+
+        historyInfo.setPreferredSize(new Dimension(width/2 - 10, height));
+        historyContainer = new JScrollPane(historyInfo);
+        historyContainer.setPreferredSize(new Dimension(width/2 - 25, height));
+        wrapper.add(historyContainer);
+        historyInfo.setOpaque(false);
+        historyContainer.setOpaque(false);
+        historyContainer.getViewport().setBackground(new Color(43, 108, 25, 111));
+//        historyContainer.getViewport().setOpaque(false);
+        historyInfo.setEditable(false);
+        return wrapper;
+    }
+
+    protected void updateGameStateInfo(AbstractGameState gameState) {
+        super.updateGameStateInfo(gameState);
+        ResGameState resgs = (ResGameState) gameState;
+
+        missionFailCounter.setText( "Mission Fail Counter :" + Collections.frequency(resgs.getGameBoardValues(),false) );
+        missionSuccessCounter.setText( "Mission Success Counter :" + Collections.frequency(resgs.getGameBoardValues(),true) );
+        failedVoteCounter.setText("Failed Vote Counter :" + resgs.getFailedVoteCounter());
     }
 
 }

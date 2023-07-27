@@ -26,15 +26,8 @@ public class ResParameters extends AbstractParameters {
 
     private ResGameState gameState;
 
-    // Hard coded bad idea.
-    //public int[] gameBoard = getPlayerBoard(gameState.getNPlayers());
-
-    //public int[] factions = getFactions(gameState.getNPlayers());
-    // Hard coded bad idea
-    //public int[] factions = getFactions();
-
     public int getMaxRounds(){return 5;}
-    // might be wrong
+
     public ResGameBoard getPlayerBoard(int numberPlayers){
         if (numberPlayers == 5)
         {return new ResGameBoard(new int[]{2, 3, 2, 3, 3});}
@@ -69,7 +62,7 @@ public class ResParameters extends AbstractParameters {
     public String getDataPath() { return dataPath; }
     @Override
     protected AbstractParameters _copy() {
-        // TODO: deep copy of all variables.
+
         ResParameters resp = new ResParameters(System.currentTimeMillis());
 
 
@@ -81,7 +74,7 @@ public class ResParameters extends AbstractParameters {
 
     @Override
     protected boolean _equals(Object o) {
-        // TODO: compare all variables.
+
         if (this == o) return true;
         if (!(o instanceof ResParameters)) return false;
         if (!super.equals(o)) return false;
@@ -93,7 +86,7 @@ public class ResParameters extends AbstractParameters {
 
     @Override
     public int hashCode() {
-        // TODO: include the hashcode of all variables.
+
         return Objects.hash(super.hashCode());
     }
 }

@@ -21,14 +21,6 @@ public class ResVoting extends AbstractAction implements IExtendedSequence {
         this.cardType = cardType;
     }
 
-
-    /////////// MIGHT BE DUMB RANDOMLY CHOOSING WITH HARDCODEd HAND
-    public ResVoting getHiddenChoice( int i) {
-        Random rnd = new Random();
-        if (rnd.nextInt(2) == 0){return new ResVoting(i, ResPlayerCards.CardType.Yes);}
-        else {return new ResVoting(i, ResPlayerCards.CardType.No);}
-    }
-
     @Override
     public boolean execute(AbstractGameState gs) {
         ((ResGameState)gs).addCardChoice(this, gs.getCurrentPlayer());

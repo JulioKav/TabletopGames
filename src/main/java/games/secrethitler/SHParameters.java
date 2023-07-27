@@ -17,22 +17,10 @@ import java.util.Objects;
  * automatic game parameter optimisation tools in the framework.</p>
  */
 public class SHParameters extends AbstractParameters {
-    public String dataPath = "data/resistance/";
+    public String dataPath = "data/secrethitler/";
     public SHParameters(long seed) {
         super(seed);
     }
-
-    private SHGameState gameState;
-
-    // Hard coded bad idea.
-    //public int[] gameBoard = getPlayerBoard(gameState.getNPlayers());
-
-    //public int[] factions = getFactions(gameState.getNPlayers());
-    // Hard coded bad idea
-    //public int[] factions = getFactions();
-
-    public int getMaxRounds(){return 5;}
-    // might be wrong
     public SHGameBoard getPlayerBoard(int numberPlayers){
         if (numberPlayers == 5)
         {return new SHGameBoard(new int[]{2, 3, 2, 3, 3});}
@@ -67,19 +55,13 @@ public class SHParameters extends AbstractParameters {
     public String getDataPath() { return dataPath; }
     @Override
     protected AbstractParameters _copy() {
-        // TODO: deep copy of all variables.
         SHParameters resp = new SHParameters(System.currentTimeMillis());
-
-
-
-        //resp.factions = factions;
         return resp;
 
     }
 
     @Override
     protected boolean _equals(Object o) {
-        // TODO: compare all variables.
         if (this == o) return true;
         if (!(o instanceof SHParameters)) return false;
         if (!super.equals(o)) return false;
@@ -91,7 +73,6 @@ public class SHParameters extends AbstractParameters {
 
     @Override
     public int hashCode() {
-        // TODO: include the hashcode of all variables.
         return Objects.hash(super.hashCode());
     }
 }

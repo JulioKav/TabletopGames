@@ -59,12 +59,6 @@ public class ResForwardModel extends StandardForwardModel {
         {throw new AssertionError("GameBoard shouldn't be null");};
         resgs.factions = resp.getFactions(firstState.getNPlayers());
 
-
-        //resgs.finalTeamChoice = new int[20];
-        
-        
-
-        //List<PartialObservableDeck<SHPlayerCards>> playerHandCards = new ArrayList<>(firstState.getNPlayers());
         int spyCounter = 0;
         int resistanceCounter = 0;
         for (int i = 0; i < firstState.getNPlayers(); i++) {
@@ -126,20 +120,14 @@ public class ResForwardModel extends StandardForwardModel {
             resgs.playerHandCards.add(playerCards);
         }
 
-        //Adding leader card
-        //SHPlayerCards leader = new SHPlayerCards(SHPlayerCards.CardType.LEADER);
+        //Adding leader
         int randomPlayerLeader = rnd.nextInt(resgs.getNPlayers());
         System.out.println("Random Player Leader : " +randomPlayerLeader);
-//        leader.setOwnerId(randomPlayerLeader);
-//        resgs.playerHandCards.get(randomPlayerLeader).add(leader);
+
         resgs.leaderID = randomPlayerLeader;
         resgs.setGamePhase(LeaderSelectsTeam);
         resgs.previousGamePhase = LeaderSelectsTeam;
-//        int isThereLeaderCard = 0;
-//        for (int i = 0; i < resgs.getNPlayers(); i++) {
-//            if (resgs.getPlayerHandCards().get(i).get(0).cardType != SHPlayerCards.CardType.LEADER) {isThereLeaderCard += 1;}
-//            if (isThereLeaderCard == resgs.getNPlayers()){throw new AssertionError("No Leader Card");}
-//        }
+
     }
 
     /**
@@ -159,12 +147,6 @@ public class ResForwardModel extends StandardForwardModel {
         if (resgs.getGamePhase() == LeaderSelectsTeam) {
             
             //Leader Creates Team
-//            int isThereLeaderCard = 0;
-//            for (int i = 0; i < resgs.getNPlayers(); i++) {
-//                if (resgs.getPlayerHandCards().get(i).get(0).cardType != SHPlayerCards.CardType.LEADER) {isThereLeaderCard += 1;}
-//                System.out.println(resgs.getPlayerHandCards().get(i));
-//                if (isThereLeaderCard == resgs.getNPlayers()){throw new AssertionError("No Leader Card");}
-//            }
             System.out.println("Leader Outside Loop | Player ID :" + currentPlayer);
             if (currentPlayer == resgs.leaderID) {
                 System.out.println("Leader In Loop | Player ID :" + currentPlayer);
@@ -187,17 +169,11 @@ public class ResForwardModel extends StandardForwardModel {
 
 
             if(resgs.getGamePhase()== TeamSelectionVote) {
-                
-//                if (resgs.playerHandCards.get(currentPlayer).get(0).cardType == SHPlayerCards.CardType.LEADER)
-//                {
-//                    actions.add(new SHVoting(currentPlayer, currentPlayerHand.getSize()-2));
-//                    actions.add(new SHVoting(currentPlayer, currentPlayerHand.getSize()-3));
-//                }
+
                 // All players can do is choose a yes or no card in hand to play.
                 actions.add(new ResVoting(currentPlayer, ResPlayerCards.CardType.Yes));
-                //System.out.println("ADDING VOTE ACTION : " + currentPlayerHand.get(currentPlayerHand.getSize() - 3));
                 actions.add(new ResVoting(currentPlayer, ResPlayerCards.CardType.No));
-                //System.out.println("ADDING VOTE ACTION : " + currentPlayerHand.get(currentPlayerHand.getSize() - 2));
+
             }
 
         if(resgs.getGamePhase()== MissionVote) {
@@ -212,7 +188,6 @@ public class ResForwardModel extends StandardForwardModel {
             }
         }
 
-            //System.out.println(actions.get(0).toString());
             return actions;
     }
 
@@ -224,13 +199,10 @@ public class ResForwardModel extends StandardForwardModel {
 
         //Leader Selects Team
         if (resgs.getGamePhase() == LeaderSelectsTeam && haveBeenInLoop == false) {
-            //if (resgs.getCurrentPlayer() == resgs.leaderID){System.out.println("Action Taken By Leader : " + action.getString(resgs));}
             int turn = resgs.getTurnCounter();
 
             if ((turn + 1) % (resgs.getNPlayers()) == 0) {
                 revealCards(resgs);
-
-                //resgs.previousGamePhase = resgs.getGamePhase();
                 resgs.setGamePhase(TeamSelectionVote);
 
             }
@@ -282,11 +254,6 @@ public class ResForwardModel extends StandardForwardModel {
             if ((turn + 1) % resgs.getNPlayers() == 0 && resgs.previousGamePhase == resgs.getGamePhase()) {
 
                 revealCards(resgs);
-
-
-//                // Check if the round is over
-  //              if (isRoundOver(resgs)) {
-                // It is! Process end of round rules.
                 resgs.clearCardChoices();
                 resgs.clearMissionChoices();
                 resgs.clearVoteChoices();
@@ -295,10 +262,6 @@ public class ResForwardModel extends StandardForwardModel {
                 endRound(resgs);
                 roundEnded = true;
                 _endRound(resgs);
-
-                // Clear card choices from this turn, ready for the next simultaneous choice.
-
-
 
                 // Check if the game is over
                 int occurrenceCountTrue = Collections.frequency(resgs.gameBoardValues, true);
@@ -319,10 +282,8 @@ public class ResForwardModel extends StandardForwardModel {
                     resgs.winners = 0;
                     resgs.setGameStatus(CoreConstants.GameResult.GAME_END);
                     endGame(resgs);
-                    //roundEnded = true;
                     if(occurrenceCountTrue == 3){ System.out.println("GAME ENDED BY SUCCESSFUL MISSIONS");}
-                    ////MAYBE GET RID OF RETURNS
-                    //return;
+
                 }
 
                 if (occurrenceCountFalse == 3) {
@@ -348,16 +309,6 @@ public class ResForwardModel extends StandardForwardModel {
                     resgs.failedVoteCounter = 0;
                     resgs.setGamePhase(LeaderSelectsTeam);
                 }
-
-
-
-            //}
-//                else {
-//                    // Clear card choices
-//                    resgs.clearCardChoices();
-//                    resgs.clearMissionChoices();
-//                    resgs.clearTeamChoices();
-                //}
             }
 
             else{resgs.previousGamePhase = resgs.getGamePhase();}
@@ -377,14 +328,11 @@ public class ResForwardModel extends StandardForwardModel {
 
             ArrayList<ResPlayerCards.CardType> allVotes = new ArrayList<>();
         for (int i = 0; i < resgs.getNPlayers(); i++) {
-            //PartialObservableDeck<SHPlayerCards> hand = resgs.playerHandCards.get(i);
             for (ResVoting cc: resgs.votingChoice.get(i)) {
                 allVotes.add(cc.cardType);
                 break;
             }
-            //System.out.println("player :"+ i + "  |card");
         }
-        // returns if the vote successful
 
             int occurrenceCount = Collections.frequency(allVotes, ResPlayerCards.CardType.Yes);
             System.out.println("Team Vote :  " + allVotes);
@@ -427,15 +375,7 @@ public class ResForwardModel extends StandardForwardModel {
 
     }
 
-    public void _startRound(ResGameState resgs) {
 
-    }
-
-    boolean isRoundOver(ResGameState resgs) {
-        //some logic
-
-        return true;
-    }
     public void _endRound(ResGameState resgs) {
         // Apply card end of round rules
 //        for (SHPlayerCards.CardType type: SHPlayerCards.CardType.values()) {

@@ -920,9 +920,9 @@ public class Game {
      * and then run this class.
      */
     public static void main(String[] args) {
-        String gameType = Utils.getArg(args, "game", "SecretHitler");
-        boolean useGUI = Utils.getArg(args, "gui", false);
-        int playerCount = Utils.getArg(args, "nPlayers", 9);
+        String gameType = Utils.getArg(args, "game", "Resistance");
+        boolean useGUI = Utils.getArg(args, "gui", true);
+        int playerCount = Utils.getArg(args, "nPlayers", 6);
         int turnPause = Utils.getArg(args, "turnPause", 0);
         long seed = Utils.getArg(args, "seed", System.currentTimeMillis());
 
@@ -950,16 +950,16 @@ public class Game {
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
 //        players.add(new RHEAPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
+//        players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-        players.add(new MCTSPlayer());
-////        players.add(new MCTSPlayer());
+       players.add(new MCTSPlayer());
 //          players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());
@@ -980,7 +980,7 @@ public class Game {
 //        players.add(new MCTSPlayer(params1));
       //  players.add(new OSLAPlayer());
   //      players.add(new RMHCPlayer());
-       // players.add(new HumanGUIPlayer(ac));
+        //players.add(new HumanGUIPlayer(ac));
         //players.add(new HumanConsolePlayer());
 //        players.add(new FirstActionPlayer());
 //        players.add(new HumanConsolePlayer());

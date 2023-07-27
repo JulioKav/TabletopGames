@@ -6,18 +6,14 @@ import core.Game;
 import core.actions.AbstractAction;
 import core.interfaces.IGamePhase;
 import games.GameType;
-import games.dicemonastery.DiceMonasteryConstants;
 import games.resistance.components.ResPlayerCards;
-import games.resistance.components.ResGameBoard;
 import games.resistance.ResGameState;
 import games.resistance.ResForwardModel;
 import games.resistance.ResParameters;
 import games.resistance.actions.ResMissionVoting;
 import games.resistance.actions.ResVoting;
-import games.resistance.actions.ResAction;
 import games.resistance.actions.ResTeamBuilding;
 import games.resistance.actions.ResWait;
-import games.secrethitler.SHGameState;
 import org.junit.Before;
 import org.junit.Test;
 import players.simple.RandomPlayer;
@@ -25,7 +21,6 @@ import utilities.Utils;
 
 import java.util.*;
 
-import static games.dicemonastery.DiceMonasteryConstants.Phase.USE_MONKS;
 import static org.junit.Assert.*;
 
 

@@ -26,11 +26,6 @@ public class ResMissionVoting extends AbstractAction implements IExtendedSequenc
         if (rnd.nextInt(2) == 0){return new ResMissionVoting(i, ResPlayerCards.CardType.Yes);}
         else {return new ResMissionVoting(i, ResPlayerCards.CardType.No);}
 
-//        if (resgs.getPlayerHandCards().get(i).getSize() > 3)
-//        {
-//
-//            return new SHPolicySelection(i, 0);}
-//        else{return new SHPolicySelection(i, 0);}
     }
 
     @Override

@@ -2,6 +2,7 @@ package games.resistance.gui;
 
 import core.AbstractGameState;
 import core.components.Deck;
+import core.properties.PropertyString;
 import games.pandemic.PandemicGameState;
 import games.resistance.ResGameState;
 import games.resistance.components.ResPlayerCards;
@@ -11,26 +12,28 @@ import utilities.ImageIO;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
+import static core.CoreConstants.imgHash;
 import static games.resistance.gui.ResGUIManager.ResPlayerCardsHeight;
 import static games.resistance.gui.ResGUIManager.ResPlayerCardsWidth;
 
 public class ResBoardView extends JComponent {
 
-    String dataPath;
-    ResGameState gameState;
-    Image backOfCard;
-    ResBoardView gameBoardView;
-    public ResBoardView(AbstractGameState gs,String dataPath) {
-        gameState = (ResGameState) gs;
-        this.dataPath = dataPath;
-        this.gameBoardView = new ResBoardView(gameState,dataPath);
-        backOfCard = ImageIO.GetInstance().getImage(dataPath + "CardBack.png");
-    }
 
-    public void update(ResGameState gameState)
-    {
-        this.gameState = gameState;
+    private Image backgroundImage;
 
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        int imgWidth = backgroundImage.getWidth(this);
+        int imgHeight = backgroundImage.getHeight(this);
+
+        // Calculate the position to center the image
+        int x = (getWidth() - imgWidth) / 2;
+        int y = (getHeight() - imgHeight) / 2;
+
+        g.drawImage(backgroundImage, x, y, imgWidth, imgHeight, this);
     }
 }

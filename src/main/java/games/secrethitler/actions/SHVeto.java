@@ -20,12 +20,7 @@ public class SHVeto extends AbstractAction implements IExtendedSequence {
     }
 
 
-//    /////////// MIGHT BE DUMB RANDOMLY CHOOSING WITH HARDCODEd HAND
-//    public SHVoting getHiddenChoice(int i) {
-//        Random rnd = new Random();
-//        if (rnd.nextInt(2) == 0){return new SHVoting(i, SHPlayerCards.CardType.Yes);}
-//        else {return new SHVoting(i, SHPlayerCards.CardType.No);}
-//    }
+
 
     @Override
     public boolean execute(AbstractGameState gs) {

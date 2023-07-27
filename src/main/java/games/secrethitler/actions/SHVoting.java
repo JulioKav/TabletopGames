@@ -20,14 +20,6 @@ public class SHVoting extends AbstractAction implements IExtendedSequence {
         this.cardType = cardType;
     }
 
-
-//    /////////// MIGHT BE DUMB RANDOMLY CHOOSING WITH HARDCODEd HAND
-//    public SHVoting getHiddenChoice(int i) {
-//        Random rnd = new Random();
-//        if (rnd.nextInt(2) == 0){return new SHVoting(i, SHPlayerCards.CardType.Yes);}
-//        else {return new SHVoting(i, SHPlayerCards.CardType.No);}
-//    }
-
     @Override
     public boolean execute(AbstractGameState gs) {
         ((SHGameState)gs).addCardChoice(this, gs.getCurrentPlayer());
@@ -36,9 +28,15 @@ public class SHVoting extends AbstractAction implements IExtendedSequence {
 
     @Override
     public List<AbstractAction> _computeAvailableActions(AbstractGameState state) {
+        SHGameState state1 = (SHGameState) state;
         List<AbstractAction> actions = new ArrayList<>();
-        actions.add(new SHVoting(state.getCurrentPlayer(), SHPlayerCards.CardType.Yes));
-        actions.add(new SHVoting(state.getCurrentPlayer(), SHPlayerCards.CardType.No));
+        if(!state1.getDeceasedFellas().contains(state.getCurrentPlayer())) {
+            actions.add(new SHVoting(state.getCurrentPlayer(), SHPlayerCards.CardType.Yes));
+            actions.add(new SHVoting(state.getCurrentPlayer(), SHPlayerCards.CardType.No));
+        }
+        else{
+            actions.add(new SHDeceased(state.getCurrentPlayer()));
+        }
         return actions;
     }
 

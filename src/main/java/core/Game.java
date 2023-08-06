@@ -920,7 +920,7 @@ public class Game {
      * and then run this class.
      */
     public static void main(String[] args) {
-        String gameType = Utils.getArg(args, "game", "Resistance");
+        String gameType = Utils.getArg(args, "game", "SecretHitler");
         boolean useGUI = Utils.getArg(args, "gui", true);
         int playerCount = Utils.getArg(args, "nPlayers", 6);
         int turnPause = Utils.getArg(args, "turnPause", 0);
@@ -953,13 +953,13 @@ public class Game {
 //        players.add(new MCTSPlayer());
 //        players.add(new MCTSPlayer());
 //        players.add(new MCTSPlayer());
-//        players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
         players.add(new MCTSPlayer());
-       players.add(new MCTSPlayer());
+        players.add(new MCTSPlayer());
+//       players.add(new MCTSPlayer());
 //          players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());
 //        players.add(new RMHCPlayer());

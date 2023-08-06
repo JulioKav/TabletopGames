@@ -134,10 +134,7 @@ public class SHGameState extends AbstractGameState {
             final2PolicyChoices.add(shPolicySelection.selectedCards.get(0));
             final2PolicyChoices.add(shPolicySelection.selectedCards.get(1));
 
-            drawnPolicies = new ArrayList<>();
-            drawnPolicies.add(shPolicySelection.drawn3Cards.get(0));
-            drawnPolicies.add(shPolicySelection.drawn3Cards.get(1));
-            drawnPolicies.add(shPolicySelection.drawn3Cards.get(2));
+
 
 
 

@@ -74,16 +74,22 @@ public class TestSecretHitler {
         while ( state.getGameStatus() != CoreConstants.GameResult.GAME_END && !firstPhaseCheck)
         {
             for (int i = 0; i < state.getNPlayers(); i++) {
-                fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
+                if(state.getGameStatus() != CoreConstants.GameResult.GAME_END) {
+                    fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
+                }
             }
 
             if (state.getGamePhase() == SHGameState.SHGamePhase.VotingOnLeader) {firstPhaseCheck = true;}
         }
         while (state.getCurrentPlayer() != state.getNPlayers()-1 && state.getGameStatus() != CoreConstants.GameResult.GAME_END)
         {
+            if(state.getGameStatus() != CoreConstants.GameResult.GAME_END) {
+                fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
+            }
+        }
+        if(state.getGameStatus() != CoreConstants.GameResult.GAME_END) {
             fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
         }
-        fm.next(state, rnd._getAction(state, fm.computeAvailableActions(state)));
     }
     @Before
     public void setup() {

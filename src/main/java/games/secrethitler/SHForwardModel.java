@@ -170,7 +170,7 @@ public class SHForwardModel extends StandardForwardModel {
             shgs.playerHandCards.add(playerCards);
         }
 
-        //Adding leader card
+        //Adding leader
         int randomPlayerLeader = rnd.nextInt(shgs.getNPlayers());
         System.out.println("Random Player Leader : " + randomPlayerLeader);
         shgs.leaderID = randomPlayerLeader;
@@ -286,6 +286,7 @@ public class SHForwardModel extends StandardForwardModel {
                 }
                 ArrayList<int[]> choiceOfPolicies = Utils.generateCombinations(numberOfDrawnPolicies, 2);
 
+                System.out.println(shgs.drawPile.getSize() + " draw pile size");
                 for (int[] combinations : choiceOfPolicies) {
                     shgs.final2PolicyChoices = new ArrayList<>();
                     for (int index : combinations) {
@@ -395,7 +396,7 @@ public class SHForwardModel extends StandardForwardModel {
                     System.out.println("Hitler Has Bitten The Bullet");
                 }
                 //Reveal and Enact Policy On 3 Failed Votes
-                if (shgs.failedVoteCounter == 3) {
+                else if (shgs.failedVoteCounter == 3) {
                     drawSingleCardAndPlay(shgs);
                     shgs.occurrenceCountTrue = Collections.frequency(shgs.gameBoardValues, true);
                     shgs.occurrenceCountFalse = Collections.frequency(shgs.gameBoardValues, false);
@@ -480,9 +481,10 @@ public class SHForwardModel extends StandardForwardModel {
                         if (Collections.frequency(shgs.gameBoardValues, false) > 3 && shgs.getHitlerID() == shgs.getChancellorID()) {
                             fascistWin(shgs);
                         }
-                        shgs.setGamePhase(LeaderSelectsPolicy);
+
                         shgs.clearVoteChoices();
                         shgs.failedVoteCounter = 0;
+                        shgs.drawnPolicies.clear();
                         if (shgs.drawPile.getSize() < 3) {
                             shuffleDiscardsIntoDrawPile(shgs);
                         }
@@ -493,6 +495,7 @@ public class SHForwardModel extends StandardForwardModel {
                             }
                             shgs.drawnPolicies.add(card);
                         }
+                        shgs.setGamePhase(LeaderSelectsPolicy);
                     } else {
                         shgs.clearCardChoices();
 
@@ -675,6 +678,19 @@ public class SHForwardModel extends StandardForwardModel {
             int turn = shgs.getTurnCounter();
             if ((turn + 1) % shgs.getNPlayers() == 0 && shgs.previousGamePhase == shgs.getGamePhase()) {
                 revealCards(shgs);
+                shgs.clearVoteChoices();
+                shgs.failedVoteCounter = 0;
+                shgs.drawnPolicies.clear();
+                if (shgs.drawPile.getSize() < 3) {
+                    shuffleDiscardsIntoDrawPile(shgs);
+                }
+                for (int i = 0; i < 3; i++) {
+                    SHPolicyCards card = shgs.drawPile.draw();
+                    if (card == null) {
+                        throw new AssertionError("card is null after shuffle ");
+                    }
+                    shgs.drawnPolicies.add(card);
+                }
                 shgs.setGamePhase(LeaderSelectsPolicy);
             } else {
                 shgs.previousGamePhase = shgs.getGamePhase();

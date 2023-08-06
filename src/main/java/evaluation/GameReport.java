@@ -79,7 +79,7 @@ public class GameReport {
         if (listenerClasses.size() > 1 && logFiles.size() > 1 && listenerClasses.size() != logFiles.size())
             throw new IllegalArgumentException("Lists of log files and listeners must be the same length");
 
-        int nGames = getArg(args, "nGames", 1000);
+        int nGames = getArg(args, "nGames", 2);
         List<String> tempGames = new ArrayList<>(Arrays.asList(getArg(args, "games", "all").split("\\|")));
         List<String> games = tempGames;
         if (tempGames.get(0).equals("all")) {
